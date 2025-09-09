@@ -13,10 +13,27 @@
                 min-height: 100vh;
             }
 
+            .title-text {
+                color: #667eea
+            }
+
             .tagline {
                 font-size: 1.2em;
                 color: #665;
                 font-weight: 300;
+            }
+
+            .title-box {
+                text-align: center;
+                padding: 20px;
+                margin: 20px;
+                border-radius: 15px;
+                box-shadow:
+                    0 1px 1px hsl(0deg 0% 0% / 0.075),
+                    0 2px 2px hsl(0deg 0% 0% / 0.075),
+                    0 4px 4px hsl(0deg 0% 0% / 0.075),
+                    0 8px 8px hsl(0deg 0% 0% / 0.075),
+                    0 16px 16px hsl(0deg 0% 0% / 0.075);
             }
 
             .team-area {
@@ -31,16 +48,28 @@
                 gap: 30px;
                 margin-top: 40px;
             }
+            
+            .profile-box {
+                border-radius: 15px;
+                box-shadow:
+                    0 1px 1px hsl(0deg 0% 0% / 0.075),
+                    0 2px 2px hsl(0deg 0% 0% / 0.075),
+                    0 4px 4px hsl(0deg 0% 0% / 0.075),
+                    0 8px 8px hsl(0deg 0% 0% / 0.075),
+                    0 16px 16px hsl(0deg 0% 0% / 0.075);
+            }
 
             .member-name {
                 font-size: 1.4em;
                 color: #333;
+                text-align: center;
                 margin-bottom: 8px;
                 font-weight: 600;
             }
 
             .member-role {
                 color: #667eea;
+                text-align: center;
                 font-weight: 600;
                 margin-bottom: 15px;
                 font-size: 1.1em;
@@ -48,6 +77,7 @@
 
             .member-experience {
                 color: #665;
+                text-align: center;
                 font-size: 0.95em;
                 margin-bottom: 15px;
                 font-style: italic;
@@ -55,6 +85,7 @@
 
             .member-description {
                 color: #555;
+                text-align: center;
                 line-height: 1.6;
                 font-size: 0.95em;
             }
@@ -70,8 +101,8 @@
     </head>
     <body>
         <header>
-            <div class = "container">
-                <h1 class = "logo">Harmony</h1>
+            <div class = "title-box">
+                <h1 class = "title-text">Harmony</h1>
             </div>
         </header>
 
@@ -82,34 +113,35 @@
                     <h2 class = "section-title">Meet Our Team</h2>
 
                     <div class = "team-grid">
-                        <div class = "team-member">
+                        <div class = "profile-box">
                             <h3 class ="member-name">Mason Orton</h3>
                             <p class = "member-role">Front-End Developer</p>
-                            <p = class"member-experience">3rd Year</p>
+                            <p class = "member-experience">3rd Year</p>
+                            <p class = "member-description">I have experience in self-made projects as well as research groups at schools such as Cal State Fullerton.</p>
                         </div>
 
-                        <div class = "team-member">
+                        <div class = "profile-box">
                             <h3 class ="member-name">Kelechi Duru</h3>
                             <p class = "member-role">Full-Stack Developer</p>
-                            <p = class"member-experience"> *** Year</p>
+                            <p class ="member-experience"> *** Year</p>
                         </div>
 
-                        <div class = "team-member">
+                        <div class = "profile-box">
                             <h3 class ="member-name">Jack Woline</h3>
                             <p class = "member-role"> ********** </p>
-                            <p = class"member-experience"> *** Year</p>
+                            <p class ="member-experience"> *** Year</p>
                         </div>
 
-                        <div class = "team-member">
+                        <div class = "profile-box">
                             <h3 class ="member-name">Helena Crowley</h3>
                             <p class = "member-role"> ********** </p>
-                            <p = class"member-experience"> *** Year</p>
+                            <p class ="member-experience"> *** Year</p>
                         </div>
 
-                        <div class = "team-member">
+                        <div class = "profile-box">
                             <h3 class ="member-name">Daniel Castillo</h3>
                             <p class = "member-role"> ********** </p>
-                            <p = class"member-experience"> *** Year</p>
+                            <p class = "member-experience"> *** Year</p>
                         </div>
                     </div>
                 </div>
