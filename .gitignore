@@ -3,7 +3,8 @@ node_modules/
 dist/
 db*
 __pycache__/
-
+*.pyc
+db.sqlite3
 #ignore venvs 
 venv/
 .venv/
