@@ -1,0 +1,14 @@
+To run this server, create a venv in the backend directory 
+Then pip install Django and psycopg
+
+What I get when running pip list:
+
+Package           Version
+----------------- -------
+asgiref           3.9.2
+Django            5.2.7
+pip               25.2
+psycopg           3.2.10
+sqlparse          0.5.3
+typing_extensions 4.15.0
+tzdata            2025.2
