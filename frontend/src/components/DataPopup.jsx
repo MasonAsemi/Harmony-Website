@@ -76,7 +76,7 @@ const DataPopup = ({ isOpen, onClose }) => {
         {loading && <p>Loading...</p>}
         {error && <p style={{color: 'red'}}>{error}</p>}
         
-        {!loading && !error && data && data.users.length > 0 && (
+        {!loading && !error && data && data.users && data.users.length > 0 && (
           <table border="1" style={{width: '100%', marginTop: '20px'}}>
             <thead>
               <tr>
