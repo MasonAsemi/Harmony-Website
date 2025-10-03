@@ -17,7 +17,7 @@ const DataPopup = ({ isOpen, onClose }) => {
     setError(null);
     
     try {
-      const response = await fetch('http://localhost:8000/api/user-data/');
+      const response = await fetch('https://harmony-backend-4080.herokuapp.com/api/user-data/');
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
