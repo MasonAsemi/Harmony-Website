@@ -4,6 +4,33 @@ from django.views.decorators.http import require_http_methods
 import json
 from .models import User
 
+@require_http_methods(["GET"])
+def get_user_data(request):
+    try:
+        users = User.objects.all().values()
+        data = list(users)
+        
+        return JsonResponse({
+            'success': True,
+            'data': data,
+            'count': len(data)
+        }, safe=False)
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+
+
+
 @csrf_exempt  # For demo purposes; use proper CSRF in production
 @require_http_methods(["GET", "POST"])
 def users_api(request):

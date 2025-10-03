@@ -16,11 +16,15 @@
     "main": "src/main.jsx",
     "scripts": {
         "dev": "webpack serve --open",
-        "build": "webpack --mode production"
+        "start": "react-scripts start",
+        "build": "react-scripts build",
+        "test": "react-scripts test",
+        "eject": "react-scripts eject"
     },
     "dependencies": {
         "react": "^19.1.1",
-        "react-dom": "^19.1.1"
+        "react-dom": "^19.1.1",
+        "react-scripts": "^5.0.1"
     },
     "devDependencies": {
         "@babel/core": "^7.28.4",
