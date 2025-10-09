@@ -36,20 +36,20 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
-    #'rest_framework',
     "harmony.apps.HarmonyConfig",
-    "polls.apps.PollsConfig",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'corsheaders',
+    # 'corsheaders',
+    'rest_framework',
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
+    #'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',  # Add this
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -77,10 +77,10 @@ TEMPLATES = [
     },
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    "https://harmonymatching.com", #For deployed server
-    "http://localhost:3000", #For react
-]
+# CORS_ALLOWED_ORIGINS = [
+#     "https://harmonymatching.com", #For deployed server
+#     "http://localhost:3000", #For react
+# ]
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
@@ -148,3 +148,12 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# REST_FRAMEWORK = {
+#     'DEFAULT_AUTHENTICATION_CLASSES': [
+#         'rest_framework.authentication.JWTAuthentication',
+#         'rest_framework.authentication.SessionAuthentication',
+
+#     ]
+# }

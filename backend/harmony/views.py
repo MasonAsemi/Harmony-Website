@@ -1,72 +1,54 @@
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_http_methods
-import json
-from .models import User
+#run code for any api whenever it gets called 
+from rest_framework.decorators import api_view 
+from rest_framework.response import Response # generate json responses 
 
-@require_http_methods(["GET"])
-def get_user_data(request):
-    try:
-        users = User.objects.all().values()
-        data = list(users)
-        
-        return JsonResponse({
-            'success': True,
-            'data': data,
-            'count': len(data)
-        }, safe=False)
-        
-    except Exception as e:
-        return JsonResponse({
-            'success': False,
-            'error': str(e)
-        }, status=500)
-        
-    except Exception as e:
-        return JsonResponse({
-            'success': False,
-            'error': str(e)
-        }, status=500)
+from .serializers import UserSerializer
+from rest_framework import status 
+from rest_framework.authtoken.models import Token
+from django.contrib.auth.models import User
 
+from django.shortcuts import get_object_or_404
 
+@api_view(['POST'])
+def login(request):
 
-
-@csrf_exempt  # For demo purposes; use proper CSRF in production
-@require_http_methods(["GET", "POST"])
-def users_api(request):
-    if request.method == "GET":
-        # Return all users
-        users = User.objects.all()
-        users_list = [
-            {
-                'id': user.id,
-                'name': user.name,
-                'created_at': user.created_at.isoformat()
-            }
-            for user in users
-        ]
-        return JsonResponse({'users': users_list}, safe=False)
+    user = get_object_or_404(User, username=request.data['username'])
     
-    elif request.method == "POST":
-        # Create a new user
-        try:
-            data = json.loads(request.body)
-            name = data.get('name')
-            
-            if not name:
-                return JsonResponse({'error': 'Name is required'}, status=400)
-            
-            user = User.objects.create(name=name)
-            return JsonResponse({
-                'message': 'User created successfully',
-                'user': {
-                    'id': user.id,
-                    'name': user.name,
-                    'created_at': user.created_at.isoformat()
-                }
-            }, status=201)
+    if not user.check_password(request.data['password']):
+        return Response({"detail": "Not Found."}, status=status.HTTP_404_NOT_FOUND)
+    
+    token, created = Token.objects.get_or_create(user=user)
+    serializer = UserSerializer(instance=user)
+    
+    return Response({"token": token.key, "user":serializer.data})   
+
+@api_view(['POST'])
+def register(request):
+    
+    serializer = UserSerializer(data = request.data)    
+    if serializer.is_valid():
+        serializer.save()
+        user = User.objects.get(username=request.data['username'])
         
-        except json.JSONDecodeError:
-            return JsonResponse({'error': 'Invalid JSON'}, status=400)
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500)
+        #make sure password is hashed 
+        user.set_password(request.data['password'])
+        user.save() 
+        token = Token.objects.create(user=user)
+        return Response({"token": token.key, "user":serializer.data})  
+    
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
+
+
+
+#We want to be able to pass in an authtoken and get a respective user 
+from rest_framework.decorators import authentication_classes, permission_classes
+from rest_framework.authentication import SessionAuthentication, TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+
+
+# api only works if user is authenticated 
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsAuthenticated]) 
+def test_token(request):
+    return Response("passed for user: {}".format(request.user.email)) #request should have the user if this func is envoked
