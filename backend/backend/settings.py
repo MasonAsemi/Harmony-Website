@@ -36,20 +36,28 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
-    #'rest_framework',
     "harmony.apps.HarmonyConfig",
-    "polls.apps.PollsConfig",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+<<<<<<< HEAD
+    # 'corsheaders',
+    'rest_framework',
+    'rest_framework.authtoken',
+]
+
+MIDDLEWARE = [
+    #'corsheaders.middleware.CorsMiddleware',
+=======
     'corsheaders'
 ]
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
+>>>>>>> a6cca018f9cbaef89e2c77428a68382e88a1fee5
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',  # Add this
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -77,10 +85,17 @@ TEMPLATES = [
     },
 ]
 
+<<<<<<< HEAD
+# CORS_ALLOWED_ORIGINS = [
+#     "https://harmonymatching.com", #For deployed server
+#     "http://localhost:3000", #For react
+# ]
+=======
 CORS_ALLOWED_ORIGINS = [
     "https://harmonymatching.com", #For deployed server
     "http://localhost:3000", #For react
 ]
+>>>>>>> a6cca018f9cbaef89e2c77428a68382e88a1fee5
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
@@ -89,10 +104,12 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 # Database configuration
+import dj_database_url
 if os.environ.get('DATABASE_URL'):
     # Heroku PostgreSQL
     DATABASES = {
         'default': dj_database_url.config(
+            default=os.environ.get('DATABASE_URL'),
             conn_max_age=600,
             conn_health_checks=True,
         )
@@ -146,3 +163,12 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# REST_FRAMEWORK = {
+#     'DEFAULT_AUTHENTICATION_CLASSES': [
+#         'rest_framework.authentication.JWTAuthentication',
+#         'rest_framework.authentication.SessionAuthentication',
+
+#     ]
+# }
