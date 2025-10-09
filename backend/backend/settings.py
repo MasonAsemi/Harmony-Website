@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-<<<<<<< HEAD
     # 'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
@@ -51,13 +50,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     #'corsheaders.middleware.CorsMiddleware',
-=======
-    'corsheaders'
-]
-
-MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
->>>>>>> a6cca018f9cbaef89e2c77428a68382e88a1fee5
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',  # Add this
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -85,17 +77,10 @@ TEMPLATES = [
     },
 ]
 
-<<<<<<< HEAD
 # CORS_ALLOWED_ORIGINS = [
 #     "https://harmonymatching.com", #For deployed server
 #     "http://localhost:3000", #For react
 # ]
-=======
-CORS_ALLOWED_ORIGINS = [
-    "https://harmonymatching.com", #For deployed server
-    "http://localhost:3000", #For react
-]
->>>>>>> a6cca018f9cbaef89e2c77428a68382e88a1fee5
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
