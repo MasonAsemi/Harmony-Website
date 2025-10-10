@@ -42,14 +42,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # 'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
     'drf_yasg', # auto generated docs 
 ]
 
 MIDDLEWARE = [
-    #'corsheaders.middleware.CorsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',  # Add this
@@ -81,6 +79,9 @@ TEMPLATES = [
 CORS_ALLOWED_ORIGINS = [
     "https://www.harmonymatching.com", #For deployed server
     "http://localhost:3000", #For react
+    "http://harmonymatching.com",
+    "https://harmonymatching.com"
+
 ]
 
 CORS_ALLOW_METHODS = [
