@@ -41,7 +41,7 @@ function Register() {
 
         try {
             // Replace with your actual backend URL
-            const response = await fetch('https://harmony-backend-4080-0c4993847d89.herokuapp.com/api/users', {
+            const response = await fetch('https://harmony-backend-4080-0c4993847d89.herokuapp.com/api/register/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
