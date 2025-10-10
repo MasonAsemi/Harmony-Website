@@ -12,21 +12,14 @@ body {
     0% {
         background-position: 0% 50%;
     }
+
     50% {
         background-position: 100% 50%;
     }
+
     100% {
         background-position: 0% 50%;
     }
-}
-
-.navbar-title {
-    cursor: pointer;
-    transition: opacity 0.3s ease;
-}
-
-.navbar-title:hover {
-    opacity: 0.7;
 }
 
 html,
@@ -84,6 +77,7 @@ footer {
     align-items: center;
     gap: 15px;
 }
+
 .navbar-button {
     padding: 8px 20px;
     border: none;
@@ -98,7 +92,7 @@ footer {
     background-color: transparent;
     color: #333;
     border: 2px solid #333;
-    }
+}
 
 .register {
     background-color: transparent;
@@ -109,5 +103,22 @@ footer {
 .navbar-button:hover {
     background-color: #333;
     color: white;
+}
+
+.register-box {
+    width: 400px;
+    background-color: white;
+    border-radius: 10px;
+    padding: 40px;
+    margin: 100px auto;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.register-title {
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
 }
 
