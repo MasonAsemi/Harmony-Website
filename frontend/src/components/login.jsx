@@ -8,10 +8,6 @@ function Login() {
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
 
-    const displayGrid = () => {
-    setIsPopupOpen(true);
-    };
-
     const handleSubmit = (e) => {
     e.preventDefault();
     

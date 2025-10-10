@@ -111,3 +111,27 @@ footer {
     color: white;
 }
 
+@media (max-width: 767px) {
+    .navbar-logoAndName {
+        visibility: hidden;
+        display: none;
+        position: absolute;
+    }
+
+    .login {
+        height: 4rem;
+    }
+
+    .register {
+        height: 4rem;
+    }
+
+    .navbar-loginAndRegister {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .navbar-button {
+        font-size: 20px;
+    }
+}

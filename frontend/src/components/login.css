@@ -8,18 +8,6 @@ body {
     animation: gradient-animation 15s ease infinite alternate;
 }
 
-@keyframes gradient-animation {
-    0% {
-        background-position: 0% 50%;
-    }
-    50% {
-        background-position: 100% 50%;
-    }
-    100% {
-        background-position: 0% 50%;
-    }
-}
-
 html, body, #root {
     height: 100%;
     margin: 0;
@@ -42,6 +30,17 @@ footer {
     color: black;
     padding: 20px 0;
     margin-top: auto;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    row-gap: 1rem;
+}
+
+input {
+    height: 3rem;
+    padding: 5px;
 }
 
 .navbar {
@@ -75,22 +74,11 @@ footer {
     gap: 15px;
 }
 
-.navbar-button {
-    padding: 8px 20px;
-    border: none;
-    border-radius: 5px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
 .login {
     background-color: transparent;
     color: #333;
     border: 2px solid #333;
 }
-
 
 .register {
     background-color: transparent;
@@ -104,7 +92,8 @@ footer {
 }
 
 .login-box {
-    width: 400px;
+    max-width: 400px;
+    width: 80%;
     background-color: white;
     border-radius: 10px;
     padding: 40px;
@@ -120,3 +109,14 @@ footer {
     color: #333;
 }
 
+@keyframes gradient-animation {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
