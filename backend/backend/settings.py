@@ -79,7 +79,7 @@ TEMPLATES = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    "https://harmonymatching.com", #For deployed server
+    "https://www.harmonymatching.com", #For deployed server
     "http://localhost:3000", #For react
 ]
 
