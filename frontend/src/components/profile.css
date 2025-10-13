@@ -1,0 +1,67 @@
+.content-field {
+  padding: 10px;
+}
+
+.content-container {
+    width: 80%;
+    background-color: white;
+    border-radius: 10px;
+    padding: 40px;
+    margin: 100px auto;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.content-title {
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    row-gap: 1rem;
+}
+
+.profile-picture-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.profile-fields {
+  width: 100%;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.profile-picture {
+  width: 300px;
+  height: 300px;
+}
+
+.field-title {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.data {
+  max-width: 75%;
+  overflow-wrap: break-word;
+}
+
+.edit-button {
+  width: 4rem;
+  height: 4rem;
+  border: none;
+  background-color: transparent;
+}
+
+.edit-button:hover {
+  cursor: pointer;
+  color:rgba(100, 150, 200, 1)
+}

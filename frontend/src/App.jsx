@@ -6,6 +6,7 @@ import Login from "./components/login";
 import Register from "./components/register";
 import { AuthProvider, useAuth } from './AuthContext';
 import './App.css';
+import Profile from './components/profile';
 
 function NavBar() {
   const { user, logout } = useAuth();
@@ -63,6 +64,7 @@ function App() {
               <Route path="/about" element={<About />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/profile" element={<Profile />} />
             </Routes>
           </main>
 
