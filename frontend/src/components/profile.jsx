@@ -1,5 +1,4 @@
 import { useAuth } from '../AuthContext';
-import DataPopup from './DataPopup';
 import ProfileField from './ProfileField';
 import './profile.css';
 
@@ -14,7 +13,7 @@ function Profile({ pfp_src }) {
             <div className='profile-picture-wrapper'>
               <img className='profile-picture' src={pfp_src}></img>
               <div className='profile-fields'>
-                <ProfileField title="Name" data="Placeholder" />
+                <ProfileField title="Username" data={user.username} />
                 <ProfileField title="Age" data="Placeholder" />
                 <ProfileField title="Interests" data="Placeholder" />
               </div>
