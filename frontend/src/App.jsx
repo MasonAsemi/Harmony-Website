@@ -1,13 +1,20 @@
+// Dependencies
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+
+//Components
 import DataPopup from './components/DataPopup';
-import About from './About';
-import Login from "./components/login";
-import Register from "./components/register";
-import { AuthProvider, useAuth } from './AuthContext';
-import './App.css';
-import Profile from './components/profile';
+import { AuthProvider, useAuth } from './components/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
+
+// Style
+import './styles/App.css';
+
+// Pages
+import Login from "./pages/login";
+import Register from "./pages/register";
+import Profile from './pages/profile';
+import About from './pages/About';
 
 function NavBar() {
   const { user, logout } = useAuth();

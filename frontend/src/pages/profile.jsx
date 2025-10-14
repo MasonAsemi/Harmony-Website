@@ -1,6 +1,6 @@
-import { useAuth } from '../AuthContext';
-import ProfileField from './ProfileField';
-import './profile.css';
+import { useAuth } from '../components/AuthContext';
+import ProfileField from '../components/ProfileField';
+import '../styles/profile.css';
 
 function Profile({ pfp_src }) {
   const { user } = useAuth();

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../AuthContext';
-import DataPopup from './DataPopup';
-import './login.css';
+import { useAuth } from '../components/AuthContext';
+import DataPopup from '../components/DataPopup';
+import '../styles/login.css';
 
 function Login() {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
