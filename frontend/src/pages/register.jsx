@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import DataPopup from './DataPopup';
-import './register.css';
+import DataPopup from '../components/DataPopup';
+import '../styles/register.css';
 
 function Register() {
     const [isPopupOpen, setIsPopupOpen] = useState(false);

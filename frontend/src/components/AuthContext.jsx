@@ -1,3 +1,9 @@
+/**
+ * Manages the state of the user's authentication, providing a context to descendant components containing the authentication information
+ * @param {React.ReactNode} children - Descendents to provide the context to 
+ * @returns {JSX.Element} - The context provider
+ */
+
 import React, { createContext, useState, useContext } from 'react';
 
 const AuthContext = createContext();
@@ -21,9 +27,9 @@ export const AuthProvider = ({ children }) => {
         {children}
         </AuthContext.Provider>
     );
-    };
+};
 
-    export const useAuth = () => {
+export const useAuth = () => {
     const context = useContext(AuthContext);
     if (!context) {
         throw new Error('useAuth must be used within an AuthProvider');
