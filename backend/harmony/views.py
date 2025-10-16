@@ -94,4 +94,4 @@ def register(request):
 @authentication_classes([SessionAuthentication, TokenAuthentication])
 @permission_classes([IsAuthenticated]) 
 def test_token(request):
-    return Response({"message": "Token is valid","user": request.user.username}) #request should have the user if this func is envoked
+    return Response({"message": "Token is valid","user": request.user}) #request should have the user if this func is envoked
