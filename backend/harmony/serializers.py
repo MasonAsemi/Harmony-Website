@@ -14,7 +14,7 @@ class RegisterSerializer(serializers.Serializer):
     first_name = serializers.CharField(required=True)
     last_name = serializers.CharField(required=True)
     location = serializers.CharField(required=True)
-    profile_image = serializers.ImageField(required=False)
+    profile_image = serializers.FileField(required=False)
 
 
 class LoginSerializer(serializers.Serializer):
