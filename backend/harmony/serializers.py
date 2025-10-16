@@ -5,9 +5,11 @@ from django.contrib.auth.models import User
 class UserSerializer(serializers.ModelSerializer):
     class Meta(object):
         model = User
-        fields = ['id', 'username', 'password', 'email']
+        fields = ['id', 'username', 'password', 'email', 'first_name', 'last_name']
 
 class RegisterSerializer(serializers.Serializer):
+    first_name = serializers.CharField(required=True, help_text="First Name ")
+    last_name = serializers.CharField(required=True, help_text="Last Name ")
     username = serializers.CharField(required=True, help_text="Username for the account")
     email = serializers.EmailField(required=True, help_text="User's email address")
     password = serializers.CharField(required=True, write_only=True, help_text="Password (min 8 characters)")
