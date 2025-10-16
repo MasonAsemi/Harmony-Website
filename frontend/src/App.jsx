@@ -30,7 +30,11 @@ function NavBar() {
         <div className='navbar-loginAndRegister'>
           {user ? (
             <>
-              <span className='navbar-welcome'>Welcome, {user.username}</span>
+              <Link to="/profile" style={{ textDecoration: 'none' }}>
+                <span className='navbar-welcome' style={{ cursor: 'pointer' }}>
+                  Welcome, {user.username}
+                </span>
+              </Link>
               <button className='navbar-button logout' onClick={logout}>Logout</button>
             </>
           ) : (
