@@ -39,7 +39,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # Application definition
 
 INSTALLED_APPS = [
-    "harmony.apps.HarmonyConfig",
+    "harmony",
     'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -85,7 +85,8 @@ CORS_ALLOWED_ORIGINS = [
     "https://www.harmonymatching.com", #For deployed server
     "http://localhost:3000", #For react
     "http://harmonymatching.com",
-    "https://harmonymatching.com"
+    "https://harmonymatching.com",
+    'https://harmony-backend-4080-0c4993847d89.herokuapp.com'
 
 ]
 

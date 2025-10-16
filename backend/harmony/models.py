@@ -4,11 +4,10 @@ from django.db import models
 
 class CustomUser(AbstractUser):
     location = models.CharField(max_length=255, blank=True, null=True)
-    profile_image = models.ImageField(
+    profile_image = models.FileField(
         upload_to='profile_images/',
         blank=True,
         null=True,
-        default='profile_images/default.jpg'  # 👈 default image
     )
 
     def __str__(self):
