@@ -7,11 +7,13 @@ import '../styles/profile.css';
 function Profile({ pfp_src }) {
   const { user, token, login } = useAuth();
   const [profileData, setProfileData] = useState({
-    username: 'Loading...',
-    age: null,
-    interests: '',
-    biography: '',
-    location: ''
+    //username: 'Loading...',
+    //** TODO: REMOVE AND UNCOMMENT */
+    // age: null,
+    // interests: '',
+    // biography: '',
+    // location: ''
+
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
