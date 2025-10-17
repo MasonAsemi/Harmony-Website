@@ -4,7 +4,25 @@ console.log('=== API.JS LOADED ===');
 console.log('API_BASE_URL in api.js:', API_BASE_URL);
 
 export const profileAPI = {
-    getProfile: async (token) => {
+  getProfile: async (token) => {
+        // First test if token works
+        try {
+        const testResponse = await fetch(`${API_BASE_URL}/test-token/`, {
+            method: 'GET',
+            headers: {
+            'Authorization': `Token ${token}`,
+            'Content-Type': 'application/json',
+            },
+        });
+        console.log('Test token status:', testResponse.status);
+        
+        if (testResponse.ok) {
+            console.log('Token is valid!', await testResponse.json());
+        }
+        } catch (e) {
+        console.error('Test token failed:', e);
+        }
+
         const fullURL = `${API_BASE_URL}/profile/`;
         console.log('Fetching profile from:', fullURL);
         console.log('Token:', token);
