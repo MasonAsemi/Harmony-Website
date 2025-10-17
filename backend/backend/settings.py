@@ -34,7 +34,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
-    'harmony',
+    "harmony",
     'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
