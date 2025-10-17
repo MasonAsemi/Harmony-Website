@@ -1,5 +1,7 @@
+import { useEffect, useState } from 'react';
 import { useAuth } from '../components/AuthContext';
 import ProfileField from '../components/ProfileField';
+import { profileAPI } from '../services/api';
 import '../styles/profile.css';
 
 function Profile({ pfp_src }) {
@@ -32,9 +34,10 @@ function Profile({ pfp_src }) {
         [fieldName]: value
       });
       
+      // Update local state
       setProfileData(updatedData);
       
-      // Update username
+      // Update user context if username changed
       if (fieldName === 'username') {
         login(updatedData, token);
       }
