@@ -4,7 +4,7 @@ console.log('=== API.JS LOADED ===');
 console.log('API_BASE_URL in api.js:', API_BASE_URL);
 
 export const profileAPI = {
-  getProfile: async (token) => {
+   getProfile: async (token) => {
         // First test if token works
         try {
         const testResponse = await fetch(`${API_BASE_URL}/test-token/`, {
@@ -18,6 +18,9 @@ export const profileAPI = {
         
         if (testResponse.ok) {
             console.log('Token is valid!', await testResponse.json());
+
+            //*** TODO: REMOVE THIS IN FUTURE ****
+            return testResponse; 
         }
         } catch (e) {
         console.error('Test token failed:', e);
