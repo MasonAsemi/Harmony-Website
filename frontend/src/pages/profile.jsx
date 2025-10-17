@@ -32,10 +32,9 @@ function Profile({ pfp_src }) {
         [fieldName]: value
       });
       
-      // Update local state
       setProfileData(updatedData);
       
-      // Update user context if username changed
+      // Update username
       if (fieldName === 'username') {
         login(updatedData, token);
       }

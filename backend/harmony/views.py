@@ -7,9 +7,11 @@ from rest_framework.response import Response # generate json responses
 from .serializers import UserSerializer , RegisterSerializer, LoginSerializer, TokenResponseSerializer
 from rest_framework import status 
 from rest_framework.authtoken.models import Token
+
 #For custom user model in order to change from the default setup
 from django.contrib.auth import get_user_model
 User = get_user_model()
+
 from django.shortcuts import get_object_or_404
 #We want to be able to pass in an authtoken and get a respective user 
 from rest_framework.decorators import authentication_classes, permission_classes
@@ -37,7 +39,8 @@ def login(request):
     token, created = Token.objects.get_or_create(user=user)
     serializer = UserSerializer(instance=user)
     
-    return Response({"token": token.key, "user":serializer.data})   
+    profile_serializer = UserProfileSerializer(instance=user)
+    return Response({"token": token.key, "user": profile_serializer.data})
 
 #REGISTER
 @swagger_auto_schema(

@@ -1,6 +1,8 @@
 #allows us to map json to models our database can interpret
 from rest_framework import serializers
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 #Used for the creation of an account: Highest priority/level
 class UserSerializer(serializers.ModelSerializer):
