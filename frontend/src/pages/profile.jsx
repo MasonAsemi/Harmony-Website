@@ -6,13 +6,24 @@ import '../styles/profile.css';
 
 function Profile({ pfp_src }) {
   const { user, token, login } = useAuth();
-  const [profileData, setProfileData] = useState(null);
+  const [profileData, setProfileData] = useState({
+    username: 'Loading...',
+    age: null,
+    interests: '',
+    biography: '',
+    location: ''
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    loadProfile();
-  }, []);
+    if (token) {
+      loadProfile();
+    } else {
+      setLoading(false);
+      setError('No authentication token found');
+    }
+  }, [token]);
 
   const loadProfile = async () => {
     try {
@@ -21,14 +32,20 @@ function Profile({ pfp_src }) {
       setProfileData(data);
       setError(null);
     } catch (err) {
-      setError('Failed to load profile');
-      console.error(err);
+      setError('Failed to load profile data');
+      console.error('Profile load error:', err);
+      // Keep default values when error occurs
     } finally {
       setLoading(false);
     }
   };
 
   const handleFieldSave = async (fieldName, value) => {
+    if (!token) {
+      alert('Cannot save: Not authenticated');
+      return;
+    }
+
     try {
       const updatedData = await profileAPI.updateProfile(token, {
         [fieldName]: value
@@ -47,38 +64,51 @@ function Profile({ pfp_src }) {
     }
   };
 
-  if (loading) {
-    return (
-      <div className='content-container'>
-        <div className='content-title'>Loading profile...</div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className='content-container'>
-        <div className='content-title'>Error</div>
-        <p>{error}</p>
-        <button onClick={loadProfile}>Retry</button>
-      </div>
-    );
-  }
-
   return (
     <div className='content-container'>
       <div className='content-title'>Profile</div>
+      
+      {error && (
+        <div style={{ 
+          backgroundColor: '#ffebee', 
+          color: '#c62828', 
+          padding: '10px', 
+          borderRadius: '5px', 
+          marginBottom: '20px',
+          textAlign: 'center'
+        }}>
+          {error}
+          <button 
+            onClick={loadProfile} 
+            style={{ 
+              marginLeft: '10px', 
+              padding: '5px 10px',
+              backgroundColor: '#c62828',
+              color: 'white',
+              border: 'none',
+              borderRadius: '3px',
+              cursor: 'pointer'
+            }}
+          >
+            Retry
+          </button>
+        </div>
+      )}
+
       <div className='content'>
         <div className='profile-picture-wrapper'>
           <img 
             className='profile-picture' 
             src={pfp_src || '/default-avatar.png'}
             alt="Profile"
+            onError={(e) => {
+              e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="300"%3E%3Crect fill="%23ddd" width="300" height="300"/%3E%3Ctext fill="%23999" font-family="sans-serif" font-size="40" text-anchor="middle" x="150" y="160"%3ENo Image%3C/text%3E%3C/svg%3E';
+            }}
           />
           <div className='profile-fields'>
             <ProfileField 
               title="Username" 
-              data={profileData?.username} 
+              data={profileData?.username || 'Not set'} 
               onSave={(value) => handleFieldSave('username', value)}
             />
             <ProfileField 
@@ -88,20 +118,20 @@ function Profile({ pfp_src }) {
             />
             <ProfileField 
               title="Interests" 
-              data={profileData?.interests} 
+              data={profileData?.interests || ''} 
               onSave={(value) => handleFieldSave('interests', value)}
             />
           </div>
         </div>
         <ProfileField 
           title="Biography" 
-          data={profileData?.biography} 
+          data={profileData?.biography || ''} 
           onSave={(value) => handleFieldSave('biography', value)}
           multiline={true}
         />
         <ProfileField 
           title="Location" 
-          data={profileData?.location} 
+          data={profileData?.location || ''} 
           onSave={(value) => handleFieldSave('location', value)}
         />
       </div>
