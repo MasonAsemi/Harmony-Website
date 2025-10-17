@@ -1,11 +1,22 @@
 #allows us to map json to models our database can interpret
 from rest_framework import serializers
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 
+User = get_user_model()
+
+#Used for the creation of an account: Highest priority/level
 class UserSerializer(serializers.ModelSerializer):
     class Meta(object):
         model = User
-        fields = ['id', 'username', 'password', 'email', 'first_name', 'last_name']
+        fields = ['id', 'username', 'password', 'email', 'first_name', 'last_name', 'age', 'interests', 'biography', 'location']
+        extra_kwargs = {'password': {'write_only': True}}
+
+#Used for editing existing profiles: Lower priority/level
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'age', 'interests', 'biography', 'location']
+        read_only_fields = ['id', 'username', 'email']
 
 class RegisterSerializer(serializers.Serializer):
     first_name = serializers.CharField(required=True, help_text="First Name ")

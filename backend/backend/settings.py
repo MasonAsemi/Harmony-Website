@@ -34,7 +34,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
-    "harmony",
+    'harmony',
     'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -181,3 +181,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 #     ]
 # }
+
+# User model change for non-default users
+AUTH_USER_MODEL = 'harmony.CustomUser'
