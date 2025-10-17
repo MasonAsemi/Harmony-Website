@@ -1,15 +1,24 @@
 import { API_BASE_URL } from '../config';
 
+console.log('=== API.JS LOADED ===');
+console.log('API_BASE_URL in api.js:', API_BASE_URL);
+
 export const profileAPI = {
-  // Fetch user profile from backend
     getProfile: async (token) => {
-        const response = await fetch(`${API_BASE_URL}/profile/`, {
+        const fullURL = `${API_BASE_URL}/profile/`;
+        console.log('Fetching profile from:', fullURL);
+        console.log('Token:', token);
+        
+        const response = await fetch(fullURL, {
         method: 'GET',
         headers: {
             'Authorization': `Token ${token}`,
             'Content-Type': 'application/json',
         },
         });
+        
+        console.log('Response URL:', response.url);
+        console.log('Response status:', response.status);
         
         if (!response.ok) {
         throw new Error('Failed to fetch profile');
