@@ -78,7 +78,7 @@ TEMPLATES = [
 
 CORS_ALLOWED_ORIGINS = [
     "https://www.harmonymatching.com", #For deployed server
-    "http://localhost:3000", #For react
+    "http://localhost:5173", #For react
     "http://harmonymatching.com",
     "https://harmonymatching.com",
     'https://harmony-backend-4080-0c4993847d89.herokuapp.com'
