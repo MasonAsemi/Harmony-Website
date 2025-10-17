@@ -1,7 +1,7 @@
 import { API_BASE_URL } from '../config';
 
 export const profileAPI = {
-  // In order to fetch user porfile from backend
+  // Fetch user profile from backend
     getProfile: async (token) => {
         const response = await fetch(`${API_BASE_URL}/profile/`, {
         method: 'GET',
@@ -18,7 +18,7 @@ export const profileAPI = {
         return response.json();
     },
 
-    // Updating the user's profile from settings
+    // Update the user's profile
     updateProfile: async (token, profileData) => {
         const response = await fetch(`${API_BASE_URL}/profile/update/`, {
         method: 'PUT',
