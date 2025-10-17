@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../config';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../components/AuthContext';
@@ -29,7 +30,7 @@ function Login() {
         setMessage('');
 
         try {
-        const response = await fetch('https://harmony-backend-4080-0c4993847d89.herokuapp.com/api/login/', {
+        const response = await fetch(`${API_BASE_URL}/login/`, {
             method: 'POST',
             headers: {
             'Content-Type': 'application/json',
