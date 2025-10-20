@@ -1,0 +1,9 @@
+# basic workflow (new project)
+python -m venv venv
+source venv/bin/activate
+
+# add your model, admin, serializers, views, urls, settings as above
+python manage.py makemigrations
+python manage.py migrate
+python manage.py createsuperuser
+python manage.py runserver
