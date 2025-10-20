@@ -29,45 +29,30 @@ function Login() {
         setIsLoading(true);
         setMessage('');
 
+        // Here
+
         try {
-        const response = await fetch(`${API_BASE_URL}/login/`, {
-            method: 'POST',
-            headers: {
-            'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-            username: username,
-            password: password
-            })
-        });
+            const loginRes = await login(username, password)
 
-        const data = await response.json();
-
-        if (response.ok) {
-            setMessage('Login successful! Redirecting...');
-            
-            // Store user and token in context
-            login(data.user, data.token);
-            
-            console.log('Token:', data.token);
-            console.log('User:', data.user);
-            
-            // Clear form
-            setUsername('');
-            setPassword('');
-            
-            // Redirect to home page after around 1 second to give loading time
-            setTimeout(() => {
-            navigate('/');
-            }, 1000);
-        } else {
-            setMessage(data.detail || 'Login failed. Please check your credentials.');
-        }
+            if (loginRes.ok) {
+                setMessage('Login successful! Redirecting...');
+                
+                // Clear form
+                setUsername('');
+                setPassword('');
+                
+                // Redirect to home page after around 1 second to give loading time
+                setTimeout(() => {
+                    navigate('/');
+                }, 1000);
+            } else {
+                setMessage('Login failed. Please check your credentials.');
+            }
         } catch (error) {
-        console.error('Login error:', error);
-        setMessage('Network error. Please check your connection and try again.');
+            console.error('Login error:', error);
+            setMessage('Network error. Please check your connection and try again.');
         } finally {
-        setIsLoading(false);
+            setIsLoading(false);
         }
     };
 

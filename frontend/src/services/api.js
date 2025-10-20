@@ -4,26 +4,31 @@ console.log('=== API.JS LOADED ===');
 console.log('API_BASE_URL in api.js:', API_BASE_URL);
 
 export const profileAPI = {
-   getProfile: async (token) => {
-        // First test if token works
+    // Endpoint needs to authenticate the token and return the user data to regenerate the front-end
+    checkAuth: async (token) => {
         try {
-        const testResponse = await fetch(`${API_BASE_URL}/test-token/`, {
-            method: 'GET',
-            headers: {
-            'Authorization': `Token ${token}`,
-            'Content-Type': 'application/json',
-            },
-        });
-        console.log('Test token status:', testResponse.status);
-        
-        if (testResponse.ok) {
-            console.log('Token is valid!', await testResponse.json());
+            const testResponse = await fetch(`${API_BASE_URL}/test-token/`, {
+                method: 'GET',
+                headers: {
+                'Authorization': `Token ${token}`,
+                'Content-Type': 'application/json',
+                },
+            });
+            console.log('Test token status:', testResponse.status);
+            return testResponse;
 
-            //*** TODO: REMOVE THIS IN FUTURE ****
-            return testResponse; 
-        }
         } catch (e) {
-        console.error('Test token failed:', e);
+            console.error('Test token failed:', e);
+        }
+    },
+
+    getProfile: async (token) => {
+        // First test if token works
+        const checkRes = await profileAPI.checkAuth(token);
+
+        if (!checkRes.ok)
+        {
+            throw new Error('User is not authenticated');
         }
 
         const fullURL = `${API_BASE_URL}/profile/`;
