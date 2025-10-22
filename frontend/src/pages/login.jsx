@@ -29,8 +29,6 @@ function Login() {
         setIsLoading(true);
         setMessage('');
 
-        // Here
-
         try {
             const loginRes = await login(username, password)
 
