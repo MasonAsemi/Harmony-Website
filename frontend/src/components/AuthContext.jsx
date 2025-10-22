@@ -5,7 +5,6 @@
  */
 
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { profileAPI } from '../services/api';
 import { API_BASE_URL } from '../config';
 
 const AuthContext = createContext();
@@ -13,28 +12,48 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [token, setToken] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const storedToken = localStorage.getItem("token");
 
-        if (storedToken)
-        {
-            const checkRes = profileAPI.checkAuth(storedToken);
-
-            if (checkRes && checkRes.ok)
-            {
+        if (storedToken) {
+            // Verify token and get user data using /users/me/
+            fetch(`${API_BASE_URL}/users/me/`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Token ${storedToken}`,
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error('Invalid token');
+            })
+            .then(userData => {
                 setToken(storedToken);
-                // Also needs to set user from checkAuth response
-                // setUser(...)
-            }
+                setUser(userData);
+            })
+            .catch(error => {
+                console.error('Token validation failed:', error);
+                localStorage.removeItem("token");
+            })
+            .finally(() => {
+                setLoading(false);
+            });
+        } else {
+            setLoading(false);
         }
-    }, [])
+    }, []);
 
     const login = async (username, password) => {
-        const response = await fetch(`${API_BASE_URL}/login/`, {
+        // Use api-token-auth endpoint
+        const response = await fetch(`${API_BASE_URL}/api-token-auth/`, {
             method: 'POST',
             headers: {
-            'Content-Type': 'application/json',
+                'Content-Type': 'application/json',
             },
             body: JSON.stringify({
                 username: username,
@@ -42,9 +61,29 @@ export const AuthProvider = ({ children }) => {
             })
         });
 
-        const data = await response.json();
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.non_field_errors?.[0] || 'Login failed');
+        }
 
-        setUser(data.user);
+        const data = await response.json();
+        
+        // Get user data after login
+        const userResponse = await fetch(`${API_BASE_URL}/users/me/`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Token ${data.token}`,
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!userResponse.ok) {
+            throw new Error('Failed to fetch user data');
+        }
+
+        const userData = await userResponse.json();
+
+        setUser(userData);
         setToken(data.token);
         localStorage.setItem("token", data.token);
 
@@ -58,8 +97,8 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, token, login, logout }}>
-        {children}
+        <AuthContext.Provider value={{ user, token, login, logout, loading }}>
+            {children}
         </AuthContext.Provider>
     );
 };
