@@ -1,8 +1,13 @@
-from django.urls import path
-from . import views
+# harmony/urls.py
+from rest_framework.routers import DefaultRouter
+from django.urls import path, include
+from .views import UserViewSet
+from rest_framework.authtoken.views import obtain_auth_token
+
+router = DefaultRouter()
+router.register(r'users', UserViewSet, basename='user')
 
 urlpatterns = [
-    path('register/', views.register, name='register'),
-    path('login/', views.login, name='login'),
-    path('test-token/', views.test_token, name='test-token'),
+    path('', include(router.urls)),
+    path('api-token-auth/', obtain_auth_token, name='api_token_auth'),  # to obtain token
 ]

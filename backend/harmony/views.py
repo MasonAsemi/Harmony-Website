@@ -1,97 +1,62 @@
-#run code for any api whenever it gets called 
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
-from rest_framework.decorators import api_view 
-from rest_framework.response import Response # generate json responses 
-from .serializers import UserSerializer , RegisterSerializer, LoginSerializer, TokenResponseSerializer
-from rest_framework import status 
+
+from rest_framework import viewsets, permissions, status 
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from .models import User
+from .serializers import UserSerializer
+from .permissions import IsSelfOrReadOnly
+from rest_framework.decorators import action
+from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
-from django.contrib.auth.models import User
-from django.shortcuts import get_object_or_404
-#We want to be able to pass in an authtoken and get a respective user 
-from rest_framework.decorators import authentication_classes, permission_classes
-from rest_framework.authentication import SessionAuthentication, TokenAuthentication
-from rest_framework.permissions import IsAuthenticated
 
-#LOGIN
-@swagger_auto_schema(
-    method='post',
-    request_body=LoginSerializer,
-    responses={
-        200: TokenResponseSerializer,
-        404: 'Unauthorized - user not found'
-    },
-    operation_description="Login with username and password to receive authentication token"
-)
-@api_view(['POST'])
-def login(request):
 
-    user = get_object_or_404(User, username=request.data['username'])
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
     
-    if not user.check_password(request.data['password']):
-        return Response({"detail": "Not Found."}, status=status.HTTP_404_NOT_FOUND)
-    
-    token, created = Token.objects.get_or_create(user=user)
-    serializer = UserSerializer(instance=user)
-    
-    return Response({"token": token.key, "user":serializer.data})   
-
-#REGISTER
-@swagger_auto_schema(
-    method='post',
-    request_body=RegisterSerializer,
-    responses={
-        201: TokenResponseSerializer,
-        400: 'Bad Request - validation errors'
-    },
-    operation_description="Register a new user account"
-)
-@api_view(['POST'])
-def register(request):
-    
-    serializer = UserSerializer(data = request.data)    
-    if serializer.is_valid():
-        serializer.save()
-        user = User.objects.get(username=request.data['username'])
+    def get_permissions(self):
+        if self.action == 'create':
+            return [permissions.AllowAny()]  # anyone can create a user (signup)
+        else:
+            return [permissions.IsAuthenticated(), IsSelfOrReadOnly()]
         
-        #make sure password is hashed 
-        user.set_password(request.data['password'])
-        user.save() 
-        token = Token.objects.create(user=user)
-        return Response({"token": token.key, "user":serializer.data})  
+    # Override create to return token immediately
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+
+        # Generate token
+        token, _ = Token.objects.get_or_create(user=user)
+
+        data = serializer.data
+        data['token'] = token.key
+        return Response(data, status=status.HTTP_201_CREATED)
+
+    #get current user 
+    def get_object(self):
+        # for update/patch actions, only return the logged-in user
+        if self.action in ['update', 'partial_update', 'destroy', 'retrieve'] and self.request.user.is_authenticated:
+            # return request.user (this prevents updating other users)
+            return self.request.user
+        return super().get_object()
     
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
-
-
-#TEST TOKEN
-@swagger_auto_schema(
-    method='get',
-    manual_parameters=[
-        openapi.Parameter(
-            'Authorization',
-            openapi.IN_HEADER,
-            description="Token <your_token_here>",
-            type=openapi.TYPE_STRING,
-            required=True
-        )
-    ],
-    responses={
-        200: openapi.Response(
-            description="Token is valid",
-            examples={
-                "application/json": {
-                    "message": "Token is valid",
-                    "user": "username"
-                }
-            }
-        ),
-        401: 'Unauthorized - invalid or missing token'
-    },
-    operation_description="Test if your authentication token is valid"
-)
-# api only works if user is authenticated 
-@api_view(['GET'])
-@authentication_classes([SessionAuthentication, TokenAuthentication])
-@permission_classes([IsAuthenticated]) 
-def test_token(request):
-    return Response({"message": "Token is valid","user": request.user}) #request should have the user if this func is envoked
+    def get_queryset(self):
+        # For list action, only allow admin users
+        if self.action == 'list':
+            if self.request.user.is_staff:
+                return User.objects.all()
+            else:
+                return User.objects.filter(id=self.request.user.id)
+        return User.objects.all()
+    
+    #to get and update the logged in user data 
+    @action(detail=False, methods=['get', 'patch', 'put'], permission_classes=[permissions.IsAuthenticated])
+    def me(self, request):
+        if request.method == 'GET':
+            serializer = self.get_serializer(request.user)
+            return Response(serializer.data)
+        elif request.method == 'PATCH':
+            serializer = self.get_serializer(request.user, data=request.data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data)

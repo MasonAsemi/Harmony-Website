@@ -1,6 +1,10 @@
 from django.contrib import admin
-from django.contrib.auth import get_user_model
+from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
+from .models import User
 
-User = get_user_model()
-
-admin.site.register(User)
+@admin.register(User)
+class UserAdmin(DjangoUserAdmin):
+    # show the additional fields in admin list/display if desired
+    fieldsets = DjangoUserAdmin.fieldsets + (
+        ('Extra', {'fields': ('location', 'profile_image', 'age', 'interests', 'biography')}),
+    )
