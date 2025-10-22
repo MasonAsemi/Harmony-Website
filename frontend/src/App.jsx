@@ -10,7 +10,7 @@ import { Header } from "./components/Header";
 import { FallingAnimation } from "./components/FallingAnimation";
 
 // Style
-import './styles/App.css';
+
 
 // Pages
 import Login from "./pages/login";
