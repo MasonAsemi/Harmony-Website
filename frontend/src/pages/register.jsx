@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from '../config';
 import '../styles/register.css';
+import { requestLogin } from '../api/auth';
 
 function Register() {
     const [username, setUsername] = useState('');
@@ -33,13 +34,7 @@ function Register() {
 
         try {
             // Use /users/ endpoint which returns token on creation
-            const response = await fetch(`${API_BASE_URL}/users/`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, email, password }),
-            });
-
-            const data = await response.json();
+            const response = requestLogin({ username, email, password });
 
             if (response.ok) {
                 setMessage('Registration successful! Redirecting to login...');
@@ -49,6 +44,7 @@ function Register() {
                 setConfirmPassword('');
                 setTimeout(() => navigate('/login'), 1500);
             } else {
+                const data = await response.json();
                 if (data.username) setMessage(`Username: ${data.username[0]}`);
                 else if (data.email) setMessage(`Email: ${data.email[0]}`);
                 else if (data.password) setMessage(`Password: ${data.password[0]}`);
