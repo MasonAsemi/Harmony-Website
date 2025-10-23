@@ -20,7 +20,7 @@ export const AuthProvider = ({ children }) => {
 
         if (storedToken) {
             // Verify token and get user data using /users/me/
-            fetch(`${API_BASE_URL}/users/me/`, {
+            fetch(`${API_BASE_URL}/api/users/me/`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Token ${storedToken}`,

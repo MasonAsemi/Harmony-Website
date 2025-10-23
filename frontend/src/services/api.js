@@ -5,7 +5,7 @@ console.log('API_BASE_URL in api.js:', API_BASE_URL);
 
 export const profileAPI = {
     getProfile: async (token) => {
-        const fullURL = `${API_BASE_URL}/users/me/`;
+        const fullURL = `${API_BASE_URL}/api/users/me/`;  // Add /api/ here
         console.log('Fetching profile from:', fullURL);
         console.log('Token:', token);
         
@@ -27,9 +27,8 @@ export const profileAPI = {
         return response.json();
     },
 
-    // Update the user's profile using PATCH on /users/me/
     updateProfile: async (token, profileData) => {
-        const response = await fetch(`${API_BASE_URL}/users/me/`, {
+        const response = await fetch(`${API_BASE_URL}/api/users/me/`, {  // Add /api/ here
             method: 'PATCH',
             headers: {
                 'Authorization': `Token ${token}`,
