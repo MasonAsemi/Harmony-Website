@@ -20,106 +20,102 @@ body {
     }
 }
 
-* {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-            }
 
-            .title-text {
-                color: #667eea
-            }
 
-            .tagline {
-                font-size: 1.2em;
-                color: #665;
-                font-weight: 300;
-            }
+.title-text {
+    color: #667eea
+}
 
-            .container {
-                max-width: 1200px;
-                margin: 0 auto;
-                padding: 0 20px;
-            }
+.tagline {
+    font-size: 1.2em;
+    color: #665;
+    font-weight: 300;
+}
 
-            .team-section {
-                background: rgba(255, 255, 255, 0.95);
-                backdrop-filter: blur(10px);
-                margin: 20px;
-                border-radius: 15px;
-                padding: 60px 40px;
-            }
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
 
-            .title-box {
-                background: rgba(255, 255, 255, 0.95);
-                text-align: center;
-                padding: 20px;
-                margin: 20px;
-                border-radius: 15px;
-                box-shadow:
-                    0 1px 1px hsl(0deg 0% 0% / 0.075),
-                    0 2px 2px hsl(0deg 0% 0% / 0.075),
-                    0 4px 4px hsl(0deg 0% 0% / 0.075),
-                    0 8px 8px hsl(0deg 0% 0% / 0.075),
-                    0 16px 16px hsl(0deg 0% 0% / 0.075);
-            }
+.team-section {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    margin: 20px;
+    border-radius: 15px;
+    padding: 60px 40px;
+}
 
-            .team-area {
-                background: rgba(255,255,255);
-                margin: 20px;
-                border-radius: 15px;
-            }
+.title-box {
+    background: rgba(255, 255, 255, 0.95);
+    text-align: center;
+    padding: 20px;
+    margin: 20px;
+    border-radius: 15px;
+    box-shadow:
+        0 1px 1px hsl(0deg 0% 0% / 0.075),
+        0 2px 2px hsl(0deg 0% 0% / 0.075),
+        0 4px 4px hsl(0deg 0% 0% / 0.075),
+        0 8px 8px hsl(0deg 0% 0% / 0.075),
+        0 16px 16px hsl(0deg 0% 0% / 0.075);
+}
 
-            .team-grid {
-                display: grid;
-                grid-template-columns: repeat(auto-fit,minmax(300px, 1fr));
-                gap: 60px;
-                margin-top: 50px;
-            }
-            
-            .profile-box {
-                border-radius: 15px;
-                box-shadow:
-                    0 1px 1px hsl(0deg 0% 0% / 0.075),
-                    0 2px 2px hsl(0deg 0% 0% / 0.075),
-                    0 4px 4px hsl(0deg 0% 0% / 0.075),
-                    0 8px 8px hsl(0deg 0% 0% / 0.075),
-                    0 16px 16px hsl(0deg 0% 0% / 0.075);
-            }
+.team-area {
+    background: rgba(255,255,255);
+    margin: 20px;
+    border-radius: 15px;
+}
 
-            .member-name {
-                font-size: 1.4em;
-                color: #333;
-                text-align: center;
-                margin-bottom: 8px;
-                font-weight: 600;
-            }
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(300px, 1fr));
+    gap: 60px;
+    margin-top: 50px;
+}
 
-            .member-role {
-                color: #667eea;
-                text-align: center;
-                font-weight: 600;
-                margin-bottom: 15px;
-                font-size: 1.1em;
-            }
+.profile-box {
+    border-radius: 15px;
+    box-shadow:
+        0 1px 1px hsl(0deg 0% 0% / 0.075),
+        0 2px 2px hsl(0deg 0% 0% / 0.075),
+        0 4px 4px hsl(0deg 0% 0% / 0.075),
+        0 8px 8px hsl(0deg 0% 0% / 0.075),
+        0 16px 16px hsl(0deg 0% 0% / 0.075);
+}
 
-            .member-experience {
-                color: #665;
-                text-align: center;
-                font-size: 0.95em;
-                margin-bottom: 15px;
-                font-style: italic;
-            }
+.member-name {
+    font-size: 1.4em;
+    color: #333;
+    text-align: center;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
 
-            .member-description {
-                color: #555;
-                text-align: center;
-                line-height: 1.6;
-                font-size: 0.95em;
-            }
+.member-role {
+    color: #667eea;
+    text-align: center;
+    font-weight: 600;
+    margin-bottom: 15px;
+    font-size: 1.1em;
+}
 
-            footer {
-                text-align: center;
-                padding: 40px 20px;
-                color: rgba(255,255,255);
-            }
+.member-experience {
+    color: #665;
+    text-align: center;
+    font-size: 0.95em;
+    margin-bottom: 15px;
+    font-style: italic;
+}
+
+.member-description {
+    color: #555;
+    text-align: center;
+    line-height: 1.6;
+    font-size: 0.95em;
+}
+
+footer {
+    text-align: center;
+    padding: 40px 20px;
+    color: rgba(255,255,255);
+}
