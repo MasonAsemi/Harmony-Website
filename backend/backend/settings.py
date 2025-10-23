@@ -81,8 +81,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173", #For react
     "http://harmonymatching.com",
     "https://harmonymatching.com",
-    'https://harmony-backend-4080-0c4993847d89.herokuapp.com'
-
+    'https://harmony-backend-4800-3fc8f73b6cb5.herokuapp.com',
+    ''
 ]
 
 CORS_ALLOW_METHODS = [
