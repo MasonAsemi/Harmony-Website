@@ -6,6 +6,7 @@
 
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { API_BASE_URL } from '../config';
+import { getUserData, requestLogin } from '../api/auth';
 
 const AuthContext = createContext();
 
@@ -50,16 +51,7 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (username, password) => {
         // Use api-token-auth endpoint
-        const response = await fetch(`${API_BASE_URL}/api-token-auth/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                username: username,
-                password: password
-            })
-        });
+        const response = await requestLogin({username: username, password: password});
 
         if (!response.ok) {
             const errorData = await response.json();
@@ -67,15 +59,12 @@ export const AuthProvider = ({ children }) => {
         }
 
         const data = await response.json();
+
+        setToken(data.token);
+        localStorage.setItem("token", data.token);
         
         // Get user data after login
-        const userResponse = await fetch(`${API_BASE_URL}/users/me/`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Token ${data.token}`,
-                'Content-Type': 'application/json',
-            },
-        });
+        const userResponse = await getUserData();
 
         if (!userResponse.ok) {
             throw new Error('Failed to fetch user data');
@@ -84,8 +73,6 @@ export const AuthProvider = ({ children }) => {
         const userData = await userResponse.json();
 
         setUser(userData);
-        setToken(data.token);
-        localStorage.setItem("token", data.token);
 
         return response;
     };

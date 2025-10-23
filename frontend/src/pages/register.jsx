@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { API_BASE_URL } from '../config';
 import '../styles/register.css';
-import { requestLogin } from '../api/auth';
+import { createUser, requestLogin } from '../api/auth';
 
 function Register() {
     const [username, setUsername] = useState('');
@@ -33,8 +32,8 @@ function Register() {
         setMessage('');
 
         try {
-            // Use /users/ endpoint which returns token on creation
-            const response = requestLogin({ username, email, password });
+            // Use /api/users/ endpoint which returns token on creation
+            const response = await createUser({ username, email, password });
 
             if (response.ok) {
                 setMessage('Registration successful! Redirecting to login...');
