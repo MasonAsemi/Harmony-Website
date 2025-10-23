@@ -5,9 +5,8 @@ console.log('API_BASE_URL in api.js:', API_BASE_URL);
 
 export const profileAPI = {
   getProfile: async (token) => {
-    const fullURL = `${API_BASE_URL}/users/me/`; // API_BASE_URL already includes /api
+    const fullURL = `${API_BASE_URL}/users/me/`;
     console.log('Fetching profile from:', fullURL);
-    console.log('Token:', token);
 
     const response = await fetch(fullURL, {
       method: 'GET',
@@ -17,9 +16,6 @@ export const profileAPI = {
       },
     });
 
-    console.log('Response URL:', response.url);
-    console.log('Response status:', response.status);
-
     if (!response.ok) {
       throw new Error('Failed to fetch profile');
     }
@@ -28,7 +24,7 @@ export const profileAPI = {
   },
 
   updateProfile: async (token, profileData) => {
-    const url = `${API_BASE_URL}/users/me/`; // don't add extra /api
+    const url = `${API_BASE_URL}/users/me/`;
     const response = await fetch(url, {
       method: 'PATCH',
       headers: {
