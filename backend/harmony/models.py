@@ -8,5 +8,6 @@ class User(AbstractUser):
     interests = models.TextField(blank=True, null=True)
     biography = models.TextField(blank=True, null=True)
     
+    
     def __str__(self):
         return self.username
