@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
-    'drf_yasg', # auto generated docs 
+    'drf_yasg', # auto generated docs
+    'chat',
 ]
 
 MIDDLEWARE = [
@@ -82,8 +83,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://harmonymatching.com",
     "https://harmonymatching.com",
     'https://harmony-backend-4800-3fc8f73b6cb5.herokuapp.com',
-    'https://harmony-website.pages.dev/',
-    'https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015'
+    'https://harmony-website.pages.dev',
+    'https://static.cloudflareinsights.com'
 ]
 
 CORS_ALLOW_METHODS = [
