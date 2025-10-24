@@ -11,3 +11,4 @@ Endpoint	Methods	Description
 /api/api-token-auth/ (Login) POST Returns the token of inputted user;  Body should look like: {"username": username, "password": password} 
 
 /api/search?query=No Role Modelz  GET  Returns a list of three songs based on the search query
+/api/songs 

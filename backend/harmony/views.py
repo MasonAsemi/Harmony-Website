@@ -67,19 +67,21 @@ class UserViewSet(viewsets.ModelViewSet):
             serializer.save()
             return Response(serializer.data)
         
-    #to get and update the logged in user data 
-    @action(detail=False, methods=['get', 'post'], permission_classes=[permissions.IsAuthenticated])
-    def songs(self, request):
-        if request.method == 'GET':
-            user_songs = Song.objects.filter(user=request.user)
-            return Response(SongSerializer(user_songs, many=True).data, status=status.HTTP_200_OK)
 
-        elif request.method == 'POST':
-            serializer = SongSerializer(data=request.data)
-            if serializer.is_valid():
-                serializer.save(user=request.user)  # ✅ Attach song to authenticated user
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class SongViewSet(viewsets.ModelViewSet):
+    serializer_class = SongSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # Only return songs belonging to the logged-in user
+        return Song.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        # Automatically attach the user to the song
+        serializer.save(user=self.request.user)
+
 
 
 #TODO: store the token and refresh every hour instead of making a request everytime
