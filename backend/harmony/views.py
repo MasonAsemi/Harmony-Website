@@ -1,8 +1,8 @@
 
 from rest_framework import viewsets, permissions, status 
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
-from .models import User
-from .serializers import UserSerializer
+from .models import User, Song
+from .serializers import UserSerializer, SongSerializer
 from .permissions import IsSelfOrReadOnly
 from rest_framework.decorators import action, api_view, permission_classes 
 from rest_framework.response import Response
@@ -66,6 +66,21 @@ class UserViewSet(viewsets.ModelViewSet):
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data)
+        
+    #to get and update the logged in user data 
+    @action(detail=False, methods=['get', 'post'], permission_classes=[permissions.IsAuthenticated])
+    def songs(self, request):
+        if request.method == 'GET':
+            user_songs = Song.objects.filter(user=request.user)
+            return Response(SongSerializer(user_songs, many=True).data, status=status.HTTP_200_OK)
+
+        elif request.method == 'POST':
+            serializer = SongSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save(user=request.user)  # ✅ Attach song to authenticated user
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 #TODO: store the token and refresh every hour instead of making a request everytime
 def get_spotify_token(client_id, client_secret):
@@ -123,7 +138,6 @@ def song_search(request):
         if response.status_code == 200  :
             #TODO: format the response into song data type 
             data = response.json()
-            songs = []
             
             if data['tracks'] and data['tracks']['items'] and data['tracks']['items']:
                 
@@ -140,8 +154,8 @@ def song_search(request):
                     
                     songs.append({
                         'list_of_artists': list_of_artists,
-                        'song_link': song_link,
-                        'song_name': song_name,
+                        'link': song_link,
+                        'name': song_name,
                     })
                 return Response({
                     'songs': songs
