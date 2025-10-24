@@ -1,8 +1,8 @@
 const styleFromMessageSource = (author, userAuthor) => 
 {
     if (author.id === userAuthor.id)
-        return 'justify-end';
-    return 'justify-start';
+        return 'justify-start';
+    return 'justify-end';
 };
 
 /**
@@ -14,11 +14,14 @@ const styleFromMessageSource = (author, userAuthor) =>
  */
 const Message = ({ author, userAuthor, text }) =>
 {
-    return (<div className={`flex ${styleFromMessageSource(author, userAuthor)} w-full min-h-0 mb-2`}>
-        <div className={`text-left text-white text-lg max-w-max w-1/2 p-2 break-words rounded-xl`}>
-            {text}
+    return <div>
+        <div className={``}>{author.username}</div>
+        <div className={`flex ${styleFromMessageSource(author, userAuthor)} bg-white rounded-2xl w-full min-h-0 mb-2`}>
+            <div className={`text-left text-black text-lg max-w-max w-1/2 p-2 wrap-break-word rounded-xl`}>
+                <div>{text}</div>
+            </div>
         </div>
-    </div>);
+    </div>;
 };
 
 export default Message;
