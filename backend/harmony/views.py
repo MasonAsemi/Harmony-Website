@@ -1,15 +1,18 @@
 
 from rest_framework import viewsets, permissions, status 
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from .models import User
 from .serializers import UserSerializer
 from .permissions import IsSelfOrReadOnly
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view, permission_classes 
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
-
+import base64
+import requests
+import os 
 
 class UserViewSet(viewsets.ModelViewSet):
+    
     queryset = User.objects.all()
     serializer_class = UserSerializer
     
@@ -60,3 +63,61 @@ class UserViewSet(viewsets.ModelViewSet):
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data)
+
+#TODO: store the token and refresh every hour instead of making a request everytime
+def get_spotify_token(client_id, client_secret):
+    auth_string = f"{client_id}:{client_secret}"
+    auth_base64 = base64.b64encode(auth_string.encode()).decode()
+
+    response = requests.post(
+        "https://accounts.spotify.com/api/token",
+        headers={"Authorization": f"Basic {auth_base64}"},
+        data={"grant_type": "client_credentials"}
+    )
+
+    if response.status_code == 200:
+        return response.json().get("access_token")
+    else:
+        raise Exception("Token retrieval failed:", response.text)
+
+#return list of songs from spotify based on query
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def song_search(request):
+    return Response([])
+    #TODO: working on route 
+    # client_id = os.getenv('CLIENT_ID')
+    # client_secret = os.getenv('CLIENT_SECRET')
+    
+    
+    # if not client_secret or client_id:
+    #     return Response("Client ID and/or Secret Not Loaded Properly From Environment", status= HTTP_500_INTERNAL_SERVER_ERROR)
+    # token = get_spotify_token(client_id, client_secret)
+    
+    # if(token):
+    #     query = request.GET.get('query', None)
+        
+    #     if not query :
+    #         return Response("Must Input A Song Query", status= status.HTTP_400_BAD_REQUEST)
+        
+    #     url = "https://api.spotify.com/v1/search"
+    #     params = {
+    #         'q': query,
+    #         'type': 'track',
+    #         'limit': 3,
+    #         # 'market': 'ES',
+    #         # 'offset':0,
+    #     }
+    #     header = {
+    #         'Authorization': f'Bearer {token}'
+    #     }
+        
+    #     response = requests.get(url, headers=header, params=params)
+        
+    #     if response.status_code == 200  :
+    #         return Response (response.json())
+    #     else:
+    #         return Response("Track Retrieval error: ", response.text)
+    # else:
+    #     return Response({"message: ", "Failed to retrieve token from spotify. Couldn't process search request"}, status=status.HTTP_417_EXPECTATION_FAILED)
