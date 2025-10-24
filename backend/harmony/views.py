@@ -96,7 +96,7 @@ def song_search(request):
     
     
     if not client_secret or not client_id:
-        return Response({"detail": "forehead" }, status= status.HTTP_503_SERVICE_UNAVAILABLE)
+        return Response({"detail": "Client Secret and Client ID not received from environment" }, status= status.HTTP_503_SERVICE_UNAVAILABLE)
     
     token = get_spotify_token(client_id, client_secret)
     
