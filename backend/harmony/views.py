@@ -10,6 +10,7 @@ from rest_framework.authtoken.models import Token
 import base64
 import requests
 import os 
+from dotenv import load_dotenv
 
 class UserViewSet(viewsets.ModelViewSet):
     
@@ -52,6 +53,8 @@ class UserViewSet(viewsets.ModelViewSet):
                 return User.objects.filter(id=self.request.user.id)
         return User.objects.all()
     
+
+
     #to get and update the logged in user data 
     @action(detail=False, methods=['get', 'patch', 'put'], permission_classes=[permissions.IsAuthenticated])
     def me(self, request):
@@ -85,39 +88,66 @@ def get_spotify_token(client_id, client_secret):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def song_search(request):
-    return Response([])
-    #TODO: working on route 
-    # client_id = os.getenv('CLIENT_ID')
-    # client_secret = os.getenv('CLIENT_SECRET')
+    
+    load_dotenv() 
+
+    client_id = os.getenv('CLIENT_ID')
+    client_secret = os.getenv('CLIENT_SECRET')
     
     
-    # if not client_secret or client_id:
-    #     return Response("Client ID and/or Secret Not Loaded Properly From Environment", status= HTTP_500_INTERNAL_SERVER_ERROR)
-    # token = get_spotify_token(client_id, client_secret)
+    if not client_secret or not client_id:
+        return Response({"detail": "forehead" }, status= status.HTTP_503_SERVICE_UNAVAILABLE)
     
-    # if(token):
-    #     query = request.GET.get('query', None)
+    token = get_spotify_token(client_id, client_secret)
+    
+    if(token):
+        query = request.GET.get('query', None)
         
-    #     if not query :
-    #         return Response("Must Input A Song Query", status= status.HTTP_400_BAD_REQUEST)
+        if not query :
+            return Response("Must Input A Song Query", status= status.HTTP_400_BAD_REQUEST)
         
-    #     url = "https://api.spotify.com/v1/search"
-    #     params = {
-    #         'q': query,
-    #         'type': 'track',
-    #         'limit': 3,
-    #         # 'market': 'ES',
-    #         # 'offset':0,
-    #     }
-    #     header = {
-    #         'Authorization': f'Bearer {token}'
-    #     }
+        url = "https://api.spotify.com/v1/search"
+        params = {
+            'q': query,
+            'type': 'track',
+            'limit': 3,
+            # 'market': 'ES',
+            # 'offset':0,
+        }
+        header = {
+            'Authorization': f'Bearer {token}'
+        }
         
-    #     response = requests.get(url, headers=header, params=params)
+        response = requests.get(url, headers=header, params=params)
         
-    #     if response.status_code == 200  :
-    #         return Response (response.json())
-    #     else:
-    #         return Response("Track Retrieval error: ", response.text)
-    # else:
-    #     return Response({"message: ", "Failed to retrieve token from spotify. Couldn't process search request"}, status=status.HTTP_417_EXPECTATION_FAILED)
+        if response.status_code == 200  :
+            #TODO: format the response into song data type 
+            data = response.json()
+            songs = []
+            
+            if data['tracks'] and data['tracks']['items'] and data['tracks']['items']:
+                
+
+                for song in data['tracks']['items']:
+                    song_link = song['external_urls']
+                    song_name= song['name'] 
+                    list_of_artists =[]
+                    for artist in song['artists']:
+                        list_of_artists.append({
+                            'name': artist['name'],
+                            'links': artist['external_urls']
+                        })
+                    
+                    return Response({
+                        'list_of_artists': list_of_artists,
+                        'song_link': song_link,
+                        'song_name': song_name,
+                    })
+
+            else: 
+                return Response({"detail": "Returned data wasn't in correct format"}, status=status.HTTP_417_EXPECTATION_FAILED)
+                
+        else:
+            return Response({"Track Retrieval error: ", response.text})
+    else:
+        return Response({"message: ", "Failed to retrieve token from spotify. Couldn't process search request"}, status=status.HTTP_417_EXPECTATION_FAILED)
