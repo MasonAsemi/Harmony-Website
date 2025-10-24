@@ -17,10 +17,11 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         const storedToken = localStorage.getItem("token");
+        console.log("Token: ", storedToken);
 
         if (storedToken) {
             // Verify token and get user data using /users/me/
-            fetch(`${API_BASE_URL}/users/me/`, {
+            fetch(`${API_BASE_URL}users/me/`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Token ${storedToken}`,
