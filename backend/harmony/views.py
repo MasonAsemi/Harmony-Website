@@ -127,7 +127,7 @@ def song_search(request):
             
             if data['tracks'] and data['tracks']['items'] and data['tracks']['items']:
                 
-
+                songs = []
                 for song in data['tracks']['items']:
                     song_link = song['external_urls']
                     song_name= song['name'] 
@@ -138,12 +138,14 @@ def song_search(request):
                             'links': artist['external_urls']
                         })
                     
-                    return Response({
+                    songs.append({
                         'list_of_artists': list_of_artists,
                         'song_link': song_link,
                         'song_name': song_name,
                     })
-
+                return Response({
+                    'songs': songs
+                })
             else: 
                 return Response({"detail": "Returned data wasn't in correct format"}, status=status.HTTP_417_EXPECTATION_FAILED)
                 
