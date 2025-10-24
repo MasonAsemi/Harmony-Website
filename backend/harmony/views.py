@@ -1,8 +1,8 @@
 
 from rest_framework import viewsets, permissions, status 
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
-from .models import User
-from .serializers import UserSerializer
+from .models import User, Song
+from .serializers import UserSerializer, SongSerializer
 from .permissions import IsSelfOrReadOnly
 from rest_framework.decorators import action, api_view, permission_classes 
 from rest_framework.response import Response
@@ -66,6 +66,23 @@ class UserViewSet(viewsets.ModelViewSet):
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data)
+        
+
+
+
+class SongViewSet(viewsets.ModelViewSet):
+    serializer_class = SongSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # Only return songs belonging to the logged-in user
+        return Song.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        # Automatically attach the user to the song
+        serializer.save(user=self.request.user)
+
+
 
 #TODO: store the token and refresh every hour instead of making a request everytime
 def get_spotify_token(client_id, client_secret):
@@ -123,7 +140,6 @@ def song_search(request):
         if response.status_code == 200  :
             #TODO: format the response into song data type 
             data = response.json()
-            songs = []
             
             if data['tracks'] and data['tracks']['items'] and data['tracks']['items']:
                 
@@ -140,8 +156,8 @@ def song_search(request):
                     
                     songs.append({
                         'list_of_artists': list_of_artists,
-                        'song_link': song_link,
-                        'song_name': song_name,
+                        'link': song_link,
+                        'name': song_name,
                     })
                 return Response({
                     'songs': songs

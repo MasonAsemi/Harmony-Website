@@ -49,6 +49,8 @@ const Chat = () =>
     // If the last assistant response was unsuccessful, then it will override the unsuccessful response and user message that prompted it
     const handleReturn = async () => 
     {
+        console.log(user)
+        messages.push({author: user, userAuthor: user, text: userContent});
         setUserContent("");
         // TODO: User userContent (user's input to the chat field) to send the message
     };
@@ -93,10 +95,10 @@ const Chat = () =>
 
     return (
         <>
-            <div className="flex flex-col flex-grow m-3 w-11/12 h-11/12">
-                <div className="flex-grow mb-8 p-4 bg-transparent">
+            <div className="flex flex-col grow m-3 w-11/12 h-11/12">
+                <div className="grow mb-8 p-4 bg-transparent">
                     {messages.map((message, index) => (
-                        <Message key={index} text={message.text} />
+                        <Message key={index} author={message.author} userAuthor={message.userAuthor} text={message.text} />
                     ))}
                     <div className={messages.length > 0 ? "hidden" : ""}>
                         <h1 className="text-3xl font-bold text-white">The beginning of your conversation with ...</h1>
@@ -104,7 +106,7 @@ const Chat = () =>
                 </div>
             </div>
             <div className="fixed w-full bottom-2">
-                <div className={"flex items-end rounded-xl p-2 flex-grow ml-1 mr-1 h-max bg-citrus-blue"}>
+                <div className={"flex items-end rounded-xl p-2 grow ml-1 mr-1 h-max bg-citrus-blue"}>
                     <div data-testid="input" contentEditable="true" suppressContentEditableWarning={true} onBlur={handleOnBlur} onFocus={handleOnFocus} onKeyDown={handleKeyDown} onKeyUp={handleKeyUp} data-placeholder={placeholderText} className="p-1 h-max max-h-32 overflow-auto resize-none flex-grow placeholder:text-slate-300 text-white text-lg bg-transparent rounded">{placeholderText}</div>
                     <button data-testid="submit" onClick={handleReturn} disabled={isButtonDisabled()} className={`flex justify-center items-center text-3xl border p-2 ml-1 w-9 h-9 rounded ${isButtonDisabled() ? "bg-transparent" : "bg-white hover:bg-[#eee]"}`}>
                     </button>
