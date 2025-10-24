@@ -9,3 +9,5 @@ Endpoint	Methods	Description
 /api/users/me/	PUT	Update current user (full update, add put to methods if needed)
 
 /api/api-token-auth/ (Login) POST Returns the token of inputted user;  Body should look like: {"username": username, "password": password} 
+
+/api/search?query=No Role Modelz  GET  Returns a list of three songs based on the search query
