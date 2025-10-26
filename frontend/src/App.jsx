@@ -18,6 +18,7 @@ import Register from "./pages/register";
 import Profile from './pages/profile';
 import About from './pages/About';
 import Chat from './pages/Chat';
+import Dashboard from './pages/Dashboard';
 
 function Home() {
   return (
@@ -94,6 +95,7 @@ export default function App() {
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/about" element={<About />} />
             <Route path="/chat" element={<Chat />} />
+            <Route path="/dashboard" element={<Dashboard />} />
           </Routes>
         </div>
       </AuthProvider>
