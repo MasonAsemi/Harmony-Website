@@ -57,8 +57,12 @@ function Register() {
         }
     };
 
+    const handleSpotify = () => {
+        console.log("Spotify sign in")
+    }
+
     return (
-        <section className="relative h-screen pt-20 overflow-hidden bg-gradient-to-br from-rose-300 via-pink-400 to-rose-500 flex items-center justify-center">
+        <section className="relative h-screen pt-20 overflow-hidden flex-col gap-y-2 bg-gradient-to-br from-rose-300 via-pink-400 to-rose-500 flex items-center justify-center">
             <div className="auth-panel mx-4">
                 <h2 className="auth-title">Register</h2>
 
@@ -129,6 +133,10 @@ function Register() {
                         </p>
                     )}
                 </form>
+            </div>
+            <div className="w-full flex flex-col gap-y-3 items-center center max-w-[520px]">
+                <div className="text-white text-2xl text-center">Or</div>
+                <button onClick={handleSpotify} className="rounded-2xl w-[75%] bg-[#7f7] p-3">Sign up with Spotify</button>
             </div>
         </section>
     );
