@@ -11,7 +11,7 @@ const ChatsList = ({ userChats }) => {
             throw new Error("ChatsList userChats is not an array")
     }, [])
 
-    return <div className="flex flex-col gap-4 w-1/3">
+    return <div className="flex flex-col gap-4 w-full">
         <div className="w-full text-center text-white text-xl">Chats</div>
         {
             currentChats.map((item, index) => {
