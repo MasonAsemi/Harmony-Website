@@ -1,12 +1,9 @@
-import { API_BASE_URL } from '../config';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../components/AuthContext';
-import DataPopup from '../components/DataPopup';
 import '../styles/login.css';
 
 function Login() {
-    const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
@@ -14,106 +11,85 @@ function Login() {
     const navigate = useNavigate();
     const { login } = useAuth();
 
-    const displayGrid = () => {
-        setIsPopupOpen(true);
-    };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         
         if (!username || !password) {
-        setMessage('Please fill in all fields');
-        return;
+            setMessage('Please fill in all fields');
+            return;
         }
 
         setIsLoading(true);
         setMessage('');
 
         try {
-        const response = await fetch(`${API_BASE_URL}/login/`, {
-            method: 'POST',
-            headers: {
-            'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-            username: username,
-            password: password
-            })
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
+            await login(username, password);
             setMessage('Login successful! Redirecting...');
-            
-            // Store user and token in context
-            login(data.user, data.token);
-            
-            console.log('Token:', data.token);
-            console.log('User:', data.user);
             
             // Clear form
             setUsername('');
             setPassword('');
             
-            // Redirect to home page after around 1 second to give loading time
+            // Redirect to profile page
             setTimeout(() => {
-            navigate('/');
+                navigate('/profile');
             }, 1000);
-        } else {
-            setMessage(data.detail || 'Login failed. Please check your credentials.');
-        }
         } catch (error) {
-        console.error('Login error:', error);
-        setMessage('Network error. Please check your connection and try again.');
+            console.error('Login error:', error);
+            setMessage(error.message || 'Login failed. Please check your credentials.');
         } finally {
-        setIsLoading(false);
+            setIsLoading(false);
         }
     };
 
     return (
-        <>
-        <div className='login-box'>
-            <div className='login-title'>Login</div>
-            <form onSubmit={handleSubmit}>
-            <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Username"
-                required
-                disabled={isLoading}
-            />
+        <section className="relative h-screen pt-20 overflow-hidden bg-gradient-to-br from-rose-300 via-pink-400 to-rose-500 flex items-center justify-center">
+            <div className="auth-panel mx-4">
+                <h2 className="auth-title">Login</h2>
 
-            <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
-                required
-                disabled={isLoading}
-            />
+                <form onSubmit={handleSubmit} className="auth-form">
+                    <div className="form-group">
+                        <label>Username</label>
+                        <input
+                            type="text"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            placeholder="Username"
+                            required
+                            disabled={isLoading}
+                            className="auth-input"
+                        />
+                    </div>
 
-            <input 
-                type="submit" 
-                value={isLoading ? "Logging in..." : "Login"} 
-                style={{ backgroundColor: "#a1eafb", cursor: isLoading ? 'not-allowed' : 'pointer' }} 
-                disabled={isLoading}
-            />
-            
-            {message && (
-                <p style={{ 
-                color: message.includes('successful') ? 'green' : 'red', 
-                marginTop: '10px',
-                textAlign: 'center'
-                }}>
-                {message}
-                </p>
-            )}
-            </form>
-        </div>
-        <DataPopup isOpen={isPopupOpen} onClose={() => setIsPopupOpen(false)} />
-        </>
+                    <div className="form-group">
+                        <label>Password</label>
+                        <input
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="Password"
+                            required
+                            disabled={isLoading}
+                            className="auth-input"
+                        />
+                    </div>
+
+                    <button
+                        type="submit"
+                        className="auth-btn"
+                        disabled={isLoading}
+                    >
+                        {isLoading ? 'Logging in...' : 'Login'}
+                    </button>
+                    
+                    {message && (
+                        <p className={`auth-message ${message.includes('successful') ? 'text-green-600' : 'text-red-600'}`}>
+                            {message}
+                        </p>
+                    )}
+                </form>
+            </div>
+        </section>
     );
 }
 
