@@ -7,6 +7,7 @@ from .permissions import IsSelfOrReadOnly
 from rest_framework.decorators import action, api_view, permission_classes 
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
+from django.http import JsonResponse, HttpResponseRedirect
 import base64
 import requests
 import os 
@@ -183,7 +184,7 @@ def spotify_login(request):
         "response_type": "code",
         "redirect_uri": os.getenv('SPOTIFY_REDIRECT_URI'), #when testing it's localhost 
         "scope": "user-read-email user-read-private",   # Add other scopes as needed
-        "state": "random_csrf_string_or_user_id",       # Optional but recommended
+      #  "state": "random_csrf_string_or_user_id",       # Optional but recommended
     }
 
     url = f"{spotify_auth_url}?{urllib.parse.urlencode(params)}"
@@ -191,13 +192,12 @@ def spotify_login(request):
 
 
 @api_view(['GET'])
-@api_view(['GET'])
 def spotify_callback(request):
     code = request.GET.get('code')
     error = request.GET.get('error')
 
     if error:
-        return Response({"error": error}, status=400)
+        return JsonResponse({"error": error}, status=400)
 
     # exchange code for access + refresh token
     token_url = 'https://accounts.spotify.com/api/token'
@@ -218,7 +218,7 @@ def spotify_callback(request):
     scope = token_data.get('scope')
 
     if not access_token:
-        return Response({"error": "Failed to retrieve Spotify token"}, status=400)
+        return JsonResponse({"error": "Failed to retrieve Spotify token"}, status=400)
 
     # use access token to get Spotify user's profile info
     user_profile_response = requests.get(
@@ -258,6 +258,6 @@ def spotify_callback(request):
     auth_token, _ = Token.objects.get_or_create(user=user)
 
     # Send user back to frontend with token (or store in session)
-    frontend_redirect = f"https://harmonymatching.com/?token={auth_token.key}"
+    frontend_redirect = f"https://harmonymatching.com/profile?token={auth_token.key}"
     return redirect(frontend_redirect)
 
