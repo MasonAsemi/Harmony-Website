@@ -58,7 +58,8 @@ function Register() {
     };
 
     const handleSpotify = () => {
-        console.log("Spotify sign in")
+        //TODO: test code 
+        window.location.href = "https://harmony-backend-4800-3fc8f73b6cb5.herokuapp.com/api/spotify-auth/login/"; // redirect users to spotify
     }
 
     return (

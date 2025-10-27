@@ -102,3 +102,12 @@ class UserFavoriteGenre(models.Model):
 
     def __str__(self):
         return f"{self.user.username} favorite genre: {self.genre.genre_name}"
+    
+
+class SpotifyCredentials(models.Model):
+    user= models.ForeignKey(User,on_delete= models.CASCADE)
+    access_token = models.CharField(max_length=255, blank=True, null=True)
+    token_type = models.CharField(max_length=255, blank=True, null=True)
+    scope = models.CharField(max_length=500, blank=True, null=True)
+    expires_in = models.IntegerField(); #seconds 
+    refresh_token = models.CharField(max_length=255, blank=True, null=True)

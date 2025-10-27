@@ -1,4 +1,4 @@
-
+from django.shortcuts import redirect
 from rest_framework import viewsets, permissions, status 
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from .models import User, Song
@@ -7,11 +7,12 @@ from .permissions import IsSelfOrReadOnly
 from rest_framework.decorators import action, api_view, permission_classes 
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
+from django.http import JsonResponse, HttpResponseRedirect
 import base64
 import requests
 import os 
 from dotenv import load_dotenv
-
+import urllib.parse
 class UserViewSet(viewsets.ModelViewSet):
     
     queryset = User.objects.all()
@@ -169,3 +170,94 @@ def song_search(request):
             return Response({"Track Retrieval error: ", response.text})
     else:
         return Response({"message: ", "Failed to retrieve token from spotify. Couldn't process search request"}, status=status.HTTP_417_EXPECTATION_FAILED)
+
+
+@api_view(['GET'])
+def spotify_login(request):
+
+    load_dotenv() 
+    # Spotify OAuth URL
+    spotify_auth_url = "https://accounts.spotify.com/authorize"
+
+    params = {
+        "client_id": os.getenv('CLIENT_ID'), 
+        "response_type": "code",
+        "redirect_uri": os.getenv('SPOTIFY_REDIRECT_URI'), #when testing it's localhost 
+        "scope": "user-read-email user-read-private",   # Add other scopes as needed
+      #  "state": "random_csrf_string_or_user_id",       # Optional but recommended
+    }
+
+    url = f"{spotify_auth_url}?{urllib.parse.urlencode(params)}"
+    return redirect(url)  # Sends a 302 redirect to Spotify
+
+
+@api_view(['GET'])
+def spotify_callback(request):
+    code = request.GET.get('code')
+    error = request.GET.get('error')
+
+    if error:
+        return JsonResponse({"error": error}, status=400)
+
+    # exchange code for access + refresh token
+    token_url = 'https://accounts.spotify.com/api/token'
+    payload = {
+        'grant_type': 'authorization_code',
+        'code': code,
+        'redirect_uri': os.getenv('SPOTIFY_REDIRECT_URI'),
+        'client_id': os.getenv('CLIENT_ID'),
+        'client_secret': os.getenv('CLIENT_SECRET'),
+    }
+    token_response = requests.post(token_url, data=payload)
+    token_data = token_response.json()
+
+    access_token = token_data.get('access_token')
+    refresh_token = token_data.get('refresh_token')
+    expires_in = token_data.get('expires_in')
+    token_type = token_data.get('token_type')
+    scope = token_data.get('scope')
+
+    if not access_token:
+        return JsonResponse({"error": "Failed to retrieve Spotify token"}, status=400)
+
+    # use access token to get Spotify user's profile info
+    user_profile_response = requests.get(
+        "https://api.spotify.com/v1/me",
+        headers={"Authorization": f"Bearer {access_token}"}
+    )
+    spotify_user = user_profile_response.json()
+
+    # spotify_user contains: id, email, display_name, images...
+    spotify_id = spotify_user.get('id')
+    email = spotify_user.get('email')   # Need 'user-read-email' scope
+    username = spotify_user.get('display_name') or f"spotify_{spotify_id}"
+
+    # Create or get  User
+    user, created = User.objects.get_or_create(
+        username=spotify_id,       # OR email if you prefer unique email-based accounts
+        defaults={
+            "email": email,
+            "first_name": username or "",
+        }
+    )
+
+    # Store Spotify credentials for that user
+    from .models import SpotifyCredentials
+    SpotifyCredentials.objects.update_or_create(
+        user=user,
+        defaults={
+            "access_token": access_token,
+            "refresh_token": refresh_token,
+            "expires_in": expires_in,
+            "token_type": token_type,
+            "scope": scope,
+        }
+    )
+
+    #Create DRF token for authentication with your API
+    auth_token, _ = Token.objects.get_or_create(user=user)
+
+    # Send user back to frontend with token (or store in session)
+    frontend_redirect = f"https://harmonymatching.com/profile?token={auth_token.key}"
+    return redirect(frontend_redirect)
+
