@@ -258,6 +258,6 @@ def spotify_callback(request):
     auth_token, _ = Token.objects.get_or_create(user=user)
 
     # Send user back to frontend with token (or store in session)
-    frontend_redirect = f"https://harmonymatching.com/profile?token={auth_token.key}"
+    frontend_redirect = f"https://harmonymatching.com/login?token={auth_token.key}"
     return redirect(frontend_redirect)
 
