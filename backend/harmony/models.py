@@ -106,8 +106,8 @@ class UserFavoriteGenre(models.Model):
 
 class SpotifyCredentials(models.Model):
     user= models.ForeignKey(User,on_delete= models.CASCADE)
-    access_token = models.CharField(max_length=255, blank=True, null=True)
-    token_type = models.CharField(max_length=255, blank=True, null=True)
-    scope = models.CharField(max_length=500, blank=True, null=True)
+    access_token = models.TextField( blank=True, null=True)
+    token_type = models.TextField(  blank=True, null=True)
+    scope = models.TextField( blank=True, null=True)
     expires_in = models.IntegerField(); #seconds 
-    refresh_token = models.CharField(max_length=255, blank=True, null=True)
+    refresh_token = models.TextField(blank=True, null=True)
