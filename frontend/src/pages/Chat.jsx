@@ -2,30 +2,16 @@ import { useState, useEffect } from "react";
 import Message from "../components/Message";
 import { useAuth } from "../components/AuthContext";
 
-const Chat = () =>
+const Chat = ({ currentChat }) =>
 {
     const [messages, setMessages] = useState([]);
     const [userContent, setUserContent] = useState('');
     const [response, setResponse] = useState('');
 
     const [isHoldingShift, setIsHoldingShift] = useState(false);
-    const [isMobile, setIsMobile] = useState(false);
     const placeholderText = 'Send a message...';
     const { user } = useAuth();
     const authUser = new Author(user?.id, user?.username);
-
-    // Check if the user is on mobile
-    useEffect(() => 
-    {
-        const userAgent = navigator.userAgent;
-
-        if (/iPhone|iPad|iPod|Android/i.test(userAgent)) 
-        {
-            setIsMobile(true);
-        } else {
-            setIsMobile(false);
-        }
-    }, []);
 
     // Update the messages state when a response from the server is loaded
     useEffect(() => 
@@ -51,8 +37,9 @@ const Chat = () =>
     {
         console.log(user)
         messages.push({author: user, userAuthor: user, text: userContent});
-        setUserContent("");
         // TODO: User userContent (user's input to the chat field) to send the message
+        // ...
+        setUserContent("");
     };
 
     // Handles the onBlur event for the input field, updating the placeholder and text accordingly
@@ -94,8 +81,8 @@ const Chat = () =>
     };
 
     return (
-        <>
-            <div className="flex flex-col grow m-3 w-11/12 h-11/12">
+        <div className="size-full">
+            <div className="flex flex-col bg-black h-11/12">
                 <div className="grow mb-8 p-4 bg-transparent">
                     {messages.map((message, index) => (
                         <Message key={index} author={message.author} userAuthor={message.userAuthor} text={message.text} />
@@ -105,14 +92,14 @@ const Chat = () =>
                     </div>
                 </div>
             </div>
-            <div className="fixed w-full bottom-2">
-                <div className={"flex items-end rounded-xl p-2 grow ml-1 mr-1 h-max bg-citrus-blue"}>
-                    <div data-testid="input" contentEditable="true" suppressContentEditableWarning={true} onBlur={handleOnBlur} onFocus={handleOnFocus} onKeyDown={handleKeyDown} onKeyUp={handleKeyUp} data-placeholder={placeholderText} className="p-1 h-max max-h-32 overflow-auto resize-none flex-grow placeholder:text-slate-300 text-white text-lg bg-transparent rounded">{placeholderText}</div>
-                    <button data-testid="submit" onClick={handleReturn} disabled={isButtonDisabled()} className={`flex justify-center items-center text-3xl border p-2 ml-1 w-9 h-9 rounded ${isButtonDisabled() ? "bg-transparent" : "bg-white hover:bg-[#eee]"}`}>
+            <div className="fixed bottom-2">
+                <div className={"flex flex-row"}>
+                    <div className="flex" data-testid="input" contentEditable="true" suppressContentEditableWarning={true} onBlur={handleOnBlur} onFocus={handleOnFocus} onKeyDown={handleKeyDown} onKeyUp={handleKeyUp} data-placeholder={placeholderText}>{placeholderText}</div>
+                    <button className={`border hover:cursor-pointer h-full ${isButtonDisabled() ? "bg-transparent" : "bg-white hover:bg-[#eee]"}`} data-testid="submit" onClick={handleReturn} disabled={isButtonDisabled()}>
                     </button>
                 </div>
             </div>
-        </>
+        </div>
     );
 };
 
