@@ -78,6 +78,26 @@ export const AuthProvider = ({ children }) => {
         return response;
     };
 
+    // login spotify users
+    const loginToken = async (token) => {
+
+        setToken(token) ;
+        localStorage.setItem("token", token);
+        
+        // Get user data after login
+        const userResponse = await getUserData();
+
+        if (!userResponse.ok) {
+            throw new Error('Failed to fetch user data');
+        }
+
+        const userData = await userResponse.json();
+
+        setUser(userData);
+
+        return response;
+    };
+
     const logout = () => {
         setUser(null);
         setToken(null);
