@@ -219,22 +219,36 @@ def spotify_callback(request):
 
     if not access_token:
         return JsonResponse({"error": "Failed to retrieve Spotify token"}, status=400)
-
+    
     # use access token to get Spotify user's profile info
     user_profile_response = requests.get(
         "https://api.spotify.com/v1/me",
         headers={"Authorization": f"Bearer {access_token}"}
     )
-    spotify_user = user_profile_response.json()
+    
+    if user_profile_response.status_code != 200:
+        return JsonResponse({
+            "error": f"Failed to fetch user profile from Spotify",
+            "status_code": user_profile_response.status_code,
+            "response": user_profile_response.text
+        }, status=400)
+    
+    try:
+        spotify_user = user_profile_response.json()
+    except requests.exceptions.JSONDecodeError:
+        return JsonResponse({
+            "error": "Invalid JSON response from Spotify",
+            "response_text": user_profile_response.text
+        }, status=400)
 
     # spotify_user contains: id, email, display_name, images...
     spotify_id = spotify_user.get('id')
     email = spotify_user.get('email')   # Need 'user-read-email' scope
     username = spotify_user.get('display_name') or f"spotify_{spotify_id}"
 
-    # Create or get  User
+    # Create or get User
     user, created = User.objects.get_or_create(
-        username=spotify_id,       # OR email if you prefer unique email-based accounts
+        username=spotify_id,
         defaults={
             "email": email,
             "first_name": username or "",
@@ -254,7 +268,7 @@ def spotify_callback(request):
         }
     )
 
-    #Create DRF token for authentication with your API
+    # Create DRF token for authentication with your API
     auth_token, _ = Token.objects.get_or_create(user=user)
 
     # Send user back to frontend with token (or store in session)
