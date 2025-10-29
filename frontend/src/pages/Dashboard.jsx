@@ -83,11 +83,6 @@ function Dashboard() {
                                 </div>
                             </div>
                             
-                            {/* Name and info area */}
-                            <div className="p-6 text-center">
-                                <h2 className="text-2xl font-bold text-gray-800 mb-2">Select a chat</h2>
-                                <p className="text-gray-600">Choose a conversation from the left to get started</p>
-                            </div>
                         </div>
                     </div>
                 )}
