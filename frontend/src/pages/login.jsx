@@ -4,6 +4,7 @@ import { useAuth } from '../components/AuthContext';
 import '../styles/login.css';
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+
 function Login() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -14,7 +15,7 @@ function Login() {
     let { token } = useParams(); 
 
     useEffect(()=>{
-        //if there is a token in the params then send to prof
+        //if there is a token in the params then send to dashboard
         if(token){
             const loginSpotify = async () =>{ 
                 //TODO: REMOVE
@@ -27,15 +28,16 @@ function Login() {
                 setUsername('');
                 setPassword('');
                 
-                // Redirect to profile page
+                // Redirect to dashboard
                 setTimeout(() => {
-                    navigate('/profile');
+                    navigate('/dashboard');
                 }, 1000);
             }
             
             loginSpotify(); 
         }
     },[token])
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         
@@ -55,9 +57,9 @@ function Login() {
             setUsername('');
             setPassword('');
             
-            // Redirect to profile page
+            // Redirect to dashboard
             setTimeout(() => {
-                navigate('/profile');
+                navigate('/dashboard');
             }, 1000);
         } catch (error) {
             console.error('Login error:', error);

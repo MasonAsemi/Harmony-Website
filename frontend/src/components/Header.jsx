@@ -27,6 +27,9 @@ export function Header() {
                     {user ? (
                         <>
                             <span className="text-gray-700">Welcome, {user.username}!</span>
+                            <Link to="/dashboard" className="text-gray-700 px-3 py-2 rounded hover:bg-gray-100">
+                                Dashboard
+                            </Link>
                             <Link to="/profile" className="text-gray-700 px-3 py-2 rounded hover:bg-gray-100">
                                 Profile
                             </Link>
