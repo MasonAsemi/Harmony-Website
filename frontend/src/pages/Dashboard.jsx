@@ -27,7 +27,7 @@ function Dashboard() {
     };
 
     return (
-        <div className="flex flex-row h-screen bg-gradient-to-br from-rose-300 via-pink-400 to-rose-500">
+        <div className="flex flex-row h-screen bg-linear-to-br from-rose-300 via-pink-400 to-rose-500">
             <Sidebar />
             
             {/* Left sidebar with chats */}
@@ -63,7 +63,7 @@ function Dashboard() {
                     <div className="w-full max-w-md">
                         <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
                             {/* Profile image placeholder */}
-                            <div className="aspect-[3/4] bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+                            <div className="aspect-3/4 bg-linear-to-br from-gray-200 to-gray-300 flex items-center justify-center">
                                 <div className="text-center text-gray-500">
                                     <svg 
                                         xmlns="http://www.w3.org/2000/svg" 
@@ -82,7 +82,10 @@ function Dashboard() {
                                     <p className="text-lg">No Image</p>
                                 </div>
                             </div>
-                            
+                            <div className="p-6 text-center flex justify-center gap-4">
+                                <button type="button" className="w-40 focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">✖</button>
+                                <button type="button" className="w-40 focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">✓</button>
+                            </div>
                         </div>
                     </div>
                 )}
