@@ -14,6 +14,16 @@ const exampleChats = [
     }
 ]
 
+const declineMatch = () => {
+    console.log("Match declined");
+    // Add logic to handle declining a match
+}
+
+const acceptMatch = () => {
+    console.log("Match accepted");
+    // Add logic to handle accepting a match
+}
+
 function Dashboard() {
     const [currentChat, setCurrentChat] = useState(null);
 
@@ -83,8 +93,8 @@ function Dashboard() {
                                 </div>
                             </div>
                             <div className="p-6 text-center flex justify-center gap-4">
-                                <button type="button" className="w-40 focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">✖</button>
-                                <button type="button" className="w-40 focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">✓</button>
+                                <button type="button" onClick={declineMatch} className="w-40 focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">✖</button>
+                                <button type="button" onClick={acceptMatch} className="w-40 focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">✓</button>
                             </div>
                         </div>
                     </div>
