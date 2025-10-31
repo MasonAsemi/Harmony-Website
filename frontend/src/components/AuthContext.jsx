@@ -85,17 +85,22 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem("token", token);
         
         // Get user data after login
-        const userResponse = await getUserData();
+        const userResponse = await fetch(`${API_BASE_URL}/api/users/me/`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Token ${authToken}`,
+                'Content-Type': 'application/json',
+            },
+        });
 
         if (!userResponse.ok) {
             throw new Error('Failed to fetch user data');
         }
 
         const userData = await userResponse.json();
-
         setUser(userData);
-
-        return response;
+        
+        return userResponse;
     };
 
     const logout = () => {
