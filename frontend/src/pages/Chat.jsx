@@ -81,21 +81,45 @@ const Chat = ({ currentChat }) =>
     };
 
     return (
-        <div className="size-full">
-            <div className="flex flex-col bg-black h-11/12">
-                <div className="grow mb-8 p-4 bg-transparent">
-                    {messages.map((message, index) => (
-                        <Message key={index} author={message.author} userAuthor={message.userAuthor} text={message.text} />
-                    ))}
-                    <div className={messages.length > 0 ? "hidden" : ""}>
-                        <h1 className="text-3xl font-bold text-white">The beginning of your conversation with ...</h1>
+        <div className="flex flex-col h-full">
+            {/* Messages area */}
+            <div className="flex-1 overflow-y-auto p-4 bg-gradient-to-br from-rose-300 via-pink-400 to-rose-500">
+                {messages.map((message, index) => (
+                    <Message key={index} author={message.author} userAuthor={message.userAuthor} text={message.text} />
+                ))}
+                {messages.length === 0 && (
+                    <div className="flex items-center justify-center h-full">
+                        <h1 className="text-3xl font-bold text-white">The beginning of your conversation...</h1>
                     </div>
-                </div>
+                )}
             </div>
-            <div className="fixed bottom-2">
-                <div className={"flex flex-row"}>
-                    <div className="flex" data-testid="input" contentEditable="true" suppressContentEditableWarning={true} onBlur={handleOnBlur} onFocus={handleOnFocus} onKeyDown={handleKeyDown} onKeyUp={handleKeyUp} data-placeholder={placeholderText}>{placeholderText}</div>
-                    <button className={`border hover:cursor-pointer h-full ${isButtonDisabled() ? "bg-transparent" : "bg-white hover:bg-[#eee]"}`} data-testid="submit" onClick={handleReturn} disabled={isButtonDisabled()}>
+            
+            {/* Input area at bottom */}
+            <div className="p-4 bg-white border-t border-gray-200">
+                <div className="flex flex-row gap-2 w-full">
+                    <div 
+                        className="flex-1 p-3 border border-gray-300 rounded-lg bg-white text-gray-900 min-h-[50px] max-h-[150px] overflow-y-auto focus:outline-none focus:border-rose-400" 
+                        data-testid="input" 
+                        contentEditable="true" 
+                        suppressContentEditableWarning={true} 
+                        onBlur={handleOnBlur} 
+                        onFocus={handleOnFocus} 
+                        onKeyDown={handleKeyDown} 
+                        onKeyUp={handleKeyUp}
+                    >
+                        {placeholderText}
+                    </div>
+                    <button 
+                        className={`px-6 py-3 rounded-lg font-semibold transition-colors ${
+                            isButtonDisabled() 
+                                ? "bg-gray-300 text-gray-500 cursor-not-allowed" 
+                                : "bg-rose-500 text-white hover:bg-rose-600"
+                        }`} 
+                        data-testid="submit" 
+                        onClick={handleReturn} 
+                        disabled={isButtonDisabled()}
+                    >
+                        Send
                     </button>
                 </div>
             </div>
