@@ -1,11 +1,2 @@
-Endpoint	Methods	Description
-/api/users/	GET	List all users (self-only filtering may be needed)  IF NON ADMIN CALL THIS WILL JUST RETURN THE LOGGED IN USER
-/api/users/	POST	Signup (returns token) // for new users 
-/api/users/{id}/	GET	Retrieve a user (only self)
-/api/users/{id}/	PATCH	Partial update (only self)
-/api/users/{id}/	DELETE	Delete user (only self)
-/api/users/me/	GET	Get current user
-/api/users/me/	PATCH	Update current user (partial update)
-/api/users/me/	PUT	Update current user (full update, add put to methods if needed)
-
-/api/api-token-auth/ (Login) POST Returns the token of inputted user;  Body should look like: {"username": username, "password": password} 
+api/docs
+api/redoc

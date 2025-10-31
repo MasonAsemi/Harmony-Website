@@ -2,30 +2,16 @@ import { useState, useEffect } from "react";
 import Message from "../components/Message";
 import { useAuth } from "../components/AuthContext";
 
-const Chat = () =>
+const Chat = ({ currentChat }) =>
 {
     const [messages, setMessages] = useState([]);
     const [userContent, setUserContent] = useState('');
     const [response, setResponse] = useState('');
 
     const [isHoldingShift, setIsHoldingShift] = useState(false);
-    const [isMobile, setIsMobile] = useState(false);
     const placeholderText = 'Send a message...';
     const { user } = useAuth();
     const authUser = new Author(user?.id, user?.username);
-
-    // Check if the user is on mobile
-    useEffect(() => 
-    {
-        const userAgent = navigator.userAgent;
-
-        if (/iPhone|iPad|iPod|Android/i.test(userAgent)) 
-        {
-            setIsMobile(true);
-        } else {
-            setIsMobile(false);
-        }
-    }, []);
 
     // Update the messages state when a response from the server is loaded
     useEffect(() => 
@@ -49,8 +35,11 @@ const Chat = () =>
     // If the last assistant response was unsuccessful, then it will override the unsuccessful response and user message that prompted it
     const handleReturn = async () => 
     {
-        setUserContent("");
+        console.log(user)
+        messages.push({author: user, userAuthor: user, text: userContent});
         // TODO: User userContent (user's input to the chat field) to send the message
+        // ...
+        setUserContent("");
     };
 
     // Handles the onBlur event for the input field, updating the placeholder and text accordingly
@@ -92,25 +81,49 @@ const Chat = () =>
     };
 
     return (
-        <>
-            <div className="flex flex-col flex-grow m-3 w-11/12 h-11/12">
-                <div className="flex-grow mb-8 p-4 bg-transparent">
-                    {messages.map((message, index) => (
-                        <Message key={index} text={message.text} />
-                    ))}
-                    <div className={messages.length > 0 ? "hidden" : ""}>
-                        <h1 className="text-3xl font-bold text-white">The beginning of your conversation with ...</h1>
+        <div className="flex flex-col h-full">
+            {/* Messages area */}
+            <div className="flex-1 overflow-y-auto p-4 bg-gradient-to-br from-rose-300 via-pink-400 to-rose-500">
+                {messages.map((message, index) => (
+                    <Message key={index} author={message.author} userAuthor={message.userAuthor} text={message.text} />
+                ))}
+                {messages.length === 0 && (
+                    <div className="flex items-center justify-center h-full">
+                        <h1 className="text-3xl font-bold text-white">The beginning of your conversation...</h1>
                     </div>
-                </div>
+                )}
             </div>
-            <div className="fixed w-full bottom-2">
-                <div className={"flex items-end rounded-xl p-2 flex-grow ml-1 mr-1 h-max bg-citrus-blue"}>
-                    <div data-testid="input" contentEditable="true" suppressContentEditableWarning={true} onBlur={handleOnBlur} onFocus={handleOnFocus} onKeyDown={handleKeyDown} onKeyUp={handleKeyUp} data-placeholder={placeholderText} className="p-1 h-max max-h-32 overflow-auto resize-none flex-grow placeholder:text-slate-300 text-white text-lg bg-transparent rounded">{placeholderText}</div>
-                    <button data-testid="submit" onClick={handleReturn} disabled={isButtonDisabled()} className={`flex justify-center items-center text-3xl border p-2 ml-1 w-9 h-9 rounded ${isButtonDisabled() ? "bg-transparent" : "bg-white hover:bg-[#eee]"}`}>
+            
+            {/* Input area at bottom */}
+            <div className="p-4 bg-white border-t border-gray-200">
+                <div className="flex flex-row gap-2 w-full">
+                    <div 
+                        className="flex-1 p-3 border border-gray-300 rounded-lg bg-white text-gray-900 min-h-[50px] max-h-[150px] overflow-y-auto focus:outline-none focus:border-rose-400" 
+                        data-testid="input" 
+                        contentEditable="true" 
+                        suppressContentEditableWarning={true} 
+                        onBlur={handleOnBlur} 
+                        onFocus={handleOnFocus} 
+                        onKeyDown={handleKeyDown} 
+                        onKeyUp={handleKeyUp}
+                    >
+                        {placeholderText}
+                    </div>
+                    <button 
+                        className={`px-6 py-3 rounded-lg font-semibold transition-colors ${
+                            isButtonDisabled() 
+                                ? "bg-gray-300 text-gray-500 cursor-not-allowed" 
+                                : "bg-rose-500 text-white hover:bg-rose-600"
+                        }`} 
+                        data-testid="submit" 
+                        onClick={handleReturn} 
+                        disabled={isButtonDisabled()}
+                    >
+                        Send
                     </button>
                 </div>
             </div>
-        </>
+        </div>
     );
 };
 

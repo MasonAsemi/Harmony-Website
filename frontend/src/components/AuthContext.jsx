@@ -17,10 +17,11 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         const storedToken = localStorage.getItem("token");
+        console.log("Token: ", storedToken);
 
         if (storedToken) {
             // Verify token and get user data using /users/me/
-            fetch(`${API_BASE_URL}/users/me/`, {
+            fetch(`${API_BASE_URL}users/me/`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Token ${storedToken}`,
@@ -62,6 +63,26 @@ export const AuthProvider = ({ children }) => {
 
         setToken(data.token);
         localStorage.setItem("token", data.token);
+        
+        // Get user data after login
+        const userResponse = await getUserData();
+
+        if (!userResponse.ok) {
+            throw new Error('Failed to fetch user data');
+        }
+
+        const userData = await userResponse.json();
+
+        setUser(userData);
+
+        return response;
+    };
+
+    // login spotify users
+    const loginToken = async (token) => {
+
+        setToken(token) ;
+        localStorage.setItem("token", token);
         
         // Get user data after login
         const userResponse = await getUserData();

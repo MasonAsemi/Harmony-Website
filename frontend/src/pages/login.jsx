@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../components/AuthContext';
 import '../styles/login.css';
+import { useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 
 function Login() {
     const [username, setUsername] = useState('');
@@ -9,7 +11,32 @@ function Login() {
     const [message, setMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
-    const { login } = useAuth();
+    const { login, loginToken } = useAuth();
+    let { token } = useParams(); 
+
+    useEffect(()=>{
+        //if there is a token in the params then send to dashboard
+        if(token){
+            const loginSpotify = async () =>{ 
+                //TODO: REMOVE
+                console.log("Spotify Token: ", token)   
+                await loginToken(token)
+                
+                setMessage('Login successful! Redirecting...');
+                
+                // Clear form
+                setUsername('');
+                setPassword('');
+                
+                // Redirect to dashboard
+                setTimeout(() => {
+                    navigate('/dashboard');
+                }, 1000);
+            }
+            
+            loginSpotify(); 
+        }
+    },[token])
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -30,9 +57,9 @@ function Login() {
             setUsername('');
             setPassword('');
             
-            // Redirect to profile page
+            // Redirect to dashboard
             setTimeout(() => {
-                navigate('/profile');
+                navigate('/dashboard');
             }, 1000);
         } catch (error) {
             console.error('Login error:', error);
