@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "./AuthContext";
 
 const Sidebar = () => {
     const [isExpanded, setIsExpanded] = useState(false);
+    const { user, logout } = useAuth();
 
     const menuItems = [
         { 
@@ -92,7 +94,8 @@ const Sidebar = () => {
                             </span>
                         </Link>
                     ))}
-                    <button className="flex mt-auto items-center px-4 py-4 text-gray-700 hover:bg-rose-100 transition-colors duration-200 w-full">
+                    {user != null ?
+                    <button onClick={logout} className="flex mt-auto items-center px-4 py-4 text-gray-700 hover:bg-rose-100 transition-colors duration-200 w-full">
                         <div className="w-6 h-6 flex-shrink-0">
                             {logoutButton.icon}
                         </div>
@@ -103,7 +106,7 @@ const Sidebar = () => {
                         >
                             {logoutButton.label}
                         </span>
-                    </button>
+                    </button> : null}
                 </nav>
             </div>
         </div>
