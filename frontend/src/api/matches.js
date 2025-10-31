@@ -28,7 +28,7 @@ export const getMatches = async (token) => {
  * @returns Promise for the accepted matches request
  */
 export const getAcceptedMatches = async (token) => {
-    const response = await fetch(`${API_BASE_URL}matches/`, {
+    const response = await fetch(`${API_BASE_URL}matches/accepted/`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
