@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useAuth } from '../components/AuthContext';
 import '../styles/register.css';
-import { createUser, requestLogin } from '../api/auth';
+import { createUser } from '../api/auth';
 
 function Register() {
     const [username, setUsername] = useState('');
@@ -11,6 +12,43 @@ function Register() {
     const [message, setMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
+    const { loginToken } = useAuth();
+    const [searchParams] = useSearchParams();
+
+    useEffect(() => {
+        // Check if there's a token in the URL query parameters (from Spotify registration)
+        const token = searchParams.get('token');
+        
+        if (token) {
+            const registerSpotify = async () => {
+                try {
+                    setIsLoading(true);
+                    setMessage('Registering with Spotify...');
+                    
+                    console.log("Spotify Token received: ", token);
+                    
+                    // Use loginToken to authenticate with the Spotify token
+                    await loginToken(token);
+                    
+                    setMessage('Registration successful! Redirecting...');
+                    
+                    // Redirect to dashboard
+                    setTimeout(() => {
+                        navigate('/dashboard');
+                    }, 1000);
+                } catch (error) {
+                    console.error('Spotify registration error:', error);
+                    setMessage('Spotify registration failed: ' + error.message);
+                    setIsLoading(false);
+                    
+                    // Clear the token from URL to allow retry
+                    window.history.replaceState({}, document.title, '/register');
+                }
+            };
+            
+            registerSpotify();
+        }
+    }, [searchParams, loginToken, navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -58,9 +96,9 @@ function Register() {
     };
 
     const handleSpotify = () => {
-        //TODO: test code 
-        window.location.href = "https://harmony-backend-4800-3fc8f73b6cb5.herokuapp.com/api/spotify-auth/login/"; // redirect users to spotify
-    }
+        // Redirect to Spotify OAuth endpoint
+        window.location.href = "https://harmony-backend-4800-3fc8f73b6cb5.herokuapp.com/api/spotify-auth/login/";
+    };
 
     return (
         <section className="relative h-screen pt-20 overflow-hidden flex-col gap-y-2 bg-gradient-to-br from-rose-300 via-pink-400 to-rose-500 flex items-center justify-center">
@@ -137,7 +175,13 @@ function Register() {
             </div>
             <div className="w-full flex flex-col gap-y-3 items-center center max-w-[520px]">
                 <div className="text-white text-2xl text-center">Or</div>
-                <button onClick={handleSpotify} className="rounded-2xl w-[75%] bg-[#7f7] p-3">Sign up with Spotify</button>
+                <button 
+                    onClick={handleSpotify} 
+                    disabled={isLoading}
+                    className="rounded-2xl w-[75%] bg-[#1DB954] hover:bg-[#1ed760] text-white font-semibold p-3 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    Sign up with Spotify
+                </button>
             </div>
         </section>
     );

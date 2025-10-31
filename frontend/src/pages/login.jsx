@@ -22,7 +22,9 @@ function Login() {
                     setIsLoading(true);
                     setMessage('Logging in with Spotify...');
                     
-                    console.log("Spotify Token: ", token);
+                    console.log("Spotify Token received: ", token);
+                    
+                    // Use loginToken to authenticate with the Spotify token
                     await loginToken(token);
                     
                     setMessage('Login successful! Redirecting...');
@@ -33,8 +35,11 @@ function Login() {
                     }, 1000);
                 } catch (error) {
                     console.error('Spotify login error:', error);
-                    setMessage('Spotify login failed. Please try again.');
+                    setMessage('Spotify login failed: ' + error.message);
                     setIsLoading(false);
+                    
+                    // Clear the token from URL to allow retry
+                    window.history.replaceState({}, document.title, '/login');
                 }
             };
             
