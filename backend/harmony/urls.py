@@ -14,7 +14,7 @@ urlpatterns = [
     path('spotify-auth/callback/', spotify_callback),
     path('api-token-auth/', obtain_auth_token, name='api_token_auth'),  # to obtain token
     path('matches/', matches),
+    path('matches/accepted/', accepted_matches),
     path('matches/reject/', match_reject),
     path('matches/accept/', match_accept),
-    path('matches/accepted/', accepted_matches),
 ]
