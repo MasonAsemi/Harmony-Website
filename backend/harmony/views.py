@@ -311,7 +311,7 @@ def translate_spotify_songs(user,fav_songs):
         song, created = Song.objects.get_or_create(
             spotify_id=song_data['id'],
             defaults={
-                'title': song_data['name'],
+                'name': song_data['name'],
                 'album': song_data.get('album', {}).get('name', ''),
                 'album_image_url': song_data.get('album', {}).get('images', [{}])[0].get('url', '') if song_data.get('album', {}).get('images') else '',
                 'popularity': song_data.get('popularity', 0),
@@ -392,7 +392,7 @@ def translate_spotify_artist_and_genres(user, fav_artists)   :
 def get_spotify_users_fav_songs(spotify_credentials, time_frame='medium_term'):
     
     user_top_songs_response = requests.get(
-        f'https://api.spotify.com/v1/me/top/tracks?offset=0&time_range={term}',
+        f'https://api.spotify.com/v1/me/top/tracks?offset=0&time_range={time_frame}',
         headers={"Authorization": f"Bearer {spotify_credentials.access_token}"}
     )
 
@@ -400,15 +400,16 @@ def get_spotify_users_fav_songs(spotify_credentials, time_frame='medium_term'):
         print("Error when retrieving user's top songs: ", user_top_songs_response.text)
         return None 
 
+    response_json = user_top_songs_response.json()
 
-    return user_top_songs_response.get('items',[])  
+    return response_json.get('items',[])  
 
 
 
 def get_spotify_user_fav_artists(spotify_credentials, time_frame='medium_term'):
     
     user_top_artist_genres_response = requests.get(
-        f'https://api.spotify.com/v1/me/top/artists?offset=0&time_range={term}',
+        f'https://api.spotify.com/v1/me/top/artists?offset=0&time_range={time_frame}',
         headers={"Authorization": f"Bearer {spotify_credentials.access_token}"}
     )
 
@@ -416,7 +417,7 @@ def get_spotify_user_fav_artists(spotify_credentials, time_frame='medium_term'):
         print("Error when retrieving user's top artists and genres: ", user_top_artist_genres_response.text)
         return None 
 
-
-    return  user_top_artist_genres_response.get('items', [])
+    response_json = user_top_artist_genres_response.json() 
+    return  response_json.get('items', [])
 
 

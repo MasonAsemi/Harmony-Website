@@ -48,7 +48,7 @@ class Song(models.Model):
     album_image_url = models.URLField(blank=True)
     release_date = models.DateField(null=True, blank=True)
     duration_ms = models.IntegerField(null=True, blank=True)
-    preview_url = models.URLField(blank=True) # 30 second preview of song
+    preview_url = models.URLField(blank=True, null=True) # 30 second preview of song
     spotify_url = models.URLField(blank=True) # spotify page 
     popularity = models.IntegerField(default=0)
     
