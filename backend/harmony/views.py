@@ -70,6 +70,7 @@ class UserViewSet(viewsets.ModelViewSet):
             return Response(serializer.data)
         
 
+    # views.py - Replace your UserViewSet profile action
     @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated])
     def profile(self, request):
         """
@@ -77,8 +78,8 @@ class UserViewSet(viewsets.ModelViewSet):
         """
         user = request.user
         
-        # Get favorite songs with weights
-        song_preferences = UserSongPreference.objects.filter(user=user).select_related('song').prefetch_related('song__artists')
+        # Get favorite songs with weights (sorted by weight)
+        song_preferences = UserSongPreference.objects.filter(user=user).select_related('song').prefetch_related('song__artists', 'song__genres').order_by('-weight')
         favorite_songs = []
         for pref in song_preferences:
             song = pref.song
@@ -92,12 +93,13 @@ class UserViewSet(viewsets.ModelViewSet):
                 'popularity': song.popularity,
                 'duration_ms': song.duration_ms,
                 'preview_url': song.preview_url,
-                'artists': [{'id': a.id, 'name': a.name, 'spotify_id': a.spotify_id} for a in song.artists.all()],
+                'artists': [{'id': a.id, 'name': a.name, 'spotify_id': a.spotify_id, 'image_url': a.image_url} for a in song.artists.all()],
+                'genres': [{'id': g.id, 'name': g.name} for g in song.genres.all()],
                 'weight': pref.weight
             })
         
-        # Get favorite artists with weights
-        artist_preferences = UserArtistPreference.objects.filter(user=user).select_related('artist').prefetch_related('artist__genres')
+        # Get favorite artists with weights (sorted by weight)
+        artist_preferences = UserArtistPreference.objects.filter(user=user).select_related('artist').prefetch_related('artist__genres').order_by('-weight')
         favorite_artists = []
         for pref in artist_preferences:
             artist = pref.artist
@@ -111,8 +113,8 @@ class UserViewSet(viewsets.ModelViewSet):
                 'weight': pref.weight
             })
         
-        # Get favorite genres with weights
-        genre_preferences = UserGenrePreference.objects.filter(user=user).select_related('genre')
+        # Get favorite genres with weights (sorted by weight)
+        genre_preferences = UserGenrePreference.objects.filter(user=user).select_related('genre').order_by('-weight')
         favorite_genres = []
         for pref in genre_preferences:
             genre = pref.genre
@@ -131,6 +133,7 @@ class UserViewSet(viewsets.ModelViewSet):
                 'age': user.age,
                 'biography': user.biography,
                 'interests': user.interests,
+                'profile_image': user.profile_image.url if user.profile_image else None,
             },
             'favorite_songs': favorite_songs,
             'favorite_artists': favorite_artists,
@@ -154,8 +157,7 @@ class SongViewSet(viewsets.ModelViewSet):
         Return songs favorited by the logged-in user
         """
         user = self.request.user
-        # Get all songs that this user has in their favorites through UserSongPreference
-        return Song.objects.filter(favorited_by=user).prefetch_related('artists', 'genres')
+        return Song.objects.filter(favorited_by=user).prefetch_related('artists', 'genres').order_by('name')
     
     def list(self, request, *args, **kwargs):
         """
@@ -169,43 +171,17 @@ class SongViewSet(viewsets.ModelViewSet):
             for pref in UserSongPreference.objects.filter(user=request.user)
         }
         
+        # Use serializer for consistent formatting
+        serializer = self.get_serializer(queryset, many=True)
+        
+        # Add weights to each song
         songs_data = []
-        for song in queryset:
-            songs_data.append({
-                'id': song.id,
-                'name': song.name,
-                'spotify_id': song.spotify_id,
-                'album': song.album,
-                'album_image_url': song.album_image_url,
-                'release_date': song.release_date,
-                'duration_ms': song.duration_ms,
-                'preview_url': song.preview_url,
-                'spotify_url': song.spotify_url,
-                'popularity': song.popularity,
-                'energy': song.energy,
-                'valence': song.valence,
-                'danceability': song.danceability,
-                'tempo': song.tempo,
-                'acousticness': song.acousticness,
-                'artists': [
-                    {
-                        'id': artist.id,
-                        'name': artist.name,
-                        'spotify_id': artist.spotify_id,
-                        'image_url': artist.image_url,
-                        'popularity': artist.popularity
-                    } 
-                    for artist in song.artists.all()
-                ],
-                'genres': [
-                    {
-                        'id': genre.id,
-                        'name': genre.name
-                    }
-                    for genre in song.genres.all()
-                ],
-                'weight': user_song_prefs.get(song.id, 5)  # Default weight is 5
-            })
+        for song_dict in serializer.data:
+            song_dict['weight'] = user_song_prefs.get(song_dict['id'], 5)
+            songs_data.append(song_dict)
+        
+        # Sort by weight (highest first)
+        songs_data.sort(key=lambda x: x['weight'], reverse=True)
         
         return Response({
             'count': len(songs_data),
@@ -213,11 +189,8 @@ class SongViewSet(viewsets.ModelViewSet):
         })
     
     def perform_create(self, serializer):
-        # If you want users to be able to add songs manually in the future
-        # For now, songs are created through Spotify callback
+        # Songs are created through Spotify callback only
         pass
-    
-
 
 
 
