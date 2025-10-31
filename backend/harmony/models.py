@@ -158,6 +158,13 @@ class Match(models.Model):
     def __str__(self):
         return f"Match: {self.user1} and {self.user2}: {self.compatibilty_score:.1f}%"
 
+class MatchRejection(models.Model):
+    user1 = models.ForeignKey(User, on_delete=models.CASCADE, related_name='rejects')
+    user2= models.ForeignKey(User, on_delete=models.CASCADE, related_name='was_rejected_by')
+    created_at = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return f"{self.user1} rejected {self.user2}"
+
 
 class Message(models.Model):
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='messages_sent')
