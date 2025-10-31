@@ -254,11 +254,6 @@ function Dashboard() {
                                                     <p className="font-semibold text-gray-900">
                                                         {currentMatch.fav_songs[0].name}
                                                     </p>
-                                                    {currentMatch.fav_songs[0].spotify_id && (
-                                                        <p className="text-sm text-gray-600">
-                                                            Weight: {currentMatch.fav_songs[0].weight}/10
-                                                        </p>
-                                                    )}
                                                 </div>
                                             </div>
                                         </div>
