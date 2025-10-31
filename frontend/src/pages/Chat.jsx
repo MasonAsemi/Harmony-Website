@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Message from "../components/Message";
 import { useAuth } from "../components/AuthContext";
+import { API_BASE_URL } from "../config";
 
 const Chat = ({ currentChat }) =>
 {
@@ -16,10 +17,20 @@ const Chat = ({ currentChat }) =>
     // Update the messages state when a response from the server is loaded
     useEffect(() => 
     {
-        // TODO: Use EventSource to listen for server-sent events (chat message sent) and update the messages accordingly
-        let updatedMessages = []; 
-        setMessages(updatedMessages);
+        // Use web sockets
+
+        console.error("Implement needed: API endpoint for creating web socket");
+        return;
+        const socket = new WebSocket(`${API_BASE_URL}`);
+
+        socket.onmessage = (event) => {
+            const newMessage = JSON.parse(event.data);
+            setMessages((prev) => [...prev, newMessage]);
+        };
+
         setResponse('');
+
+        return () => socket.close();
     }, []);
 
     // Returns true if the button should be disabled, false if not
