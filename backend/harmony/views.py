@@ -1,7 +1,7 @@
 from django.shortcuts import redirect
 from rest_framework import viewsets, permissions, status 
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
-from .models import User, Song
+from .models import User, Song, Artist, Genre, UserSongPreference, UserArtistPreference, UserGenrePreference
 from .serializers import UserSerializer, SongSerializer
 from .permissions import IsSelfOrReadOnly
 from rest_framework.decorators import action, api_view, permission_classes 
@@ -11,6 +11,7 @@ from django.http import JsonResponse, HttpResponseRedirect
 import base64
 import requests
 import os 
+from django.db import transaction 
 from dotenv import load_dotenv
 import urllib.parse
 class UserViewSet(viewsets.ModelViewSet):
@@ -183,7 +184,7 @@ def spotify_login(request):
         "client_id": os.getenv('CLIENT_ID'), 
         "response_type": "code",
         "redirect_uri": os.getenv('SPOTIFY_REDIRECT_URI'), #when testing it's localhost 
-        "scope": "user-read-email user-read-private",   # Add other scopes as needed
+        "scope": "user-read-email user-read-private user-top-read",   # Add other scopes as needed
       #  "state": "random_csrf_string_or_user_id",       # Optional but recommended
     }
 
@@ -268,10 +269,154 @@ def spotify_callback(request):
         }
     )
 
+    #if new user was created initialize their spotify fav songs and stuff 
+    if(created):
+        user_credentials= SpotifyCredentials.objects.get(user=user)
+
+        time_frame = 'medium_term'
+
+        #the fav songs will contain the artists, genres, and songs info 
+        fav_songs = get_spotify_users_fav_songs(user_credentials, time_frame=time_frame); #get fav songs from spotify
+        if fav_songs is None: 
+             return JsonResponse({
+            "error": "Favorite song response from Spotify",
+            "response_text": user_profile_response.text
+        }, status =417) 
+
+        fav_artists  = get_spotify_user_fav_artists(user_credentials, time_frame=time_frame) 
+        if fav_artists is None: 
+             return JsonResponse({
+            "error": "Favorite artist response from Spotify",
+            "response_text": user_profile_response.text
+        }, status =417) 
+        
+        #tranlate the list of objects into the correct models and save for the user 
+        translate_spotify_songs(user, fav_songs)
+        translate_spotify_artist_and_genres(user, fav_artists)
+    
+    
     # Create DRF token for authentication with your API
     auth_token, _ = Token.objects.get_or_create(user=user)
 
     # Send user back to frontend with token (or store in session)
     frontend_redirect = f"https://harmonymatching.com/login?token={auth_token.key}"
     return redirect(frontend_redirect)
+
+
+@transaction.atomic #if something fails roll back everything
+def translate_spotify_songs(user,fav_songs):
+    for idx, song_data in enumerate(fav_songs):
+        
+        # get or create the song
+        song, created = Song.objects.get_or_create(
+            spotify_id=song_data['id'],
+            defaults={
+                'title': song_data['name'],
+                'album': song_data.get('album', {}).get('name', ''),
+                'album_image_url': song_data.get('album', {}).get('images', [{}])[0].get('url', '') if song_data.get('album', {}).get('images') else '',
+                'popularity': song_data.get('popularity', 0),
+                'duration_ms': song_data.get('duration_ms'),
+                'preview_url': song_data.get('preview_url', ''),
+                "spotify_url": song_data.get('external_urls').get('spotify') if  song_data.get('external_urls') else ''
+            }
+        )
+        
+        # Link all artists to this song
+        for artist_data in song_data.get('artists', []):
+            artist, _ = Artist.objects.get_or_create(
+                spotify_id=artist_data['id'],
+                defaults={ # all lot of the values will get overidden in next api call 
+                    'name': artist_data['name'],
+                    'image_url': '', 
+                    'popularity': 0,
+                }
+            )
+            # add artist to song
+            song.artists.add(artist)
+
+        
+        # Create user preference with weight based on ranking
+        weight = max(1, 10 - idx)  
+        UserSongPreference.objects.update_or_create(
+            user=user,
+            song=song,  # Fixed: was 'artist=song'
+            defaults={'weight': weight}
+        )
+
+@transaction.atomic #if something fails roll back everything
+def translate_spotify_artist_and_genres(user, fav_artists)   :
+    
+    #the genres that appear the most will have the most weight 
+    genre_weights = {}
+    
+    for idx, artist_data in enumerate(fav_artists):
+        # Create or get artist
+        artist, created = Artist.objects.get_or_create(
+            spotify_id=artist_data['id'],
+            defaults={
+                'name': artist_data['name'],
+                'image_url': artist_data.get('images', [{}])[0].get('url', '') if artist_data.get('images') else '',
+                'popularity': artist_data.get('popularity', 0)
+            }
+        )
+
+        # Create artist preference
+        weight = max(1, 10 - idx)
+        UserArtistPreference.objects.update_or_create(
+            user=user,
+            artist=artist,
+            defaults={'weight': weight}
+        )
+
+        #if the genre hasn't been seen before start w/ one otherwise increment 
+        for genre_name in artist_data.get('genres', []):
+            genre_weights[genre_name] = genre_weights.get(genre_name, 0) + 1
+            
+            # create and link to artist 
+            genre, _ = Genre.objects.get_or_create(name=genre_name)
+            artist.genres.add(genre)
+    
+    # create genre prefernces based on the amount of times they appeared  
+    for genre_name, count in genre_weights.items():
+        genre, _ = Genre.objects.get_or_create(name=genre_name)
+        
+        weight = min(10, count)  # Cap at 10
+        
+        UserGenrePreference.objects.update_or_create(
+            user=user,
+            genre=genre,
+            defaults={'weight': weight}
+        )
+
+#returns a list of users top songs 
+def get_spotify_users_fav_songs(spotify_credentials, time_frame='medium_term'):
+    
+    user_top_songs_response = requests.get(
+        f'https://api.spotify.com/v1/me/top/tracks?offset=0&time_range={term}',
+        headers={"Authorization": f"Bearer {spotify_credentials.access_token}"}
+    )
+
+    if user_top_songs_response.status_code != 200:
+        print("Error when retrieving user's top songs: ", user_top_songs_response.text)
+        return None 
+
+
+    return user_top_songs_response.get('items',[])  
+
+
+
+def get_spotify_user_fav_artists(spotify_credentials, time_frame='medium_term'):
+    
+    user_top_artist_genres_response = requests.get(
+        f'https://api.spotify.com/v1/me/top/artists?offset=0&time_range={term}',
+        headers={"Authorization": f"Bearer {spotify_credentials.access_token}"}
+    )
+
+    if user_top_artist_genres_response.status_code != 200:
+        print("Error when retrieving user's top artists and genres: ", user_top_artist_genres_response.text)
+        return None 
+
+
+    return  user_top_artist_genres_response.get('items', [])
+
 

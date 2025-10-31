@@ -19,7 +19,7 @@ class User(AbstractUser):
         return self.username
     
 class Genre(models.Model):
-    name = models.CharField(max_length=100, unique=True)
+    name = models.CharField(max_length=100, unique=True, default='Unknown')
     
     class Meta:
         ordering = ['name']
@@ -28,14 +28,14 @@ class Genre(models.Model):
         return self.name
     
 class Artist(models.Model):
-    name = models.CharField(max_length=200)
-    spotify_id = models.CharField(max_length=100, unique=True)
+    name = models.CharField(max_length=200, default= 'Unkown')
+    spotify_id = models.CharField(max_length=100, unique=True, default='')
     image_url = models.URLField(blank=True)
     popularity = models.IntegerField(default=0)
     genres = models.ManyToManyField(Genre, related_name='artists', blank=True)
     
     def __str__(self):
-        return self.artist_name
+        return self.name
 
 
 class Song(models.Model):
@@ -52,7 +52,7 @@ class Song(models.Model):
     spotify_url = models.URLField(blank=True) # spotify page 
     popularity = models.IntegerField(default=0)
     
-    # audio features (optional for matching later) 
+    # audio features , optional but can be useful later 
     energy = models.FloatField(null=True, blank=True)
     valence = models.FloatField(null=True, blank=True)
     danceability = models.FloatField(null=True, blank=True)
@@ -80,7 +80,7 @@ class UserSongPreference(models.Model):
         unique_together = ['user', 'song']
     
     def __str__(self):
-        return f"{self.user.username} - {self.song.title} (weight: {self.weight})"
+        return f"{self.user.username} - {self.song.name} (weight: {self.weight})"
 
 
 class UserArtistPreference(models.Model):
@@ -118,7 +118,11 @@ class UserGenrePreference(models.Model):
 
 
 class SpotifyCredentials(models.Model):
-    user= models.ForeignKey(User,on_delete= models.CASCADE)
+    user = models.OneToOneField(  # Changed from ForeignKey!
+        User, 
+        on_delete=models.CASCADE,
+        related_name='spotify_credentials'  # Add this!
+    )
     access_token = models.TextField( blank=True, null=True)
     token_type = models.TextField(  blank=True, null=True)
     scope = models.TextField( blank=True, null=True)
