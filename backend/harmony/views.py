@@ -185,9 +185,143 @@ class SongViewSet(viewsets.ModelViewSet):
         
         return Response(songs_data)
     
-    def perform_create(self, serializer):
-        # Songs are created through Spotify callback only
-        pass
+    def create(self, request, *args, **kwargs):
+        """
+        Add a song to user's favorites
+        Expects: { "spotify_id": "abc123", "weight": 5 }
+        """
+        spotify_id = request.data.get('spotify_id')
+        weight = request.data.get('weight', 5)
+        
+        if not spotify_id:
+            return Response(
+                {"error": "spotify_id is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Check if song exists in database
+        try:
+            song = Song.objects.get(spotify_id=spotify_id)
+        except Song.DoesNotExist:
+            # Song doesn't exist, fetch from Spotify and create it
+            load_dotenv()
+            client_id = os.getenv('CLIENT_ID')
+            client_secret = os.getenv('CLIENT_SECRET')
+            
+            if not client_id or not client_secret:
+                return Response(
+                    {"error": "Spotify credentials not configured"},
+                    status=status.HTTP_503_SERVICE_UNAVAILABLE
+                )
+            
+            token = get_spotify_token(client_id, client_secret)
+            
+            # Fetch song details from Spotify
+            response = requests.get(
+                f"https://api.spotify.com/v1/tracks/{spotify_id}",
+                headers={"Authorization": f"Bearer {token}"}
+            )
+            
+            if response.status_code != 200:
+                return Response(
+                    {"error": "Failed to fetch song from Spotify"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            song_data = response.json()
+            
+            # Create the song
+            song = Song.objects.create(
+                spotify_id=song_data['id'],
+                name=song_data['name'],
+                album=song_data.get('album', {}).get('name', ''),
+                album_image_url=song_data.get('album', {}).get('images', [{}])[0].get('url', '') if song_data.get('album', {}).get('images') else '',
+                popularity=song_data.get('popularity', 0),
+                duration_ms=song_data.get('duration_ms'),
+                preview_url=song_data.get('preview_url', ''),
+                spotify_url=song_data.get('external_urls', {}).get('spotify', '')
+            )
+            
+            # Add artists to the song
+            for artist_data in song_data.get('artists', []):
+                artist, _ = Artist.objects.get_or_create(
+                    spotify_id=artist_data['id'],
+                    defaults={
+                        'name': artist_data['name'],
+                        'image_url': '',
+                        'popularity': 0,
+                    }
+                )
+                song.artists.add(artist)
+        
+        # Check if user already has this song
+        if UserSongPreference.objects.filter(user=request.user, song=song).exists():
+            return Response(
+                {"error": "Song already in your favorites"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Create the user preference
+        UserSongPreference.objects.create(
+            user=request.user,
+            song=song,
+            weight=weight
+        )
+        
+        # Return the created song with weight
+        serializer = self.get_serializer(song)
+        response_data = serializer.data
+        response_data['weight'] = weight
+        
+        return Response(response_data, status=status.HTTP_201_CREATED)
+    
+    def destroy(self, request, *args, **kwargs):
+        """
+        Remove a song from user's favorites
+        """
+        song = self.get_object()
+        
+        # Delete the user preference (not the song itself)
+        UserSongPreference.objects.filter(user=request.user, song=song).delete()
+        
+        return Response(
+            {"message": "Song removed from favorites"},
+            status=status.HTTP_204_NO_CONTENT
+        )
+    
+    @action(detail=True, methods=['patch'])
+    def update_weight(self, request, pk=None):
+        """
+        Update the weight of a song in user's favorites
+        PATCH /api/songs/{id}/update_weight/
+        Body: { "weight": 8 }
+        """
+        song = self.get_object()
+        weight = request.data.get('weight')
+        
+        if weight is None:
+            return Response(
+                {"error": "weight is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        if not (1 <= weight <= 10):
+            return Response(
+                {"error": "weight must be between 1 and 10"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Update the preference
+        pref = UserSongPreference.objects.get(user=request.user, song=song)
+        pref.weight = weight
+        pref.save()
+        
+        serializer = self.get_serializer(song)
+        response_data = serializer.data
+        response_data['weight'] = weight
+        
+        return Response(response_data)
+
 
 
 
@@ -244,38 +378,66 @@ def song_search(request):
         
         response = requests.get(url, headers=header, params=params)
         
-        if response.status_code == 200  :
-            #TODO: format the response into song data type 
-            data = response.json()
-            
-            if data['tracks'] and data['tracks']['items'] and data['tracks']['items']:
-                
-                songs = []
-                for song in data['tracks']['items']:
-                    song_link = song['external_urls']
-                    song_name= song['name'] 
-                    list_of_artists =[]
-                    for artist in song['artists']:
-                        list_of_artists.append({
-                            'name': artist['name'],
-                            'links': artist['external_urls']
-                        })
-                    
-                    songs.append({
-                        'list_of_artists': list_of_artists,
-                        'link': song_link,
-                        'name': song_name,
-                    })
-                return Response({
-                    'songs': songs
-                })
-            else: 
-                return Response({"detail": "Returned data wasn't in correct format"}, status=status.HTTP_417_EXPECTATION_FAILED)
-                
-        else:
-            return Response({"Track Retrieval error: ", response.text})
-    else:
-        return Response({"message: ", "Failed to retrieve token from spotify. Couldn't process search request"}, status=status.HTTP_417_EXPECTATION_FAILED)
+         
+    if response.status_code != 200:
+        return Response(
+            {"error": "Failed to search Spotify", "details": response.text},
+            status=status.HTTP_502_BAD_GATEWAY
+        )
+    
+    data = response.json()
+    
+    if not data.get('tracks') or not data['tracks'].get('items'):
+        return Response({
+            'count': 0,
+            'songs': []
+        })
+    
+    # Format songs to match your model structure
+    songs = []
+    for track in data['tracks']['items']:
+        # Check if song already exists in database and if user has it
+        user_has_song = False
+        song_weight = 0
+        
+        try:
+            existing_song = Song.objects.get(spotify_id=track['id'])
+            pref = UserSongPreference.objects.filter(
+                user=request.user, 
+                song=existing_song
+            ).first()
+            if pref:
+                user_has_song = True
+                song_weight = pref.weight
+        except Song.DoesNotExist:
+            pass
+        
+        songs.append({
+            'spotify_id': track['id'],
+            'name': track['name'],
+            'album': track.get('album', {}).get('name', ''),
+            'album_image_url': track.get('album', {}).get('images', [{}])[0].get('url', '') if track.get('album', {}).get('images') else '',
+            'spotify_url': track.get('external_urls', {}).get('spotify', ''),
+            'preview_url': track.get('preview_url', ''),
+            'duration_ms': track.get('duration_ms'),
+            'popularity': track.get('popularity', 0),
+            'artists': [
+                {
+                    'spotify_id': artist['id'],
+                    'name': artist['name'],
+                    'spotify_url': artist.get('external_urls', {}).get('spotify', '')
+                }
+                for artist in track.get('artists', [])
+            ],
+            'in_favorites': user_has_song,  # NEW: tells frontend if user already has this song
+            'weight': song_weight  # NEW: the weight if they have it
+        })
+    
+    return Response({
+        'count': len(songs),
+        'songs': songs
+    })
+
 
 
 @api_view(['GET'])
