@@ -39,3 +39,26 @@ body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
 }
+
+@theme {
+  --animate-wiggle: wiggle 1s ease-in-out infinite;
+  --animate-fade-in: slide-in 0.4s ease-in-out normal;
+
+  @keyframes wiggle {
+    0%, 100% {
+      transform: rotate(-3deg);
+    }
+    50% {
+      transform: rotate(3deg);
+    }
+  }
+
+  @keyframes slide-in {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+}
