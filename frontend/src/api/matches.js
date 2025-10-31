@@ -22,6 +22,28 @@ export const getMatches = async (token) => {
 };
 
 /**
+ * Fetches the list of accepted matches for the authenticated user
+ * Note: This requires a backend endpoint that returns Match objects
+ * @param {string} token - Authentication token
+ * @returns Promise for the accepted matches request
+ */
+export const getAcceptedMatches = async (token) => {
+    const response = await fetch(`${API_BASE_URL}matches/accepted/`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Token ${token}`
+        }
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to fetch accepted matches');
+    }
+
+    return response.json();
+};
+
+/**
  * Accepts a match with the specified user
  * @param {string} token - Authentication token
  * @param {number} userId - ID of the user to match with
