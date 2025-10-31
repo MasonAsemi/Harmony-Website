@@ -13,6 +13,32 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
     
+    
+class Match(models.Model):
+    """Represents a successful connection between two users."""
+    
+    # Links to the two users involved in the match
+    user1 = models.ForeignKey(
+        'harmony.User', 
+        related_name='matches_initiated', 
+        on_delete=models.CASCADE
+    )
+    user2 = models.ForeignKey(
+        'harmony.User', 
+        related_name='matches_received', 
+        on_delete=models.CASCADE
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        # Ensures a pair of users can only have one Match object (order doesn't matter)
+        unique_together = ('user1', 'user2') 
+        verbose_name_plural = "Matches"
+
+    def __str__(self):
+        return f"Match between {self.user1.username} and {self.user2.username}"
+
+
 class Song(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=255, blank=True, null=True)
@@ -29,15 +55,6 @@ class Swipe(models.Model):
 
     def __str__(self):
         return f"{self.swiper_user} {self.type.lower()} {self.target_user}"
-
-
-class Match(models.Model):
-    user1 = models.ForeignKey(User, on_delete=models.CASCADE, related_name='matches_initiated')
-    user2 = models.ForeignKey(User, on_delete=models.CASCADE, related_name='matches_received')
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Match: {self.user1} and {self.user2}"
 
 
 class Message(models.Model):
