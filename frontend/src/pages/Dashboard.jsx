@@ -3,32 +3,87 @@ import Chat from "./Chat";
 import Sidebar from "../components/Sidebar";
 import Matches from "../components/Matches";
 import { useAuth } from "../components/AuthContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getMatches, acceptMatch, rejectMatch } from "../api/matches";
 
 const exampleChats = [
     { id: 1, recipient: "Example1" },
     { id: 2, recipient: "Example2" }
 ];
 
-const exampleMatches = [
-    { id: 1, name: "Match1", genre: "rock" },
-    { id: 2, name: "Match2", genre: "rock" },
-    { id: 3, name: "Match3", genre: "rock" }
-];
-
-const declineMatch = () => {
-    console.log("Match declined");
-    // Add logic to handle declining a match
-}
-
-const acceptMatch = () => {
-    console.log("Match accepted");
-    // Add logic to handle accepting a match
-}
-
 function Dashboard() {
     const [currentChat, setCurrentChat] = useState(null);
+    const [potentialMatches, setPotentialMatches] = useState([]);
+    const [acceptedMatches, setAcceptedMatches] = useState([]);
+    const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const { token, user } = useAuth();
+
+    // Fetch potential matches on component mount
+    useEffect(() => {
+        if (!token) return;
+
+        setLoading(true);
+        getMatches(token)
+            .then(data => {
+                console.log("Fetched matches:", data);
+                setPotentialMatches(data.matches || []);
+                setLoading(false);
+            })
+            .catch(err => {
+                console.error("Error fetching matches:", err);
+                setError(err.message);
+                setLoading(false);
+            });
+    }, [token]);
+
+    const currentMatch = potentialMatches[currentMatchIndex];
+
+    const handleDecline = async () => {
+        if (!currentMatch) return;
+
+        try {
+            await rejectMatch(token, currentMatch.id);
+            console.log("Match rejected:", currentMatch.username);
+            
+            // Move to next match
+            if (currentMatchIndex < potentialMatches.length - 1) {
+                setCurrentMatchIndex(currentMatchIndex + 1);
+            } else {
+                // No more matches
+                setPotentialMatches([]);
+                setCurrentMatchIndex(0);
+            }
+        } catch (err) {
+            console.error("Error rejecting match:", err);
+            alert("Failed to reject match. Please try again.");
+        }
+    };
+
+    const handleAccept = async () => {
+        if (!currentMatch) return;
+
+        try {
+            await acceptMatch(token, currentMatch.id);
+            console.log("Match accepted:", currentMatch.username);
+            
+            // Add to accepted matches
+            setAcceptedMatches([...acceptedMatches, currentMatch]);
+            
+            // Move to next match
+            if (currentMatchIndex < potentialMatches.length - 1) {
+                setCurrentMatchIndex(currentMatchIndex + 1);
+            } else {
+                // No more matches
+                setPotentialMatches([]);
+                setCurrentMatchIndex(0);
+            }
+        } catch (err) {
+            console.error("Error accepting match:", err);
+            alert("Failed to accept match. Please try again.");
+        }
+    };
 
     const handleChatClick = (chat) => {
         // Toggle chat - if clicking the same chat, close it
@@ -75,38 +130,158 @@ function Dashboard() {
                     </div>
                 ) : (
                     <div className="w-full max-w-md">
-                        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
-                            {/* Profile image placeholder */}
-                            <div className="aspect-3/4 bg-linear-to-br from-gray-200 to-gray-300 flex items-center justify-center">
-                                <div className="text-center text-gray-500">
-                                    <svg 
-                                        xmlns="http://www.w3.org/2000/svg" 
-                                        className="h-32 w-32 mx-auto mb-4 opacity-50" 
-                                        fill="none" 
-                                        viewBox="0 0 24 24" 
-                                        stroke="currentColor"
-                                    >
-                                        <path 
-                                            strokeLinecap="round" 
-                                            strokeLinejoin="round" 
-                                            strokeWidth={1} 
-                                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" 
+                        {loading ? (
+                            <div className="bg-white rounded-2xl shadow-2xl p-8 text-center">
+                                <p className="text-gray-600">Loading matches...</p>
+                            </div>
+                        ) : error ? (
+                            <div className="bg-white rounded-2xl shadow-2xl p-8 text-center">
+                                <p className="text-red-600">Error: {error}</p>
+                            </div>
+                        ) : !currentMatch ? (
+                            <div className="bg-white rounded-2xl shadow-2xl p-8 text-center">
+                                <p className="text-gray-600">No more matches available</p>
+                            </div>
+                        ) : (
+                            <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
+                                {/* Profile image */}
+                                <div className="aspect-3/4 bg-linear-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+                                    {currentMatch.profile_image ? (
+                                        <img 
+                                            src={currentMatch.profile_image} 
+                                            alt={currentMatch.username}
+                                            className="w-full h-full object-cover"
                                         />
-                                    </svg>
-                                    <p className="text-lg">No Image</p>
+                                    ) : (
+                                        <div className="text-center text-gray-500">
+                                            <svg 
+                                                xmlns="http://www.w3.org/2000/svg" 
+                                                className="h-32 w-32 mx-auto mb-4 opacity-50" 
+                                                fill="none" 
+                                                viewBox="0 0 24 24" 
+                                                stroke="currentColor"
+                                            >
+                                                <path 
+                                                    strokeLinecap="round" 
+                                                    strokeLinejoin="round" 
+                                                    strokeWidth={1} 
+                                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" 
+                                                />
+                                            </svg>
+                                            <p className="text-lg">No Profile Image</p>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Profile info */}
+                                <div className="p-6">
+                                    <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                                        {currentMatch.username}
+                                        {currentMatch.age && (
+                                            <span className="text-xl font-normal text-gray-600 ml-2">
+                                                , {currentMatch.age}
+                                            </span>
+                                        )}
+                                    </h2>
+
+                                    {currentMatch.biography && (
+                                        <p className="text-gray-700 mb-4">{currentMatch.biography}</p>
+                                    )}
+
+                                    {currentMatch.location && (
+                                        <p className="text-gray-600 mb-4">📍 {currentMatch.location}</p>
+                                    )}
+
+                                    {/* Favorite song */}
+                                    {currentMatch.fav_songs && currentMatch.fav_songs.length > 0 && (
+                                        <div className="mb-4">
+                                            <h3 className="text-sm font-semibold text-gray-600 mb-2">
+                                                Favorite Song
+                                            </h3>
+                                            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                                                {currentMatch.fav_songs[0].album_image_url ? (
+                                                    <img 
+                                                        src={currentMatch.fav_songs[0].album_image_url} 
+                                                        alt={currentMatch.fav_songs[0].name}
+                                                        className="w-16 h-16 rounded object-cover"
+                                                    />
+                                                ) : (
+                                                    <div className="w-16 h-16 bg-gray-300 rounded flex items-center justify-center">
+                                                        <svg 
+                                                            xmlns="http://www.w3.org/2000/svg" 
+                                                            className="h-8 w-8 text-gray-500" 
+                                                            fill="none" 
+                                                            viewBox="0 0 24 24" 
+                                                            stroke="currentColor"
+                                                        >
+                                                            <path 
+                                                                strokeLinecap="round" 
+                                                                strokeLinejoin="round" 
+                                                                strokeWidth={2} 
+                                                                d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" 
+                                                            />
+                                                        </svg>
+                                                    </div>
+                                                )}
+                                                <div className="flex-1">
+                                                    <p className="font-semibold text-gray-900">
+                                                        {currentMatch.fav_songs[0].name}
+                                                    </p>
+                                                    {currentMatch.fav_songs[0].spotify_id && (
+                                                        <p className="text-sm text-gray-600">
+                                                            Weight: {currentMatch.fav_songs[0].weight}/10
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Favorite artists */}
+                                    {currentMatch.fav_artists && currentMatch.fav_artists.length > 0 && (
+                                        <div className="mb-4">
+                                            <h3 className="text-sm font-semibold text-gray-600 mb-2">
+                                                Top Artists
+                                            </h3>
+                                            <div className="flex flex-wrap gap-2">
+                                                {currentMatch.fav_artists.slice(0, 3).map(artist => (
+                                                    <span 
+                                                        key={artist.id}
+                                                        className="px-3 py-1 bg-pink-100 text-pink-800 rounded-full text-sm"
+                                                    >
+                                                        {artist.name}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Action buttons */}
+                                    <div className="flex justify-center gap-4 mt-6">
+                                        <button 
+                                            type="button" 
+                                            onClick={handleDecline} 
+                                            className="w-40 focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
+                                        >
+                                            ✖ Reject
+                                        </button>
+                                        <button 
+                                            type="button" 
+                                            onClick={handleAccept} 
+                                            className="w-40 focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+                                        >
+                                            ✓ Accept
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                            <div className="p-6 text-center flex justify-center gap-4">
-                                <button type="button" onClick={declineMatch} className="w-40 focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">✖</button>
-                                <button type="button" onClick={acceptMatch} className="w-40 focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">✓</button>
-                            </div>
-                        </div>
+                        )}
                     </div>
                 )}
             </div>
 
-            {/* Right sidebar - Matches */}
-            <Matches token={token} />
+            {/* Right sidebar - Accepted Matches */}
+            <Matches token={token} acceptedMatches={acceptedMatches} />
         </div>
     );
 }
