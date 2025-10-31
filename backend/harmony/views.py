@@ -778,9 +778,27 @@ def matches(request):
     })
 
 
-@api_view(['POST'])
+@api_view(['POST', 'GET'])
 @permission_classes([IsAuthenticated])
 def match_accept(request):
+    if request.method =='GET' :
+        matched_users =  Match.objects.filter(models.Q(user1=request.user) |
+        models.Q(user1=request.user))
+    
+        matches_data = [
+            {
+                "id": match.id,
+                "user1_id": match.user1.id,
+                "user1_username": match.user1.username,
+                "user2_id": match.user2.id,
+                "user2_username": match.user2.username,
+                "created_at": match.created_at,
+            }
+            for match in matched_users 
+        ]
+
+        return Response(matches_data)
+        
     current_user = request.user
     target_user_id = request.data.get('id')
 
@@ -821,3 +839,12 @@ def match_reject(request):
         MatchRejection.objects.create(user1=current_user, user2=target_user)
 
     return Response({'message': f'You rejected {target_user.username}'}, status=201)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def return_accepted_matches(request)    :
+    accepted_users = Match.objects.filter(user1 = request.user)
+    
+    return Response({
+        'accepted': accepted_users
+    })
