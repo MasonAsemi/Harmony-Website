@@ -24,15 +24,23 @@ const acceptMatch = () => {
     // Add logic to handle accepting a match
 }
 
+const locations = {
+    MATCHES: "matches", 
+    CHAT: "chat"
+}
+
 function Dashboard() {
     const [currentChat, setCurrentChat] = useState(null);
+    const [currentLocation, setCurrentLocation] = useState(locations.MATCHES)
 
     const handleChatClick = (chat) => {
         // Toggle chat - if clicking the same chat, close it
         if (currentChat?.id === chat.id) {
             setCurrentChat(null);
+            setCurrentLocation(locations.MATCHES)
         } else {
             setCurrentChat(chat);
+            setCurrentLocation(locations.CHAT)
         }
     };
 
@@ -50,7 +58,7 @@ function Dashboard() {
                             onClick={() => handleChatClick(chat)}
                             className={`w-full p-4 rounded-lg text-left transition-all ${
                                 currentChat?.id === chat.id
-                                    ? 'bg-white text-gray-900 shadow-lg'
+                                    ? 'bg-linear-to-br from-rose-300 via-pink-400 to-rose-500 text-gray-900 shadow-lg shadow-rose-800'
                                     : 'bg-white/80 text-gray-800 hover:bg-white hover:shadow-md'
                             }`}
                         >
@@ -64,12 +72,12 @@ function Dashboard() {
             {/* Main content area */}
             <div className="flex-1 flex items-center justify-center p-6">
                 {currentChat ? (
-                    <div className="w-full h-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden">
+                    <div className="w-full h-full max-w-4xl bg-white  rounded-2xl animate-fade-in shadow-2xl overflow-hidden">
                         <Chat conversation={currentChat} />
                     </div>
                 ) : (
                     <div className="w-full max-w-md">
-                        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
+                        <div className={`${currentLocation === locations.MATCHES ? "" : ""} animate-fade-in bg-white rounded-2xl shadow-2xl overflow-hidden`}>
                             {/* Profile image placeholder */}
                             <div className="aspect-3/4 bg-linear-to-br from-gray-200 to-gray-300 flex items-center justify-center">
                                 <div className="text-center text-gray-500">
