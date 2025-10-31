@@ -26,14 +26,21 @@ function AppContent() {
   const location = useLocation();
   const [currentLocation, setCurrentLocation] = useState("/");
 
+  const userLocations = [
+    "/profile", 
+    "/dashboard" 
+  ]
+
   useEffect(() => {
     setCurrentLocation(location.pathname);
+    console.log(location.pathname, userLocations[1])
+    console.log(location.pathname in userLocations)  
   })
 
   return (
     <>
-      {(currentLocation === "/") ? <Header /> : <Sidebar />}
-      <div className={!(currentLocation === "/") ? "" : "min-h-screen pt-20"}>
+      {(userLocations.includes(currentLocation)) ? <Sidebar /> : <Header />}
+      <div className={userLocations.includes(currentLocation) ? "" : "min-h-screen pt-20"}>
             <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
