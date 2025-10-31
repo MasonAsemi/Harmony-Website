@@ -9,3 +9,5 @@ db.sqlite3
 venv/
 .venv/
 djvenv/
+# macOS system files
+.DS_Store
