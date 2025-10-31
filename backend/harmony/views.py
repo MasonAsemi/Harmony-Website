@@ -70,6 +70,82 @@ class UserViewSet(viewsets.ModelViewSet):
             return Response(serializer.data)
         
 
+    # views.py - Replace your UserViewSet profile action
+    @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated])
+    def profile(self, request):
+        """
+        Returns the authenticated user's favorite songs, artists, and genres with weights
+        """
+        user = request.user
+        
+        # Get favorite songs with weights (sorted by weight)
+        song_preferences = UserSongPreference.objects.filter(user=user).select_related('song').prefetch_related('song__artists', 'song__genres').order_by('-weight')
+        favorite_songs = []
+        for pref in song_preferences:
+            song = pref.song
+            favorite_songs.append({
+                'id': song.id,
+                'name': song.name,
+                'spotify_id': song.spotify_id,
+                'album': song.album,
+                'album_image_url': song.album_image_url,
+                'spotify_url': song.spotify_url,
+                'popularity': song.popularity,
+                'duration_ms': song.duration_ms,
+                'preview_url': song.preview_url,
+                'artists': [{'id': a.id, 'name': a.name, 'spotify_id': a.spotify_id, 'image_url': a.image_url} for a in song.artists.all()],
+                'genres': [{'id': g.id, 'name': g.name} for g in song.genres.all()],
+                'weight': pref.weight
+            })
+        
+        # Get favorite artists with weights (sorted by weight)
+        artist_preferences = UserArtistPreference.objects.filter(user=user).select_related('artist').prefetch_related('artist__genres').order_by('-weight')
+        favorite_artists = []
+        for pref in artist_preferences:
+            artist = pref.artist
+            favorite_artists.append({
+                'id': artist.id,
+                'name': artist.name,
+                'spotify_id': artist.spotify_id,
+                'image_url': artist.image_url,
+                'popularity': artist.popularity,
+                'genres': [{'id': g.id, 'name': g.name} for g in artist.genres.all()],
+                'weight': pref.weight
+            })
+        
+        # Get favorite genres with weights (sorted by weight)
+        genre_preferences = UserGenrePreference.objects.filter(user=user).select_related('genre').order_by('-weight')
+        favorite_genres = []
+        for pref in genre_preferences:
+            genre = pref.genre
+            favorite_genres.append({
+                'id': genre.id,
+                'name': genre.name,
+                'weight': pref.weight
+            })
+        
+        return Response({
+            'user': {
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'location': user.location,
+                'age': user.age,
+                'biography': user.biography,
+                'interests': user.interests,
+                'profile_image': user.profile_image.url if user.profile_image else None,
+            },
+            'favorite_songs': favorite_songs,
+            'favorite_artists': favorite_artists,
+            'favorite_genres': favorite_genres,
+            'stats': {
+                'total_songs': len(favorite_songs),
+                'total_artists': len(favorite_artists),
+                'total_genres': len(favorite_genres)
+            }
+        })
+        
+
 
 
 class SongViewSet(viewsets.ModelViewSet):
@@ -77,12 +153,41 @@ class SongViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        # Only return songs belonging to the logged-in user
-        return Song.objects.filter(user=self.request.user)
-
+        """
+        Return songs favorited by the logged-in user
+        """
+        user = self.request.user
+        return Song.objects.filter(favorited_by=user).prefetch_related('artists', 'genres').order_by('name')
+    
+    def list(self, request, *args, **kwargs):
+        """
+        List all songs favorited by the authenticated user with full details
+        """
+        queryset = self.get_queryset()
+        
+        # Get user's song preferences to include weights
+        user_song_prefs = {
+            pref.song_id: pref.weight 
+            for pref in UserSongPreference.objects.filter(user=request.user)
+        }
+        
+        # Use serializer for consistent formatting
+        serializer = self.get_serializer(queryset, many=True)
+        
+        # Add weights to each song
+        songs_data = []
+        for song_dict in serializer.data:
+            song_dict['weight'] = user_song_prefs.get(song_dict['id'], 5)
+            songs_data.append(song_dict)
+        
+        # Sort by weight (highest first)
+        songs_data.sort(key=lambda x: x['weight'], reverse=True)
+        
+        return Response(songs_data)
+    
     def perform_create(self, serializer):
-        # Automatically attach the user to the song
-        serializer.save(user=self.request.user)
+        # Songs are created through Spotify callback only
+        pass
 
 
 
