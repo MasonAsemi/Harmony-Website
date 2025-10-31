@@ -72,14 +72,16 @@ function Register() {
         try {
             // Use /api/users/ endpoint which returns token on creation
             const response = await createUser({ username, email, password });
+            const data = await response.json();
 
             if (response.ok) {
-                setMessage('Registration successful! Redirecting to login...');
+                setMessage('Registration successful! Logging you in...');
                 setUsername('');
                 setEmail('');
                 setPassword('');
                 setConfirmPassword('');
-                setTimeout(() => navigate('/login'), 1500);
+                loginToken(data.token);
+                setTimeout(() => navigate('/dashboard'), 1500);
             } else {
                 const data = await response.json();
                 if (data.username) setMessage(`Username: ${data.username[0]}`);
