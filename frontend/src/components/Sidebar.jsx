@@ -37,6 +37,28 @@ const Sidebar = () => {
         }
     ];
 
+    const logoutButton = { 
+            icon: (
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    role="img"
+                    aria-label="Log out"
+                >
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                    <polyline points="16 17 21 12 16 7" />
+                    <line x1="21" y1="12" x2="9" y2="12" />
+                </svg>
+            ), 
+            label: "Logout", 
+            path: "#" 
+        }
+
     return (
         <div
             className="fixed left-0 top-0 h-screen bg-white border-r border-gray-200 transition-all duration-300 ease-in-out z-50 shadow-lg"
@@ -51,7 +73,7 @@ const Sidebar = () => {
                     </a>
                 </div>
 
-                <nav className="flex-1">
+                <nav className="flex-1 flex-col">
                     {menuItems.map((item, index) => (
                         <Link
                             key={index}
@@ -70,6 +92,18 @@ const Sidebar = () => {
                             </span>
                         </Link>
                     ))}
+                    <button className="flex mt-auto items-center px-4 py-4 text-gray-700 hover:bg-rose-100 transition-colors duration-200 w-full">
+                        <div className="w-6 h-6 flex-shrink-0">
+                            {logoutButton.icon}
+                        </div>
+                        <span
+                            className={`ml-4 whitespace-nowrap transition-opacity duration-300 ${
+                                isExpanded ? "opacity-100" : "opacity-0"
+                            }`}
+                        >
+                            {logoutButton.label}
+                        </span>
+                    </button>
                 </nav>
             </div>
         </div>

@@ -146,6 +146,7 @@ class Match(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
  
     compatibilty_score = models.FloatField(
+        default=0,
         validators=[MinValueValidator(0), MaxValueValidator(100)]
     ) 
 
