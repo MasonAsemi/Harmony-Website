@@ -43,7 +43,7 @@ function Dashboard() {
         <div className="flex flex-row h-screen bg-linear-to-br from-rose-300 via-pink-400 to-rose-500">
             {/* Sidebar */}
             <Sidebar />
-
+                
             {/* Left sidebar - Chats */}
             <div className="w-80 ml-16 bg-pink-200 border-r border-white/20 flex flex-col">
                 <div className="p-4 border-b border-white/20">
