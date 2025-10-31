@@ -183,10 +183,7 @@ class SongViewSet(viewsets.ModelViewSet):
         # Sort by weight (highest first)
         songs_data.sort(key=lambda x: x['weight'], reverse=True)
         
-        return Response({
-            'count': len(songs_data),
-            'songs': songs_data
-        })
+        return Response(songs_data)
     
     def perform_create(self, serializer):
         # Songs are created through Spotify callback only
