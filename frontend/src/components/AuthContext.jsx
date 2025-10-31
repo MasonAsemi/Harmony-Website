@@ -80,22 +80,26 @@ export const AuthProvider = ({ children }) => {
 
     // login spotify users
     const loginToken = async (token) => {
-
-        setToken(token) ;
+        setToken(token);
         localStorage.setItem("token", token);
         
         // Get user data after login
-        const userResponse = await getUserData();
+        const userResponse = await fetch(`${API_BASE_URL}users/me/`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Token ${token}`,
+                'Content-Type': 'application/json',
+            },
+        });
 
         if (!userResponse.ok) {
             throw new Error('Failed to fetch user data');
         }
 
         const userData = await userResponse.json();
-
         setUser(userData);
-
-        return response;
+        
+        return userResponse;
     };
 
     const logout = () => {
@@ -105,7 +109,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, token, login, logout, loading }}>
+        <AuthContext.Provider value={{ user, token, login, loginToken, logout, loading }}>
             {children}
         </AuthContext.Provider>
     );

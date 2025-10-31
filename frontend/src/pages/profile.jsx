@@ -4,6 +4,7 @@ import ProfileField from '../components/ProfileField';
 import { profileAPI } from '../services/api';
 import '../styles/profile.css';
 import SongSearch from '../components/SongSearch';
+import Sidebar from '../components/Sidebar';
 
 function Profile({ pfp_src }) {
   const { user, token, login } = useAuth();
