@@ -103,6 +103,17 @@ CORS_ALLOW_HEADERS = list(default_headers)
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
+ASGI_APPLICATION = "yourproj.asgi.application"
+
+CHANNEL_LAYERS = {
+    "default": {
+        # For single-process dev:
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+        # Use this in prod (requires Redis running):
+        # "BACKEND": "channels_redis.core.RedisChannelLayer",
+        # "CONFIG": {"hosts": [("127.0.0.1", 6379)]},
+    }
+}
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
