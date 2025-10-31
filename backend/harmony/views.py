@@ -821,3 +821,80 @@ def match_reject(request):
         MatchRejection.objects.create(user1=current_user, user2=target_user)
 
     return Response({'message': f'You rejected {target_user.username}'}, status=201)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def accepted_matches(request):
+    """
+    Returns all users that the current user has accepted (created a Match with)
+    """
+    current_user = request.user
+    
+    # Get all Match objects where current_user is either user1 or user2
+    matches = Match.objects.filter(
+        models.Q(user1=current_user) | models.Q(user2=current_user)
+    ).select_related('user1', 'user2')
+    
+    # Extract the other user from each match
+    matched_users = []
+    for match in matches:
+        # Get the other user (not the current user)
+        other_user = match.user2 if match.user1 == current_user else match.user1
+        
+        # Get their profile data
+        profile_data = {
+            'id': other_user.id,
+            'username': other_user.username,
+            'email': other_user.email,
+            'location': other_user.location,
+            'age': other_user.age,
+            'biography': other_user.biography,
+            'interests': other_user.interests,
+            'profile_image': other_user.profile_image.url if other_user.profile_image else None,
+        }
+        
+        # Get their favorite songs (top 3)
+        favorite_song_prefs = UserSongPreference.objects.filter(user=other_user).select_related('song').order_by('-weight').values(
+            'song__id', 'song__name', 'song__spotify_id', 
+            'song__album_image_url', 'weight'
+        )[:3]
+        
+        fav_songs = [
+            {
+                'id': s['song__id'],
+                'name': s['song__name'],
+                'spotify_id': s['song__spotify_id'],
+                'album_image_url': s['song__album_image_url'],
+                'weight': s['weight'],
+            }
+            for s in favorite_song_prefs
+        ]
+        
+        # Get their favorite artists (top 3)
+        favorite_artists_prefs = UserArtistPreference.objects.filter(user=other_user) \
+            .select_related('artist').order_by('-weight') \
+            .values(
+                'artist__id', 'artist__name', 'artist__spotify_id', 
+                'artist__image_url', 'weight'
+            )[:3]
+        
+        fav_artists = [
+            {
+                'id': a['artist__id'],
+                'name': a['artist__name'],
+                'spotify_id': a['artist__spotify_id'],
+                'image_url': a['artist__image_url'],
+                'weight': a['weight'],
+            }
+            for a in favorite_artists_prefs
+        ]
+        
+        profile_data['fav_songs'] = fav_songs
+        profile_data['fav_artists'] = fav_artists
+        
+        matched_users.append(profile_data)
+    
+    return Response({
+        'count': len(matched_users),
+        'matches': matched_users
+    })
