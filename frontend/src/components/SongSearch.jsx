@@ -96,7 +96,7 @@ const SongSearch = () => {
         </form>
         {songs.length < 1 ? null : <div className="flex flex-col gap-2 border shadow-md p-4 overflow-y-auto max-h-48">
             {songs.map((item, index) => {
-                return (<button onClick={() => {handleSongSelect(index)}} className="hover:bg-[#ddd] p-1 text-left" key={index}>{`${item.name} by ${item.list_of_artists[0].name}`}</button>)
+                return (<button onClick={() => {handleSongSelect(index)}} className="hover:bg-[#ddd] p-1 text-left" key={index}>{`${item.name} by ${item.artists[0].name}`}</button>)
             })}
         </div>}
         <SongList songs={selectedSongs} setSongs={setSelectedSongs}/>
