@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 const Sidebar = () => {
@@ -46,9 +46,9 @@ const Sidebar = () => {
         >
             <div className="flex flex-col h-full py-6">
                 <div className="mb-8 px-4">
-                    <h2 className={`text-xl font-bold text-gray-800 whitespace-nowrap overflow-hidden transition-opacity duration-300 ${isExpanded ? "opacity-100" : "opacity-0"}`}>
+                    <a href="/" className={`text-xl font-bold text-gray-800 whitespace-nowrap overflow-hidden transition-opacity duration-300 ${isExpanded ? "opacity-100" : "opacity-0"}`}>
                         Harmony
-                    </h2>
+                    </a>
                 </div>
 
                 <nav className="flex-1">
