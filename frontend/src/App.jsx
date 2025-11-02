@@ -7,14 +7,14 @@ import {
 } from "react-router-dom";
 
 //Components
-import { AuthProvider } from "./components/AuthContext";
-import ProtectedRoute from "./components/ProtectedRoute";
+import { AuthProvider } from "./components/auth/AuthContext";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 import { Header } from "./components/Header";
 
 // Pages
-import Login from "./pages/login";
-import Register from "./pages/register";
-import Profile from "./pages/profile";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Profile from "./pages/Profile";
 import About from "./pages/About";
 import Chat from "./pages/Chat";
 import Home from "./pages/Home";

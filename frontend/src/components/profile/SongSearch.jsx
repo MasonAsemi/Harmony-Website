@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "./AuthContext";
-import harmonyLogo from "../assets/logo.png";
-import { addUserSong, getUserSongs, searchSong } from "../api/music";
+import { useAuth } from "../auth/AuthContext";
+import harmonyLogo from "../../assets/logo.png";
+import { addUserSong, getUserSongs, searchSong } from "../../api/music";
 import SongList from "./SongList";
 
 const SongSearch = () => {

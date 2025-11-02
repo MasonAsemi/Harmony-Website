@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "./AuthContext";
+import { useAuth } from "./auth/AuthContext";
 import harmonyLogo from "../assets/logo.png";
 
 export function Header() {

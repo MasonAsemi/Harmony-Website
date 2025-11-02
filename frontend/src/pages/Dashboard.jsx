@@ -2,7 +2,7 @@ import "../styles/profile.css";
 import Chat from "./Chat";
 import Sidebar from "../components/Sidebar";
 import Matches from "../components/Matches";
-import { useAuth } from "../components/AuthContext";
+import { useAuth } from "../components/auth/AuthContext";
 import { useState, useEffect } from "react";
 import { getMatches, getAcceptedMatches, acceptMatch, rejectMatch } from "../api/matches";
 
