@@ -4,7 +4,6 @@ import Sidebar from "../components/Sidebar";
 import Matches from "../components/Matches";
 import { useAuth } from "../components/auth/AuthContext";
 import { useState, useEffect } from "react";
-import { getMatches, getAcceptedMatches, acceptMatch, rejectMatch } from "../api/matches";
 import MatchCard from "../components/dashboard/MatchCard";
 
 const exampleChats = [
@@ -13,105 +12,9 @@ const exampleChats = [
 ];
 
 function Dashboard() {
-    const [currentChat, setCurrentChat] = useState(null);
-    const [potentialMatches, setPotentialMatches] = useState([]);
     const [acceptedMatches, setAcceptedMatches] = useState([]);
-    const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [currentChat, setCurrentChat] = useState(null);
     const { token, user } = useAuth();
-
-    // Fetch accepted matches
-    const fetchAcceptedMatches = async () => {
-        if (!token) return;
-        
-        try {
-            const data = await getAcceptedMatches(token);
-            console.log("Fetched accepted matches:", data);
-            setAcceptedMatches(data.matches || []);
-        } catch (err) {
-            console.error("Error fetching accepted matches:", err);
-            // Don't set error state here, as this is optional data
-        }
-    };
-
-    // Fetch potential matches and accepted matches on component mount
-    useEffect(() => {
-        if (!token) return;
-
-        setLoading(true);
-        
-        // Fetch both potential matches and accepted matches
-        Promise.all([
-            getMatches(token),
-            getAcceptedMatches(token).catch(err => {
-                console.error("Error fetching accepted matches:", err);
-                return { matches: [] }; // Return empty array if endpoint doesn't exist yet
-            })
-        ])
-            .then(([potentialData, acceptedData]) => {
-                console.log("Fetched potential matches:", potentialData);
-                console.log("Fetched accepted matches:", acceptedData);
-                setPotentialMatches(potentialData.matches || []);
-                setAcceptedMatches(acceptedData.matches || []);
-                setLoading(false);
-            })
-            .catch(err => {
-                console.error("Error fetching matches:", err);
-                setError(err.message);
-                setLoading(false);
-            });
-    }, [token]);
-
-    const currentMatch = potentialMatches[currentMatchIndex];
-
-    const handleDecline = async () => {
-        if (!currentMatch) return;
-
-        try {
-            await rejectMatch(token, currentMatch.id);
-            console.log("Match rejected:", currentMatch.username);
-            
-            // Move to next match
-            if (currentMatchIndex < potentialMatches.length - 1) {
-                setCurrentMatchIndex(currentMatchIndex + 1);
-            } else {
-                // No more matches
-                setPotentialMatches([]);
-                setCurrentMatchIndex(0);
-            }
-        } catch (err) {
-            console.error("Error rejecting match:", err);
-            alert("Failed to reject match. Please try again.");
-        }
-    };
-
-    const handleAccept = async () => {
-        if (!currentMatch) return;
-
-        try {
-            await acceptMatch(token, currentMatch.id);
-            console.log("Match accepted:", currentMatch.username);
-            
-            // Add to accepted matches immediately for UI responsiveness
-            setAcceptedMatches([...acceptedMatches, currentMatch]);
-            
-            // Also refresh accepted matches from server to ensure consistency
-            fetchAcceptedMatches();
-            
-            // Move to next match
-            if (currentMatchIndex < potentialMatches.length - 1) {
-                setCurrentMatchIndex(currentMatchIndex + 1);
-            } else {
-                // No more matches
-                setPotentialMatches([]);
-                setCurrentMatchIndex(0);
-            }
-        } catch (err) {
-            console.error("Error accepting match:", err);
-            alert("Failed to accept match. Please try again.");
-        }
-    };
 
     const handleChatClick = (chat) => {
         // Toggle chat - if clicking the same chat, close it
@@ -157,7 +60,7 @@ function Dashboard() {
                         <Chat conversation={currentChat} />
                     </div>
                 ) : (
-                    <MatchCard currentMatch={currentMatch} error={error} loading={loading} />
+                    <MatchCard token={token} acceptedMatches={acceptedMatches} setAcceptedMatches={setAcceptedMatches} />
                 )}
             </div>
 

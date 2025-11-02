@@ -1,5 +1,104 @@
+import { useEffect, useState } from "react";
+import { getMatches, getAcceptedMatches, acceptMatch, rejectMatch } from "../../api/matches";
 
-const MatchCard = ({ currentMatch, error, loading }) => {
+const MatchCard = ({ token, acceptedMatches, setAcceptedMatches }) => {
+    const [potentialMatches, setPotentialMatches] = useState([]);
+    const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    const currentMatch = potentialMatches[currentMatchIndex];
+    
+    const handleDecline = async () => {
+        if (!currentMatch) return;
+
+        try {
+            await rejectMatch(token, currentMatch.id);
+            console.log("Match rejected:", currentMatch.username);
+            
+            // Move to next match
+            if (currentMatchIndex < potentialMatches.length - 1) {
+                setCurrentMatchIndex(currentMatchIndex + 1);
+            } else {
+                // No more matches
+                setPotentialMatches([]);
+                setCurrentMatchIndex(0);
+            }
+        } catch (err) {
+            console.error("Error rejecting match:", err);
+            alert("Failed to reject match. Please try again.");
+        }
+    };
+
+    const handleAccept = async () => {
+        if (!currentMatch) return;
+
+        try {
+            await acceptMatch(token, currentMatch.id);
+            console.log("Match accepted:", currentMatch.username);
+            
+            // Add to accepted matches immediately for UI responsiveness
+            setAcceptedMatches([...acceptedMatches, currentMatch]);
+            
+            // Also refresh accepted matches from server to ensure consistency
+            fetchAcceptedMatches();
+            
+            // Move to next match
+            if (currentMatchIndex < potentialMatches.length - 1) {
+                setCurrentMatchIndex(currentMatchIndex + 1);
+            } else {
+                // No more matches
+                setPotentialMatches([]);
+                setCurrentMatchIndex(0);
+            }
+        } catch (err) {
+            console.error("Error accepting match:", err);
+            alert("Failed to accept match. Please try again.");
+        }
+    };
+
+    // Fetch accepted matches
+        const fetchAcceptedMatches = async () => {
+            if (!token) return;
+            
+            try {
+                const data = await getAcceptedMatches(token);
+                console.log("Fetched accepted matches:", data);
+                setAcceptedMatches(data.matches || []);
+            } catch (err) {
+                console.error("Error fetching accepted matches:", err);
+                // Don't set error state here, as this is optional data
+            }
+        };
+    
+        // Fetch potential matches and accepted matches on component mount
+        useEffect(() => {
+            if (!token) return;
+    
+            setLoading(true);
+            
+            // Fetch both potential matches and accepted matches
+            Promise.all([
+                getMatches(token),
+                getAcceptedMatches(token).catch(err => {
+                    console.error("Error fetching accepted matches:", err);
+                    return { matches: [] }; // Return empty array if endpoint doesn't exist yet
+                })
+            ])
+                .then(([potentialData, acceptedData]) => {
+                    console.log("Fetched potential matches:", potentialData);
+                    console.log("Fetched accepted matches:", acceptedData);
+                    setPotentialMatches(potentialData.matches || []);
+                    setAcceptedMatches(acceptedData.matches || []);
+                    setLoading(false);
+                })
+                .catch(err => {
+                    console.error("Error fetching matches:", err);
+                    setError(err.message);
+                    setLoading(false);
+                });
+        }, [token]);
+
     return <div className="w-full max-w-md">
         {loading ? (
             <div className="bg-white rounded-2xl shadow-2xl p-8 text-center">
