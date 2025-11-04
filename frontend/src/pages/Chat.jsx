@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Message from "../components/Message";
-import { useAuth } from "../components/AuthContext";
+import { useAuth } from "../components/auth/AuthContext";
 
 const Chat = ({ currentChat }) =>
 {
