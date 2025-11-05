@@ -23,15 +23,15 @@ const SongList = ({ songs, setSongs }) => {
     return (
     <div>
         <div className="field-title">Favorite songs</div>
-        {songs.length < 1 ? null : <div className="flex flex-col gap-2 border shadow-md p-4 overflow-y-auto max-h-48">
+        {songs.length < 1 ? null : <ul className="flex flex-col gap-2 border shadow-md p-4 overflow-y-auto max-h-48">
             {songs.map((song, index) => {
                 if(song && song.embed && song.embed.html){
                     return (
-                        <div dangerouslySetInnerHTML={{ __html: song.embed.html }} />
+                        <li key={index} dangerouslySetInnerHTML={{ __html: song.embed.html }} />
                     )
                 }
             })}
-        </div>}
+        </ul>}
     </div>
     );
 }
