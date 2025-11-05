@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "./AuthContext";
-import harmonyLogo from "../assets/logo.png";
-import { addUserSong, getUserSongs, searchSong } from "../api/music";
+import { useAuth } from "../auth/AuthContext";
+import harmonyLogo from "../../assets/logo.png";
+import { addUserSong, getUserSongs, searchSong } from "../../api/music";
 import SongList from "./SongList";
 
 const SongSearch = () => {
@@ -96,7 +96,22 @@ const SongSearch = () => {
         </form>
         {songs.length < 1 ? null : <div className="flex flex-col gap-2 border shadow-md p-4 overflow-y-auto max-h-48">
             {songs.map((item, index) => {
-                return (<button onClick={() => {handleSongSelect(index)}} className="hover:bg-[#ddd] p-1 text-left" key={index}>{`${item.name} by ${item.artists[0].name}`}</button>)
+                return (
+                    <button 
+                        onClick={() => {handleSongSelect(index)}} 
+                        className="hover:bg-[#ddd] p-1 text-left flex items-center gap-3" 
+                        key={index}
+                    >
+                        {item.album_image_url && (
+                            <img 
+                                src={item.album_image_url} 
+                                alt={`${item.name} album cover`} 
+                                className="w-12 h-12 object-cover rounded"
+                            />
+                        )}
+                        <span>{`${item.name} by ${item.artists[0].name}`}</span>
+                    </button>
+                )
             })}
         </div>}
         <SongList songs={selectedSongs} setSongs={setSelectedSongs}/>

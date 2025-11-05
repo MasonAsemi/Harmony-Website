@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useAuth } from '../components/AuthContext';
+import { useAuth } from '../components/auth/AuthContext';
 import '../styles/register.css';
 import { createUser } from '../api/auth';
 

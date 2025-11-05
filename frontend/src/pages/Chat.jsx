@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Message from "../components/Message";
-import { useAuth } from "../components/AuthContext";
+import { useAuth } from "../components/auth/AuthContext";
 import { API_BASE_URL } from "../config";
 
 const Chat = ({ currentChat }) =>

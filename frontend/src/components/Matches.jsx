@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { API_BASE_URL } from "../config";
 
-export default function Matches({ token }) {
+export default function Matches({ token, acceptedMatches }) {
     const [matches, setMatches] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -29,41 +29,43 @@ export default function Matches({ token }) {
             return res.json();
         })
         .then(data => {
-            console.log("Matches fetched:", data); // debug
-            if (Array.isArray(data)) {
-                setMatches(data);
-            } else {
-                setMatches([]); // fallback if data isn’t an array
-            }
+            console.log("Matches data fetched:", data);
+            // Filter out users that have been accepted (they're now in acceptedMatches)
+            const filteredMatches = (data.matches || []).filter(
+                match => !acceptedMatches.some(accepted => accepted.id === match.id)
+            );
+            setMatches(filteredMatches);
         })
         .catch(err => {
             console.error("Fetch error:", err);
             setError(err.message);
         })
         .finally(() => setLoading(false));
-    }, [token]);
+    }, [token, acceptedMatches]);
 
     return (
         <div className="w-80 mr-8 bg-pink-200 border-l border-white/20 flex flex-col">
             <div className="p-4 border-b border-white/20">
-                <h2 className="text-2xl font-bold text-white text-center">Matches</h2>
+                <h2 className="text-2xl font-bold text-white text-center">Accepted Matches</h2>
             </div>
 
             <div className="flex-1 overflow-y-auto p-4 space-y-3">
                 {loading && <p className="text-white text-center">Loading matches...</p>}
                 {error && <p className="text-red-500 text-center">{error}</p>}
-                {!loading && !error && matches.length === 0 && (
-                    <p className="text-white text-center">No matches found.</p>
+                {!loading && !error && acceptedMatches.length === 0 && (
+                    <p className="text-white text-center">No matches yet. Start swiping!</p>
                 )}
 
-                {(matches || []).map(match => (
+                {acceptedMatches.map(match => (
                     <div
                         key={match.id}
-                        className="w-full p-4 rounded-lg bg-white/80 text-gray-800 hover:bg-white hover:shadow-md transition-all"
+                        className="w-full p-4 rounded-lg bg-white/80 text-gray-800 hover:bg-white hover:shadow-md transition-all cursor-pointer"
                     >
-                        <div className="font-semibold">{match.name}</div>
-                        <div className="text-sm text-gray-600 mt-1">
-                            Favorite genres: {(match.genres || []).join(", ")}
+                        <div className="flex items-center gap-3">
+                            
+                            <div className="flex-1">
+                                <div className="font-semibold">{match.user2_username}</div>
+                            </div>
                         </div>
                     </div>
                 ))}

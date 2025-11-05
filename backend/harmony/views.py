@@ -1,7 +1,7 @@
 from django.shortcuts import redirect
 from rest_framework import viewsets, permissions, status 
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
-from .models import User, Song, Artist, Genre, UserSongPreference, UserArtistPreference, UserGenrePreference, UserFavoriteGenre
+from .models import User, Song, Artist, Genre, UserSongPreference, UserArtistPreference, UserGenrePreference, Match, MatchRejection
 from .serializers import UserSerializer, SongSerializer
 from .permissions import IsSelfOrReadOnly
 from rest_framework.decorators import action, api_view, permission_classes 
@@ -11,7 +11,7 @@ from django.http import JsonResponse, HttpResponseRedirect
 import base64
 import requests
 import os 
-from django.db import transaction 
+from django.db import transaction, models
 from dotenv import load_dotenv
 import urllib.parse
 class UserViewSet(viewsets.ModelViewSet):
@@ -687,22 +687,164 @@ def get_spotify_user_fav_artists(spotify_credentials, time_frame='medium_term'):
     response_json = user_top_artist_genres_response.json() 
     return  response_json.get('items', [])
 
+
+#TODO update user matching functionality
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def matches(request):
-    user = request.user
-    favorite_genres = UserFavoriteGenre.objects.filter(user=user).values_list('genre', flat=True)
+  
+    #TEMP 
+    # get all users barring this current one , for each build a match with the current user  
+    current_user = request.user
+
+    # Get IDs where current_user is either user1 or user2
+    matched_pairs = Match.objects.filter(
+        models.Q(user1=current_user) | models.Q(user2=current_user)
+    ).values_list('user1', 'user2')
+
+    # Flatten list of (user1, user2) tuples into a single set of IDs
+    matched_user_ids = {uid for pair in matched_pairs for uid in pair}
+
+    # IDs of users already rejected
+    rejected_user_ids = set(
+        MatchRejection.objects.filter(user1=current_user).values_list('user2', flat=True)
+    )
+
+    # Combine all excluded user IDs + current user
+    excluded_ids = matched_user_ids | rejected_user_ids | {current_user.id}
+
+    # Get all users not yet matched/rejected
+    all_users = User.objects.exclude(id__in=excluded_ids)
+
+    #only show users who haven't already been accepted/rejected 
+
+    matches_profiles = []
+    for user in all_users:
+
+        profile_data = {
+            'id': user.id,
+            'username': user.username,
+            'email': user.email,
+            'location': user.location,
+            'age': user.age,
+            'biography': user.biography,
+            'interests': user.interests,
+            'profile_image': user.profile_image.url if user.profile_image else None,
+        }
+
+        
+        favorite_song_prefs = UserSongPreference.objects.filter(user=user).select_related('song').order_by('-weight').values(
+                'song__id', 'song__name', 'song__spotify_id', 
+                'song__album_image_url', 'weight'
+            )[:3]
+        
+        fav_songs = [
+            {
+                'id': s['song__id'],
+                'name': s['song__name'],
+                'spotify_id': s['song__spotify_id'],
+                'album_image_url': s['song__album_image_url'],
+                'weight': s['weight'],
+            }
+            for s in favorite_song_prefs
+        ]
+
+        favorite_artists_prefs = UserArtistPreference.objects.filter(user=user) \
+            .select_related('artist').order_by('-weight') \
+            .values(
+                'artist__id', 'artist__name', 'artist__spotify_id', 
+                'artist__image_url', 'weight'
+            )[:3]
+
+        fav_artists = [
+            {
+                'id': a['artist__id'],
+                'name': a['artist__name'],
+                'spotify_id': a['artist__spotify_id'],
+                'image_url': a['artist__image_url'],
+                'weight': a['weight'],
+            }
+            for a in favorite_artists_prefs
+        ]
+
+        profile_data['fav_songs'] = fav_songs
+        profile_data['fav_artists'] = fav_artists
+
+        matches_profiles.append(profile_data)
+
+    return Response({
+        'count': len(matches_profiles),
+        'matches':matches_profiles
+    })
+
+
+@api_view(['POST', 'GET'])
+@permission_classes([IsAuthenticated])
+def match_accept(request):
+    if request.method =='GET' :
+        matched_users =  Match.objects.filter(models.Q(user1=request.user) |
+        models.Q(user1=request.user))
     
-    matched_users = UserFavoriteGenre.objects.filter(
-        genre__in=favorite_genres
-    ).exclude(user=user).select_related('user').distinct()
+        matches_data = [
+            {
+                "id": match.id,
+                "user1_id": match.user1.id,
+                "user1_username": match.user1.username,
+                "user2_id": match.user2.id,
+                "user2_username": match.user2.username,
+                "created_at": match.created_at,
+            }
+            for match in matched_users 
+        ]
 
-    results = []
-    for match in matched_users:
-        results.append({
-            "id": match.user.id,
-            "name": match.user.username,
-            "genres": list(UserFavoriteGenre.objects.filter(user=match.user).values_list('genre__genre_name', flat=True))
-        })
-    return Response(results)
+        return Response(matches_data)
+        
+    current_user = request.user
+    target_user_id = request.data.get('id')
 
+    if not target_user_id:
+        return Response({'error': 'user id is required'}, status=400)
+
+    try:
+        target_user = User.objects.get(id=target_user_id)
+    except User.DoesNotExist:
+        return Response({'error': 'User not found'}, status=404)
+
+    # Avoid duplicate match creation
+    if not Match.objects.filter(
+        models.Q(user1=current_user, user2=target_user) |
+        models.Q(user1=target_user, user2=current_user)
+    ).exists():
+        Match.objects.create(user1=current_user, user2=target_user)
+
+    return Response({'message': f'Match created with {target_user.username}'}, status=201)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def match_reject(request):
+    current_user = request.user
+    data = request.data
+    target_user_id = data.get('id') 
+
+    if not target_user_id:
+        return Response({'error': 'User id missing from request'}, status=400)
+
+    try:
+        target_user = User.objects.get(id=target_user_id)
+    except User.DoesNotExist:
+        return Response({'error': 'User not found'}, status=404)
+
+    # Prevent duplicates
+    if not MatchRejection.objects.filter(user1=current_user, user2=target_user).exists():
+        MatchRejection.objects.create(user1=current_user, user2=target_user)
+
+    return Response({'message': f'You rejected {target_user.username}'}, status=201)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def return_accepted_matches(request)    :
+    accepted_users = Match.objects.filter(user1 = request.user)
+    
+    return Response({
+        'accepted': accepted_users
+    })
