@@ -249,6 +249,10 @@ class SongViewSet(viewsets.ModelViewSet):
                 spotify_url=song_data.get('external_urls', {}).get('spotify', '')
             )
             
+            embed = get_song_embed(song.spotify_url)
+            song.embed = embed
+            song.save() 
+            
             # Add artists to the song
             for artist_data in song_data.get('artists', []):
                 artist, _ = Artist.objects.get_or_create(
