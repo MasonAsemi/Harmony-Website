@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { deleteUserSong } from "../api/music";
+import { deleteUserSong } from "../../api/music";
 
 const SongList = ({ songs, setSongs }) => {
     const handleClick = async (index) => {

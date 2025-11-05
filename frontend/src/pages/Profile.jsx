@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
-import { useAuth } from '../components/AuthContext';
-import ProfileField from '../components/ProfileField';
+import { useAuth } from '../components/auth/AuthContext';
+import ProfileField from '../components/profile/ProfileField';
 import { profileAPI } from '../services/api';
 import '../styles/profile.css';
-import SongSearch from '../components/SongSearch';
-import Sidebar from '../components/Sidebar';
+import SongSearch from '../components/profile/SongSearch';
 
 function Profile({ pfp_src }) {
   const { user, token, login } = useAuth();
