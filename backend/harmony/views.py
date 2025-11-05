@@ -83,6 +83,12 @@ class UserViewSet(viewsets.ModelViewSet):
         favorite_songs = []
         for pref in song_preferences:
             song = pref.song
+            #if song doesn't have an embed search for it 
+            if not song.embed:
+                song.embed = get_song_embed(song.spotify_url)
+            
+            song.save() 
+
             favorite_songs.append({
                 'id': song.id,
                 'name': song.name,
@@ -95,7 +101,8 @@ class UserViewSet(viewsets.ModelViewSet):
                 'preview_url': song.preview_url,
                 'artists': [{'id': a.id, 'name': a.name, 'spotify_id': a.spotify_id, 'image_url': a.image_url} for a in song.artists.all()],
                 'genres': [{'id': g.id, 'name': g.name} for g in song.genres.all()],
-                'weight': pref.weight
+                'weight': pref.weight,
+                'embed': song.embed
             })
         
         # Get favorite artists with weights (sorted by weight)
@@ -241,6 +248,10 @@ class SongViewSet(viewsets.ModelViewSet):
                 preview_url=song_data.get('preview_url', ''),
                 spotify_url=song_data.get('external_urls', {}).get('spotify', '')
             )
+            
+            embed = get_song_embed(song.spotify_url)
+            song.embed = embed
+            song.save() 
             
             # Add artists to the song
             for artist_data in song_data.get('artists', []):
@@ -566,14 +577,33 @@ def spotify_callback(request):
     auth_token, _ = Token.objects.get_or_create(user=user)
 
     # Send user back to frontend with token (or store in session)
-    frontend_redirect = f"https://harmonymatching.com/login?token={auth_token.key}"
+    frontend_url_base = os.getenv('FRONTEND_URL_BASE')
+    frontend_redirect = f"{frontend_url_base}/login?token={auth_token.key}"
+    print("Redirect: " ,frontend_redirect)
     return redirect(frontend_redirect)
 
+#taked in the spotify url of the songs and get the embed in form of json 
+def get_song_embed( url):
+    response = requests.get(
+        f'https://open.spotify.com/oembed?url={url}'
+    )
+
+    if response.status_code != 200:
+        return {}
+    
+    embed =  response.json();
+    return embed 
+    
+     
 
 @transaction.atomic #if something fails roll back everything
 def translate_spotify_songs(user,fav_songs):
     for idx, song_data in enumerate(fav_songs):
         
+        # based on the song's name get the embed for it
+        spotify_url = song_data.get('external_urls').get('spotify') if  song_data.get('external_urls') else ''
+        song_embed = get_song_embed (spotify_url) 
+
         # get or create the song
         song, created = Song.objects.get_or_create(
             spotify_id=song_data['id'],
@@ -584,7 +614,8 @@ def translate_spotify_songs(user,fav_songs):
                 'popularity': song_data.get('popularity', 0),
                 'duration_ms': song_data.get('duration_ms'),
                 'preview_url': song_data.get('preview_url', ''),
-                "spotify_url": song_data.get('external_urls').get('spotify') if  song_data.get('external_urls') else ''
+                "spotify_url": spotify_url, 
+                'embed' : song_embed
             }
         )
         
