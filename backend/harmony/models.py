@@ -52,6 +52,7 @@ class Song(models.Model):
     spotify_url = models.URLField(blank=True) # spotify page 
     popularity = models.IntegerField(default=0)
     
+    embed = models.JSONField('embed', null=True) # for song playing info 
     # audio features , optional but can be useful later 
     energy = models.FloatField(null=True, blank=True)
     valence = models.FloatField(null=True, blank=True)

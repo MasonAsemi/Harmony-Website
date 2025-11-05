@@ -22,7 +22,7 @@ const SongList = ({ songs, setSongs }) => {
 
     return (
     <div>
-        <div className="field-title">Your songs</div>
+        <div className="field-title">Favorite songs</div>
         {songs.length < 1 ? null : <div className="flex flex-col gap-2 border shadow-md p-4 overflow-y-auto max-h-48">
             {songs.map((item, index) => {
                 return (

@@ -24,7 +24,7 @@ export const requestLogin = (credentials) => {
  * @returns Promise for the login request. Responds with a session token for persistent authentication
  */
 export const checkCredentials = (credentials) => {
-    return fetch(`${API_BASE_URL}api-token-auth/`, {
+    return fetch(`${API_BASE_URL}/api/api-token-auth/`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -39,7 +39,7 @@ export const checkCredentials = (credentials) => {
  * @returns Promise for the account creation request
  */
 export const createUser = (credentials) => {
-    return fetch(`${API_BASE_URL}users/`, {
+    return fetch(`${API_BASE_URL}/api/users/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(credentials),
@@ -51,7 +51,7 @@ export const createUser = (credentials) => {
  * @returns Promise for the authentication check request. Responds with user data if valid
  */
 export const getUserData = () => {
-    return fetch(`${API_BASE_URL}users/me`, {
+    return fetch(`${API_BASE_URL}/api/users/me`, {
     method: 'GET',
     headers: {
         'Content-Type': 'application/json',
