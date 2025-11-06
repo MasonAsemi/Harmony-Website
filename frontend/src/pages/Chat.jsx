@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import Message from "../components/Message";
 import { useAuth } from "../components/auth/AuthContext";
 import { API_BASE_URL } from "../config";
+import { connectWebsocket } from "../api/chat";
 
 const Chat = ({ currentChat }) =>
 {
@@ -18,10 +19,11 @@ const Chat = ({ currentChat }) =>
     useEffect(() => 
     {
         // Use web sockets
+        const socket = connectWebsocket();
 
-        console.error("Implement needed: API endpoint for creating web socket");
-        return;
-        const socket = new WebSocket(`${API_BASE_URL}`);
+        socket.onopen = () => {
+            console.log("Websocket opened")
+        }
 
         socket.onmessage = (event) => {
             const newMessage = JSON.parse(event.data);
@@ -30,7 +32,7 @@ const Chat = ({ currentChat }) =>
 
         setResponse('');
 
-        return () => socket.close();
+        return socket.close;
     }, []);
 
     // Returns true if the button should be disabled, false if not

@@ -37,7 +37,7 @@ CORS_ALLOW_CREDENTIALS = True
 # Application definition
 
 INSTALLED_APPS = [
-    "harmony",
+    'harmony',
     'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'drf_yasg', # auto generated docs
+    'channels',
     'chat',
 ]
 
@@ -103,7 +104,7 @@ CORS_ALLOW_HEADERS = list(default_headers)
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
-ASGI_APPLICATION = "yourproj.asgi.application"
+ASGI_APPLICATION = "backend.asgi.application"
 
 CHANNEL_LAYERS = {
     "default": {
