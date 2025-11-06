@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../components/auth/AuthContext';
 import '../styles/login.css';
+import { API_BASE_URL } from '../config';
 
 function Login() {
     const [username, setUsername] = useState('');
@@ -80,7 +81,7 @@ function Login() {
 
     const handleSpotifyLogin = () => {
         // Redirect to Spotify OAuth endpoint
-        window.location.href = "https://harmony-backend-4800-3fc8f73b6cb5.herokuapp.com/api/spotify-auth/login/";
+        window.location.href = API_BASE_URL + "/api/spotify-auth/login/";
     };
 
     return (
