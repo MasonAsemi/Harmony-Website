@@ -180,10 +180,21 @@ function Register() {
                 <button 
                     onClick={handleSpotify} 
                     disabled={isLoading}
-                    className="rounded-2xl w-[75%] bg-[#1DB954] hover:bg-[#1ed760] text-white font-semibold p-3 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex flex-row items-center gap-4 rounded-2xl w-[75%] bg-black hover:bg-[#1DB954] text-white font-semibold p-3 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                    Sign up with Spotify
+                    <img className="absolute" width="32" alt="Spotify icon" src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Spotify_icon.svg/512px-Spotify_icon.svg.png?20220821125323" />
+                    <div className="text-center w-full">Sign Up with Spotify</div>
                 </button>
+
+                <p className="text-white text-center mt-4">
+                    Already have an account?{' '}
+                    <span 
+                        onClick={() => navigate('/login')} 
+                        className="underline cursor-pointer hover:text-rose-200"
+                    >
+                        Login here.
+                    </span>
+                </p>
             </div>
         </section>
     );

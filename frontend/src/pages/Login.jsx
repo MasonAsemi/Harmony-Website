@@ -145,6 +145,16 @@ function Login() {
                         <div className="text-center w-full">Login with Spotify</div>
                     </button>
                 </div>
+
+                <p className="text-white text-center mt-4">
+                    Don't have an account?{' '}
+                    <span 
+                        onClick={() => navigate('/register')} 
+                        className="text-white underline cursor-pointer hover:text-white"
+                    >
+                        Register here.
+                    </span>
+                </p>
             </div>
         </section>
     );
