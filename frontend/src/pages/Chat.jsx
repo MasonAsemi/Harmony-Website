@@ -2,11 +2,12 @@ import { useState, useEffect } from "react";
 import Message from "../components/Message";
 import { useAuth } from "../components/auth/AuthContext";
 import { API_BASE_URL } from "../config";
-import { connectWebsocket } from "../api/chat";
+import { connectWebsocket, getChats, sendMessage } from "../api/chat";
 
-const Chat = ({ currentChat, authUser, setCurrentChat }) =>
+const Chat = ({ matches, currentChatID, authUser }) =>
 {
     const [userContent, setUserContent] = useState('');
+    const [currentChat, setCurrentChat] = useState([]);
     const [response, setResponse] = useState('');
 
     const [isHoldingShift, setIsHoldingShift] = useState(false);
@@ -15,6 +16,15 @@ const Chat = ({ currentChat, authUser, setCurrentChat }) =>
     // Update the messages state when a response from the server is loaded
     useEffect(() => 
     {
+        // Get chats from chat ID
+        getChats(currentChatID)
+            .then((res) => {
+                if (res.status == 200)
+                {
+                    setCurrentChat(res.data)
+                }
+            })
+
         // Use web sockets
         const socket = connectWebsocket();
 
@@ -32,7 +42,7 @@ const Chat = ({ currentChat, authUser, setCurrentChat }) =>
 
         setResponse('');
 
-        return () => socket.close();
+        return () => { console.log("Websocket closed"); socket.close() };
     }, []);
 
     // Returns true if the button should be disabled, false if not
@@ -49,15 +59,12 @@ const Chat = ({ currentChat, authUser, setCurrentChat }) =>
     const handleReturn = async () => 
     {
         setCurrentChat((oldChat) => {
-            return {
-                id: oldChat.id, 
-                recipient: oldChat.recipient, 
-                messages: [...oldChat.messages, 
-                    {author: authUser, text: userContent},
-                ]
-        }})
-        // TODO: User userContent (user's input to the chat field) to send the message
-        // ...
+            return [...oldChat, {author: authUser, text: userContent}]
+        })
+
+        // TODO: Find out why this 401s
+        // sendMessage(currentChatID, authUser.username, userContent)
+
         setUserContent("");
     };
 
@@ -103,10 +110,10 @@ const Chat = ({ currentChat, authUser, setCurrentChat }) =>
         <div className="flex flex-col h-full">
             {/* Messages area */}
             <div className="flex-1 overflow-y-auto p-8 bg-gradient-to-br from-rose-300 via-pink-400 to-rose-500">
-                {currentChat.messages.map((message, index) => (
+                {currentChat.map((message, index) => (
                     <Message key={index} author={message.author} userAuthor={authUser} text={message.text} />
                 ))}
-                {currentChat.messages.length === 0 && (
+                {currentChat.length === 0 && (
                     <div className="flex items-center justify-center h-full">
                         <h1 className="text-3xl font-bold text-white">The beginning of your conversation...</h1>
                     </div>
