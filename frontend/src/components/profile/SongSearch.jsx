@@ -114,7 +114,7 @@ const SongSearch = () => {
                 )
             })}
         </div>}
-        <SongList songs={selectedSongs} setSongs={setSelectedSongs}/>
+        <SongList songs={selectedSongs} setSongs={setSelectedSongs} numSongs={3} />
     </div>
     );
 }

@@ -45,6 +45,6 @@ class SongSerializer(serializers.ModelSerializer):
             'id', 'name', 'spotify_id', 'album', 'album_image_url', 
             'release_date', 'duration_ms', 'preview_url', 'spotify_url',
             'popularity', 'energy', 'valence', 'danceability', 'tempo',
-            'acousticness', 'artists', 'genres'
+            'acousticness', 'artists', 'genres', 'embed'
         ]
         read_only_fields = fields  # All fields are read-only since songs come from Spotify

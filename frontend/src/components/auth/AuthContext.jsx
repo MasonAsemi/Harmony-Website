@@ -21,7 +21,7 @@ export const AuthProvider = ({ children }) => {
 
         if (storedToken) {
             // Verify token and get user data using /users/me/
-            fetch(`${API_BASE_URL}users/me/`, {
+            fetch(`${API_BASE_URL}/api/users/me/`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Token ${storedToken}`,
@@ -83,8 +83,9 @@ export const AuthProvider = ({ children }) => {
         setToken(token);
         localStorage.setItem("token", token);
         
+        console.log("request: "+ `${API_BASE_URL}/api/users/me/`)
         // Get user data after login
-        const userResponse = await fetch(`${API_BASE_URL}users/me/`, {
+        const userResponse = await fetch(`${API_BASE_URL}/api/users/me/`, {
             method: 'GET',
             headers: {
                 'Authorization': `Token ${token}`,
