@@ -8,7 +8,7 @@ import axios from 'axios'
  */
 export const searchSong = (searchQuery) => {
     // Fetch with the authorization token
-    return axios.get(`${API_BASE_URL}/api/search/`, {
+    return axios.get(`${API_BASE_URL}/api/search`, {
         params: {
             query: searchQuery
         },
