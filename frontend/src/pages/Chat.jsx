@@ -4,7 +4,7 @@ import { useAuth } from "../components/auth/AuthContext";
 import { API_BASE_URL } from "../config";
 import { connectWebsocket } from "../api/chat";
 
-const Chat = ({ currentChat }) =>
+const Chat = ({ currentChat, setCurrentChat }) =>
 {
     const [messages, setMessages] = useState([]);
     const [userContent, setUserContent] = useState('');
@@ -21,9 +21,17 @@ const Chat = ({ currentChat }) =>
         // Use web sockets
         const socket = connectWebsocket();
 
-        socket.onopen = () => {
+        socket.addEventListener("open", event => {
             console.log("Websocket opened")
-        }
+        })
+
+        socket.addEventListener("open", event => {
+            const messageJson = JSON.parse(event.data);
+            const messageAuthor = messageJson.author;
+            const messageText = messageJson.text;
+
+            setCurrentChat((oldChat) => [...oldChat, {author: messageAuthor, text: messageText}])
+        })
 
         socket.onmessage = (event) => {
             const newMessage = JSON.parse(event.data);
@@ -98,7 +106,7 @@ const Chat = ({ currentChat }) =>
             {/* Messages area */}
             <div className="flex-1 overflow-y-auto p-4 bg-gradient-to-br from-rose-300 via-pink-400 to-rose-500">
                 {messages.map((message, index) => (
-                    <Message key={index} author={message.author} userAuthor={message.userAuthor} text={message.text} />
+                    <Message key={index} author={message.author} userAuthor={authUser} text={message.text} />
                 ))}
                 {messages.length === 0 && (
                     <div className="flex items-center justify-center h-full">

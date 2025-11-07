@@ -55,7 +55,7 @@ function Dashboard() {
             <div className="flex-1 flex items-center justify-center p-6">
                 {currentChat ? (
                     <div className="w-full h-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden">
-                        <Chat conversation={currentChat} />
+                        <Chat currentChat={currentChat} setCurrentChat={setCurrentChat} />
                     </div>
                 ) : (
                     <MatchCard token={token} acceptedMatches={acceptedMatches} setAcceptedMatches={setAcceptedMatches} />
