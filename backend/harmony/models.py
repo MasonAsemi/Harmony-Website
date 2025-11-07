@@ -46,13 +46,13 @@ class Song(models.Model):
     spotify_id = models.CharField(max_length=100, unique=True)
     album = models.CharField(max_length=300, blank=True)
     album_image_url = models.URLField(blank=True)
+    embed = models.JSONField( null=True, blank=True) # for song playing info 
     release_date = models.DateField(null=True, blank=True)
     duration_ms = models.IntegerField(null=True, blank=True)
     preview_url = models.URLField(blank=True, null=True) # 30 second preview of song
     spotify_url = models.URLField(blank=True) # spotify page 
     popularity = models.IntegerField(default=0)
     
-    embed = models.JSONField('embed', null=True) # for song playing info 
     # audio features , optional but can be useful later 
     energy = models.FloatField(null=True, blank=True)
     valence = models.FloatField(null=True, blank=True)
