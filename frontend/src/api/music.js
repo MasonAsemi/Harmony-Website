@@ -42,7 +42,7 @@ export const deleteUserSong = (song) => {
 
 export const getUserSongs = () => {
     // Fetch with the authorization token
-    return axios.get(`${API_BASE_URL}/api/songs`, {
+    return axios.get(`${API_BASE_URL}/api/songs/`, {
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Token ${localStorage.getItem("token")}`
