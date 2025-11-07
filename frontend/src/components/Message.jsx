@@ -1,9 +1,17 @@
-const styleFromMessageSource = (author, userAuthor) => 
+const colorFromSource = (author, userAuthor) => 
 {
     if (author.id === userAuthor.id)
-        return 'justify-start';
-    return 'justify-end';
+        return 'bg-rose-400';
+    return 'bg-white';
 };
+
+const sideFromSource = (author, userAuthor) => 
+{
+    if (author.id === userAuthor.id)
+        return 'items-start';
+    return 'items-end';
+    
+}
 
 /**
  * 
@@ -15,10 +23,12 @@ const styleFromMessageSource = (author, userAuthor) =>
 const Message = ({ author, userAuthor, text }) =>
 {
     return <div>
-        <div className={``}>{author.username}</div>
-        <div className={`flex ${styleFromMessageSource(author, userAuthor)} bg-white rounded-2xl w-full min-h-0 mb-2`}>
-            <div className={`text-left text-black text-lg max-w-max w-1/2 p-2 wrap-break-word rounded-xl`}>
-                <div>{text}</div>
+        <div className={`flex flex-col gap-2 w-full ${sideFromSource(author, userAuthor)}`}>
+            <div className={``}>{author.username}</div>
+            <div className={`flex ${colorFromSource(author, userAuthor)} rounded-2xl w-max min-h-0 mb-2`}>
+                <div className={`text-left text-black text-lg w-max p-4 wrap-break-word rounded-xl`}>
+                    <div>{text}</div>
+                </div>
             </div>
         </div>
     </div>;

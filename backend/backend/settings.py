@@ -43,7 +43,7 @@ CORS_ALLOW_CREDENTIALS = True
 # Application definition
 
 INSTALLED_APPS = [
-    "harmony",
+    'harmony',
     'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'drf_yasg', # auto generated docs
+    'channels',
     'chat',
 ]
 
@@ -109,6 +110,17 @@ CORS_ALLOW_HEADERS = list(default_headers)
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
+ASGI_APPLICATION = "backend.asgi.application"
+
+CHANNEL_LAYERS = {
+    "default": {
+        # For single-process dev:
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+        # Use this in prod (requires Redis running):
+        # "BACKEND": "channels_redis.core.RedisChannelLayer",
+        # "CONFIG": {"hosts": [("127.0.0.1", 6379)]},
+    }
+}
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases

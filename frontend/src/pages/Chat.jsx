@@ -1,25 +1,38 @@
 import { useState, useEffect } from "react";
 import Message from "../components/Message";
 import { useAuth } from "../components/auth/AuthContext";
+import { API_BASE_URL } from "../config";
+import { connectWebsocket } from "../api/chat";
 
-const Chat = ({ currentChat }) =>
+const Chat = ({ currentChat, authUser, setCurrentChat }) =>
 {
-    const [messages, setMessages] = useState([]);
     const [userContent, setUserContent] = useState('');
     const [response, setResponse] = useState('');
 
     const [isHoldingShift, setIsHoldingShift] = useState(false);
     const placeholderText = 'Send a message...';
-    const { user } = useAuth();
-    const authUser = new Author(user?.id, user?.username);
 
     // Update the messages state when a response from the server is loaded
     useEffect(() => 
     {
-        // TODO: Use EventSource to listen for server-sent events (chat message sent) and update the messages accordingly
-        let updatedMessages = []; 
-        setMessages(updatedMessages);
+        // Use web sockets
+        const socket = connectWebsocket();
+
+        socket.addEventListener("open", event => {
+            console.log("Websocket opened")
+        })
+
+        socket.addEventListener("onmessage", event => {
+            console.log(event)
+        })
+
+        socket.onmessage = (event) => {
+            const newMessage = JSON.parse(event.data);
+        };
+
         setResponse('');
+
+        return () => socket.close();
     }, []);
 
     // Returns true if the button should be disabled, false if not
@@ -35,8 +48,14 @@ const Chat = ({ currentChat }) =>
     // If the last assistant response was unsuccessful, then it will override the unsuccessful response and user message that prompted it
     const handleReturn = async () => 
     {
-        console.log(user)
-        messages.push({author: user, userAuthor: user, text: userContent});
+        setCurrentChat((oldChat) => {
+            return {
+                id: oldChat.id, 
+                recipient: oldChat.recipient, 
+                messages: [...oldChat.messages, 
+                    {author: authUser, text: userContent},
+                ]
+        }})
         // TODO: User userContent (user's input to the chat field) to send the message
         // ...
         setUserContent("");
@@ -83,11 +102,11 @@ const Chat = ({ currentChat }) =>
     return (
         <div className="flex flex-col h-full">
             {/* Messages area */}
-            <div className="flex-1 overflow-y-auto p-4 bg-gradient-to-br from-rose-300 via-pink-400 to-rose-500">
-                {messages.map((message, index) => (
-                    <Message key={index} author={message.author} userAuthor={message.userAuthor} text={message.text} />
+            <div className="flex-1 overflow-y-auto p-8 bg-gradient-to-br from-rose-300 via-pink-400 to-rose-500">
+                {currentChat.messages.map((message, index) => (
+                    <Message key={index} author={message.author} userAuthor={authUser} text={message.text} />
                 ))}
-                {messages.length === 0 && (
+                {currentChat.messages.length === 0 && (
                     <div className="flex items-center justify-center h-full">
                         <h1 className="text-3xl font-bold text-white">The beginning of your conversation...</h1>
                     </div>

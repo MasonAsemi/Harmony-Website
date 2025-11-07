@@ -5,16 +5,24 @@ import Matches from "../components/Matches";
 import { useAuth } from "../components/auth/AuthContext";
 import { useState, useEffect } from "react";
 import MatchCard from "../components/dashboard/MatchCard";
-
-const exampleChats = [
-    { id: 1, recipient: "Example1" },
-    { id: 2, recipient: "Example2" }
-];
+import { Author } from "./Chat";
 
 function Dashboard() {
     const [acceptedMatches, setAcceptedMatches] = useState([]);
     const [currentChat, setCurrentChat] = useState(null);
     const { token, user } = useAuth();
+    const authUser = new Author(user?.id, user?.username);
+
+    const exampleChats = [
+        { id: 1, recipient: "Example1", messages: [
+            {author: new Author(10, "Example 1 chat"), text: "Test"},
+            {author: authUser, text: "Test user 1"}
+        ]},
+        { id: 2, recipient: "Example2", messages: [
+            {author: new Author(10, "Example 2 chat"), text: "Another Test"},
+            {author: authUser, text: "Test user 2"}
+        ] }
+    ];
 
     const handleChatClick = (chat) => {
         // Toggle chat - if clicking the same chat, close it
@@ -22,6 +30,7 @@ function Dashboard() {
             setCurrentChat(null);
         } else {
             setCurrentChat(chat);
+            console.log(chat)
         }
     };
 
@@ -55,7 +64,7 @@ function Dashboard() {
             <div className="flex-1 flex items-center justify-center p-6">
                 {currentChat ? (
                     <div className="w-full h-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden">
-                        <Chat conversation={currentChat} />
+                        <Chat currentChat={currentChat} authUser={authUser} setCurrentChat={setCurrentChat} />
                     </div>
                 ) : (
                     <MatchCard token={token} acceptedMatches={acceptedMatches} setAcceptedMatches={setAcceptedMatches} />
