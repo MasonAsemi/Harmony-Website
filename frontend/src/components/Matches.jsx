@@ -16,7 +16,7 @@ export default function Matches({ token, acceptedMatches }) {
         setLoading(true);
         setError(null);
 
-        fetch(`${API_BASE_URL}matches/`, {
+        fetch(`${API_BASE_URL}/api/matches/`, {
             headers: {
                 "Authorization": `Token ${token}`,
                 "Content-Type": "application/json",
