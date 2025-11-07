@@ -1,4 +1,5 @@
-import { WS_BASE_URL } from "../config";
+import { WS_BASE_URL, API_BASE_URL } from "../config";
+import axios from 'axios'
 
 export const connectWebsocket = () => {
   try {
@@ -6,4 +7,27 @@ export const connectWebsocket = () => {
   } catch (error) {
     console.error("WebSocket connection failed:", error);
   }
+};
+
+export const getChats = (matchID) => {
+    return axios.get(`${API_BASE_URL}/api/chat/messages/${matchID}`, {
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Token ${localStorage.getItem("token")}`
+        }
+    })
+};
+
+export const sendMessage = (matchID, user, message) => {
+    console.log(localStorage.getItem("token"))
+    return axios.post(`${API_BASE_URL}/api/chat/messages/${matchID}/send/`, {
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Token ${localStorage.getItem("token")}`
+        }, 
+        data: {
+            user: user,
+            message: message
+        }
+    })
 };
