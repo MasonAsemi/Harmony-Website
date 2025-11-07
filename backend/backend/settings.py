@@ -26,6 +26,12 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-3)jb@w%8f%4aa2+*tt-_a
 # Static files
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -175,3 +181,4 @@ REST_FRAMEWORK = {
 
 # User model change for non-default users
 AUTH_USER_MODEL = 'harmony.User'
+

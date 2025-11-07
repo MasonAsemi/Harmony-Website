@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { getMatches, getAcceptedMatches, acceptMatch, rejectMatch } from "../../api/matches";
+import { API_BASE_URL } from "../../config";
 
 const ProfileImage = ({ currentMatch }) => {
     return (
     <div className="aspect-3/4 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
         {currentMatch?.profile_image ? (
             <img 
-                src={currentMatch.profile_image} 
+                src={API_BASE_URL + currentMatch.profile_image} // user the api base url to get the images 
                 alt={currentMatch.username}
                 className="w-full h-full object-cover"
                 onError={(e) => {

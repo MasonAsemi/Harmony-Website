@@ -53,7 +53,9 @@
   justify-content: space-between;
   align-items: center;
 }
-
+.imageButton {
+  fill: #666
+}
 .data {
   max-width: 75%;
   overflow-wrap: break-word;
