@@ -16,5 +16,5 @@ urlpatterns = [
     path('matches/', matches),
     path('matches/reject/', match_reject),
     path('matches/accept/', match_accept),
-    path('api/matches/', get_genre_based_matches, name='genre_matches'),
+    path('matches/genre/', get_genre_based_matches, name='genre_matches'),
 ]
