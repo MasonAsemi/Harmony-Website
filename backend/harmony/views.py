@@ -815,10 +815,9 @@ def matches(request):
 @api_view(['POST', 'GET'])
 @permission_classes([IsAuthenticated])
 def match_accept(request):
-    if request.method == 'GET':
-        matched_users = Match.objects.filter(
-            models.Q(user1=request.user) | models.Q(user2=request.user)
-        )
+    if request.method =='GET' :
+        matched_users =  Match.objects.filter(models.Q(user1=request.user) |
+        models.Q(user1=request.user))
     
         matches_data = [
             {
@@ -832,7 +831,7 @@ def match_accept(request):
             for match in matched_users 
         ]
 
-        return Response({'matches': matches_data})
+        return Response(matches_data)
         
     current_user = request.user
     target_user_id = request.data.get('id')
