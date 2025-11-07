@@ -185,8 +185,10 @@ class SongViewSet(viewsets.ModelViewSet):
         # Add weights to each song
         songs_data = []
         for song_dict in serializer.data:
-            song_dict['weight'] = user_song_prefs.get(song_dict['id'], 5)
-            songs_data.append(song_dict)
+            # Create a new dictionary to avoid modifying read-only serializer data
+            song_with_weight = dict(song_dict)
+            song_with_weight['weight'] = user_song_prefs.get(song_dict['id'], 5)
+            songs_data.append(song_with_weight)
         
         # Sort by weight (highest first)
         songs_data.sort(key=lambda x: x['weight'], reverse=True)
