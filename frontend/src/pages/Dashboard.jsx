@@ -2,7 +2,6 @@ import "../styles/profile.css";
 import Chat from "./Chat";
 import Sidebar from "../components/Sidebar";
 import Matches from "../components/Matches";
-import BottomNav from "../components/dashboard/Bottomnav";
 import { useAuth } from "../components/auth/AuthContext";
 import { useState, useEffect } from "react";
 import MatchCard from "../components/dashboard/MatchCard";
@@ -12,22 +11,15 @@ const exampleChats = [
     { id: 2, recipient: "Example2" }
 ];
 
-function Dashboard() {
+function Dashboard({ showChatsOverlay = false, setShowChatsOverlay = () => {} }) {
     const [acceptedMatches, setAcceptedMatches] = useState([]);
     const [currentChat, setCurrentChat] = useState(null);
-    const [showChatsOverlay, setShowChatsOverlay] = useState(false);
     const [showChatWindow, setShowChatWindow] = useState(false);
     const { token, user } = useAuth();
 
     const handleChatClick = (chat) => {
         setCurrentChat(chat);
         setShowChatWindow(true);
-    };
-
-    const handleChatsButtonClick = () => {
-        setShowChatsOverlay(!showChatsOverlay);
-        setShowChatWindow(false);
-        setCurrentChat(null);
     };
 
     const handleCloseChatWindow = () => {
@@ -42,7 +34,7 @@ function Dashboard() {
     return (
         <div className="flex flex-row h-screen bg-linear-to-br from-rose-300 via-pink-400 to-rose-500">
             
-            {/* Desktop Left sidebar - Chats */}
+            {/* Desktop Left sidebar - Chats (hidden on mobile) */}
             <div className="hidden md:flex w-80 ml-16 bg-pink-200 border-r border-white/20 flex-col">
                 <div className="p-4 border-b border-white/20">
                     <h2 className="text-2xl font-bold text-white text-center">Chats</h2>
@@ -65,8 +57,8 @@ function Dashboard() {
                 </div>
             </div>
 
-            {/* Main content area */}
-            <div className="flex-1 flex items-center justify-center p-6 md:p-6 pb-20 md:pb-6">
+            {/* Main content area - adjusted padding for mobile bottom nav */}
+            <div className="flex-1 flex items-center justify-center p-6 md:p-6 pb-24 md:pb-6">
                 {currentChat && !showChatsOverlay ? (
                     <div className="w-full h-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden">
                         <Chat conversation={currentChat} />
@@ -76,21 +68,15 @@ function Dashboard() {
                 )}
             </div>
 
-            {/* Desktop Right sidebar - Accepted Matches */}
+            {/* Desktop Right sidebar - Accepted Matches (hidden on mobile) */}
             <div className="hidden md:flex">
                 <Matches token={token} acceptedMatches={acceptedMatches} />
             </div>
 
-            {/* Desktop Sidebar */}
+            {/* Desktop Sidebar (hidden on mobile) */}
             <div className="hidden md:block">
                 <Sidebar />
             </div>
-
-            {/* Mobile Bottom Navigation */}
-            <BottomNav 
-                onChatsClick={handleChatsButtonClick}
-                showChatsOverlay={showChatsOverlay}
-            />
 
             {/* Mobile Chats Overlay */}
             {showChatsOverlay && (
@@ -130,7 +116,7 @@ function Dashboard() {
             {/* Mobile Chat Window Overlay */}
             {showChatWindow && currentChat && (
                 <div className="fixed inset-0 z-50 md:hidden bg-white">
-                    <div className="h-full flex flex-col">
+                    <div className="h-full flex flex-col pb-16">
                         {/* Chat Header */}
                         <div className="bg-gradient-to-r from-rose-400 to-pink-500 p-4 flex items-center shadow-md">
                             <button 
