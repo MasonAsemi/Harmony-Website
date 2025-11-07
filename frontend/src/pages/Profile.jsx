@@ -4,7 +4,7 @@ import ProfileField from '../components/profile/ProfileField';
 import { profileAPI } from '../services/api';
 import '../styles/profile.css';
 import SongSearch from '../components/profile/SongSearch';
-
+import { API_BASE_URL } from '../config';
 function Profile({ pfp_src }) {
   const { user, token, login } = useAuth();
   const [profileData, setProfileData] = useState({
@@ -18,6 +18,7 @@ function Profile({ pfp_src }) {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [imageFile, setImageFile] = useState(null); 
 
   useEffect(() => {
     if (token) {
@@ -27,6 +28,33 @@ function Profile({ pfp_src }) {
       setError('No authentication token found');
     }
   }, [token]);
+
+  async function handleImageChange(e) {
+    const image =e.target.files[0]
+    const imageUrl = URL.createObjectURL(e.target.files[0])
+    setImageFile(imageUrl); 
+    // update user's prof with image 
+
+    if (image) {
+        const formData = new FormData();
+        formData.append('profile_image', image); 
+
+        fetch(API_BASE_URL + '/api/users/me/', { 
+            method: 'PATCH',
+            body: formData,
+            headers: {
+                'Authorization': `Token ${token}`,
+            },
+        })
+        .then(response => response.json()) // Or response.text() depending on server response
+        .then(data => {
+            console.log('Upload successful:', data);
+        })
+        .catch(error => {
+            console.error('Upload failed:', error);
+        });
+    }
+  }
 
   const loadProfile = async () => {
     try {
@@ -100,31 +128,33 @@ function Profile({ pfp_src }) {
 
       <div className='content'>
         <div className='profile-picture-wrapper'>
-          <img 
-            className='profile-picture' 
-            src={pfp_src || '/default-avatar.png'}
-            alt="Profile"
-            onError={(e) => {
-              e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="300"%3E%3Crect fill="%23ddd" width="300" height="300"/%3E%3Ctext fill="%23999" font-family="sans-serif" font-size="40" text-anchor="middle" x="150" y="160"%3ENo Image%3C/text%3E%3C/svg%3E';
-            }}
-          />
+          <div className='profile-picture'>
+            <img  
+              className='profile-picture'
+              src={imageFile || profileData?.profile_image   }
+            />
+            <input className='imageButton' type='file' onChange={handleImageChange}/>
+            
+          </div>
+          
           <div className='profile-fields'>
             <ProfileField 
               title="Username" 
               data={profileData?.username || 'Not set'} 
               onSave={(value) => handleFieldSave('username', value)}
-            />
+              />
             <ProfileField 
               title="Age" 
               data={profileData?.age?.toString() || ''} 
               onSave={(value) => handleFieldSave('age', value ? parseInt(value) : null)}
-            />
+              />
             <ProfileField 
               title="Interests" 
               data={profileData?.interests || ''} 
               onSave={(value) => handleFieldSave('interests', value)}
-            />
+              />
           </div>
+          
         </div>
         <ProfileField 
           title="Biography" 
