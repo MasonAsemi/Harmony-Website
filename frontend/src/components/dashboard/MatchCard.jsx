@@ -3,12 +3,35 @@ import { getMatches, getAcceptedMatches, acceptMatch, rejectMatch } from "../../
 
 const ProfileImage = ({ currentMatch }) => {
     return (
-    <div className="aspect-3/4 bg-linear-to-br from-gray-200 to-gray-300 flex items-center justify-center">
-        {currentMatch.profile_image ? (
+    <div className="aspect-3/4 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+        {currentMatch?.profile_image ? (
             <img 
                 src={currentMatch.profile_image} 
                 alt={currentMatch.username}
                 className="w-full h-full object-cover"
+                onError={(e) => {
+                    // Hide the image and show placeholder if it fails to load
+                    e.target.style.display = 'none';
+                    e.target.parentElement.innerHTML = `
+                        <div class="text-center text-gray-500">
+                            <svg 
+                                xmlns="http://www.w3.org/2000/svg" 
+                                class="h-32 w-32 mx-auto mb-4 opacity-50" 
+                                fill="none" 
+                                viewBox="0 0 24 24" 
+                                stroke="currentColor"
+                            >
+                                <path 
+                                    stroke-linecap="round" 
+                                    stroke-linejoin="round" 
+                                    stroke-width="1" 
+                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" 
+                                />
+                            </svg>
+                            <p class="text-lg">No Profile Image</p>
+                        </div>
+                    `;
+                }}
             />
         ) : (
             <div className="text-center text-gray-500">
@@ -32,28 +55,28 @@ const ProfileImage = ({ currentMatch }) => {
     </div>)
 }
 
-const ProfileInfo = ({ currentMatch }) => {
+const ProfileInfo = ({ currentMatch, handleDecline, handleAccept }) => {
     return (
     <div className="p-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            {currentMatch.username}
-            {currentMatch.age && (
+            {currentMatch?.username || 'Unknown User'}
+            {currentMatch?.age && (
                 <span className="text-xl font-normal text-gray-600 ml-2">
                     , {currentMatch.age}
                 </span>
             )}
         </h2>
 
-        {currentMatch.biography && (
+        {currentMatch?.biography && (
             <p className="text-gray-700 mb-4">{currentMatch.biography}</p>
         )}
 
-        {currentMatch.location && (
+        {currentMatch?.location && (
             <p className="text-gray-600 mb-4">📍 {currentMatch.location}</p>
         )}
 
         {/* Favorite song */}
-        {currentMatch.fav_songs && currentMatch.fav_songs.length > 0 && (
+        {currentMatch?.fav_songs && currentMatch.fav_songs.length > 0 && (
             <div className="mb-4">
                 <h3 className="text-sm font-semibold text-gray-600 mb-2">
                     Favorite Song
@@ -64,6 +87,9 @@ const ProfileInfo = ({ currentMatch }) => {
                             src={currentMatch.fav_songs[0].album_image_url} 
                             alt={currentMatch.fav_songs[0].name}
                             className="w-16 h-16 rounded object-cover"
+                            onError={(e) => {
+                                e.target.style.display = 'none';
+                            }}
                         />
                     ) : (
                         <div className="w-16 h-16 bg-gray-300 rounded flex items-center justify-center">
@@ -93,12 +119,12 @@ const ProfileInfo = ({ currentMatch }) => {
         )}
 
         {/* Favorite artists */}
-        {currentMatch.fav_artists && currentMatch.fav_artists.length > 0 && (
-            <FavoriteArtists />
+        {currentMatch?.fav_artists && currentMatch.fav_artists.length > 0 && (
+            <FavoriteArtists currentMatch={currentMatch} />
         )}
 
         {/* Action buttons */}
-        <ActionButtons />
+        <ActionButtons handleDecline={handleDecline} handleAccept={handleAccept} />
     </div>)
 }
 
@@ -121,7 +147,7 @@ const FavoriteArtists = ({ currentMatch }) => {
     </div>)
 }
 
-const ActionButtons = () => {
+const ActionButtons = ({ handleDecline, handleAccept }) => {
     return (
     <div className="flex justify-center gap-4 mt-6">
         <button 
@@ -198,46 +224,46 @@ const MatchCard = ({ token, acceptedMatches, setAcceptedMatches }) => {
     };
 
     // Fetch accepted matches
-        const fetchAcceptedMatches = async () => {
-            if (!token) return;
-            
-            try {
-                const data = await getAcceptedMatches(token);
-                console.log("Fetched accepted matches:", data);
-                setAcceptedMatches(data.matches || []);
-            } catch (err) {
+    const fetchAcceptedMatches = async () => {
+        if (!token) return;
+        
+        try {
+            const data = await getAcceptedMatches(token);
+            console.log("Fetched accepted matches:", data);
+            setAcceptedMatches(data.matches || []);
+        } catch (err) {
+            console.error("Error fetching accepted matches:", err);
+            // Don't set error state here, as this is optional data
+        }
+    };
+
+    // Fetch potential matches and accepted matches on component mount
+    useEffect(() => {
+        if (!token) return;
+
+        setLoading(true);
+        
+        // Fetch both potential matches and accepted matches
+        Promise.all([
+            getMatches(token),
+            getAcceptedMatches(token).catch(err => {
                 console.error("Error fetching accepted matches:", err);
-                // Don't set error state here, as this is optional data
-            }
-        };
-    
-        // Fetch potential matches and accepted matches on component mount
-        useEffect(() => {
-            if (!token) return;
-    
-            setLoading(true);
-            
-            // Fetch both potential matches and accepted matches
-            Promise.all([
-                getMatches(token),
-                getAcceptedMatches(token).catch(err => {
-                    console.error("Error fetching accepted matches:", err);
-                    return { matches: [] }; // Return empty array if endpoint doesn't exist yet
-                })
-            ])
-                .then(([potentialData, acceptedData]) => {
-                    console.log("Fetched potential matches:", potentialData);
-                    console.log("Fetched accepted matches:", acceptedData);
-                    setPotentialMatches(potentialData.matches || []);
-                    setAcceptedMatches(acceptedData.matches || []);
-                    setLoading(false);
-                })
-                .catch(err => {
-                    console.error("Error fetching matches:", err);
-                    setError(err.message);
-                    setLoading(false);
-                });
-        }, [token]);
+                return { matches: [] }; // Return empty array if endpoint doesn't exist yet
+            })
+        ])
+            .then(([potentialData, acceptedData]) => {
+                console.log("Fetched potential matches:", potentialData);
+                console.log("Fetched accepted matches:", acceptedData);
+                setPotentialMatches(potentialData.matches || []);
+                setAcceptedMatches(acceptedData.matches || []);
+                setLoading(false);
+            })
+            .catch(err => {
+                console.error("Error fetching matches:", err);
+                setError(err.message);
+                setLoading(false);
+            });
+    }, [token, setAcceptedMatches]);
 
     return <div className="w-full max-w-md">
         <div className={`bg-white rounded-2xl shadow-2xl p-8 ${(loading || error || currentMatch ? "text-center" : "overflow-hidden")}`}>
@@ -250,10 +276,14 @@ const MatchCard = ({ token, acceptedMatches, setAcceptedMatches }) => {
             ) : (
                 <div>
                     {/* Profile image */}
-                    <ProfileImage />
+                    <ProfileImage currentMatch={currentMatch} />
 
                     {/* Profile info */}
-                    <ProfileInfo />
+                    <ProfileInfo 
+                        currentMatch={currentMatch} 
+                        handleDecline={handleDecline} 
+                        handleAccept={handleAccept} 
+                    />
                 </div>
             )}
         </div>
