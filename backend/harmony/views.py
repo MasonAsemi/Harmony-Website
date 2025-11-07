@@ -13,6 +13,7 @@ import requests
 import os 
 from django.db import transaction, models
 from dotenv import load_dotenv
+from .matching_utils import compute_genre_similarity
 import urllib.parse
 class UserViewSet(viewsets.ModelViewSet):
     
@@ -879,3 +880,22 @@ def return_accepted_matches(request)    :
     return Response({
         'accepted': accepted_users
     })
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_genre_based_matches(request):
+    user = request.user
+    other_users = User.objects.exclude(id=user.id)
+
+    matches = []
+    for other in other_users:
+        similarity = compute_genre_similarity(user, other)
+        if similarity > 0.3:  # threshold
+            matches.append({
+                'id': other.id,
+                'username': other.username,
+                'similarity': similarity,
+            })
+
+    matches.sort(key=lambda x: x['similarity'], reverse=True)
+    return Response({'matches': matches})
