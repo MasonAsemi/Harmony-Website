@@ -5,6 +5,7 @@ import { profileAPI } from '../services/api';
 import '../styles/profile.css';
 import SongSearch from '../components/profile/SongSearch';
 import { API_BASE_URL } from '../config';
+
 function Profile({ pfp_src }) {
   const { user, token, login } = useAuth();
   const [profileData, setProfileData] = useState({
@@ -96,7 +97,7 @@ function Profile({ pfp_src }) {
   };
 
   return (
-    <div className='content-container'>
+    <div className='content-container pb-20 md:pb-0'>
       <div className='content-title'>Profile</div>
       
       {error && (

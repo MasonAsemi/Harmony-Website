@@ -1,8 +1,9 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 
-const BottomNav = ({ onChatsClick, showChatsOverlay }) => {
+const BottomNav = ({ onChatsClick = null, showChatsOverlay = false }) => {
     const { user, logout } = useAuth();
+    const location = useLocation();
 
     const navItems = [
         { 
@@ -24,7 +25,8 @@ const BottomNav = ({ onChatsClick, showChatsOverlay }) => {
             ), 
             label: "Chats", 
             path: null,
-            onClick: onChatsClick
+            onClick: onChatsClick,
+            showOnlyOn: ["/dashboard"] // Only show chats button on dashboard
         },
         { 
             icon: (
@@ -57,11 +59,20 @@ const BottomNav = ({ onChatsClick, showChatsOverlay }) => {
         }
     };
 
+    // Filter items based on showOnlyOn property
+    const visibleItems = navItems.filter(item => {
+        if (item.showOnlyOn) {
+            return item.showOnlyOn.includes(location.pathname);
+        }
+        return true;
+    });
+
     return (
         <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 md:hidden shadow-lg">
             <div className="flex justify-around items-center h-16 px-2">
-                {navItems.map((item, index) => {
-                    const isActive = item.label === "Chats" && showChatsOverlay;
+                {visibleItems.map((item, index) => {
+                    const isActive = (item.path && location.pathname === item.path) || 
+                                   (item.label === "Chats" && showChatsOverlay);
                     
                     if (item.path) {
                         return (
