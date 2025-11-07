@@ -298,6 +298,10 @@ const MatchCard = ({ token, acceptedMatches, setAcceptedMatches }) => {
     const currentMatch = potentialMatches[0];
     const nextMatch = potentialMatches[1];
     
+    useEffect(() => {
+        fetchAcceptedMatches()
+    }, [])
+
     const handleDecline = async () => {
         if (!currentMatch || animatingOut) return;
         
@@ -353,7 +357,7 @@ const MatchCard = ({ token, acceptedMatches, setAcceptedMatches }) => {
         try {
             const data = await getAcceptedMatches(token);
             console.log("Fetched accepted matches:", data);
-            setAcceptedMatches(data.matches || []);
+            setAcceptedMatches(data);
         } catch (err) {
             console.error("Error fetching accepted matches:", err);
         }
