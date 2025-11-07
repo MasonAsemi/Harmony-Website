@@ -6,6 +6,7 @@ import { useAuth } from "../components/auth/AuthContext";
 import { useState, useEffect } from "react";
 import MatchCard from "../components/dashboard/MatchCard";
 import { Author } from "./Chat";
+import { getAcceptedMatches } from "../api/matches";
 
 function Dashboard({ showChatsOverlay = false, setShowChatsOverlay = () => {} }) {
     const [acceptedMatches, setAcceptedMatches] = useState([]);
@@ -14,6 +15,13 @@ function Dashboard({ showChatsOverlay = false, setShowChatsOverlay = () => {} })
     const [showChatWindow, setShowChatWindow] = useState(false);
     const { token, user } = useAuth();
     const authUser = new Author(user?.id, user?.username);
+
+    useEffect(() => {
+        getAcceptedMatches(token)
+            .then((json) => {
+                setAcceptedMatches(json)
+            })
+    }, [])
 
     const handleChatClick = (match) => {
         // Toggle chat - if clicking the same chat, close it
@@ -62,7 +70,7 @@ function Dashboard({ showChatsOverlay = false, setShowChatsOverlay = () => {} })
 
             {/* Main content area */}
             <div className="flex-1 flex items-center justify-center p-6">
-                {currentChatID && !showChatsOverlay ? (
+                {currentChatID != null && !showChatsOverlay ? (
                     <div className="w-full h-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden">
                         <Chat matches={acceptedMatches} currentChatID={currentChatID} authUser={authUser} />
                     </div>
