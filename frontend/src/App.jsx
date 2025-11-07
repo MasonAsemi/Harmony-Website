@@ -15,8 +15,8 @@ function AppContent() {
   const location = useLocation();
   const [showChatsOverlay, setShowChatsOverlay] = useState(false);
   
-  // Pages where BottomNav should NOT appear
-  const excludedPages = ['/', '/about', '/login', '/register'];
+  // Pages where BottomNav should NOT appear (only Home and About)
+  const excludedPages = ['/', '/about'];
   const shouldShowBottomNav = !excludedPages.includes(location.pathname);
 
   const handleChatsClick = () => {

@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { FallingAnimation } from "../components/FallingAnimation";
+import { Header } from "../components/Header";
 
 const Home = () => {
   return (
     <>
+      <Header />
+      
       {/* Hero Section with Animated Background */}
       <section className="relative h-screen pt-20 overflow-hidden bg-linear-to-br from-rose-300 via-pink-400 to-rose-500">
         <FallingAnimation />
