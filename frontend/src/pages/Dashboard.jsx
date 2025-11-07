@@ -10,30 +10,18 @@ import { Author } from "./Chat";
 function Dashboard({ showChatsOverlay = false, setShowChatsOverlay = () => {} }) {
     const [acceptedMatches, setAcceptedMatches] = useState([]);
     const [currentChat, setCurrentChat] = useState(null);
+    const [currentChatID, setCurrentChatID] = useState(null);
     const [showChatWindow, setShowChatWindow] = useState(false);
     const { token, user } = useAuth();
     const authUser = new Author(user?.id, user?.username);
 
-    const exampleChats = [
-        { id: 1, recipient: "Example1", messages: [
-            {author: new Author(10, "Example 1 chat"), text: "Test"},
-            {author: authUser, text: "Test user 1"}
-        ]},
-        { id: 2, recipient: "Example2", messages: [
-            {author: new Author(10, "Example 2 chat"), text: "Another Test"},
-            {author: authUser, text: "Test user 2"}
-        ] }
-    ];
-
-    const handleChatClick = (chat) => {
+    const handleChatClick = (match) => {
         // Toggle chat - if clicking the same chat, close it
-        if (currentChat?.id === chat.id) {
-            setCurrentChat(null);
+        if (currentChatID === match.id) {
+            setCurrentChatID(null);
             setShowChatWindow(false); // Close mobile window if toggling off
         } else {
-            setCurrentChat(chat);
-            setShowChatWindow(true); // Open mobile window for new chat
-            console.log(chat)
+            setCurrentChatID(match.id);
         }
     };
 
@@ -55,28 +43,28 @@ function Dashboard({ showChatsOverlay = false, setShowChatsOverlay = () => {} })
                     <h2 className="text-2xl font-bold text-white text-center">Chats</h2>
                 </div>
                 <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                    {exampleChats.map((chat) => (
+                    {acceptedMatches.map((match) => (
                         <button
-                            key={chat.id}
-                            onClick={() => handleChatClick(chat)}
+                            key={match.id}
+                            onClick={() => handleChatClick(match)}
                             className={`w-full p-4 rounded-lg text-left transition-all ${
-                                currentChat?.id === chat.id
+                                currentChat?.id === match.id
                                     ? 'bg-white text-gray-900 shadow-lg'
                                     : 'bg-white/80 text-gray-800 hover:bg-white hover:shadow-md'
                             }`}
                         >
-                            <div className="font-semibold">{chat.recipient}</div>
+                            <div className="font-semibold">{match.user2_username}</div>
                             <div className="text-sm text-gray-600 mt-1">Click to view chat</div>
                         </button>
                     ))}
                 </div>
             </div>
 
-            {/* Main content area - adjusted padding for mobile bottom nav */}
-            <div className="flex-1 flex items-center justify-center p-6 md:p-6 pb-24 md:pb-6">
-                {currentChat && !showChatsOverlay ? (
+            {/* Main content area */}
+            <div className="flex-1 flex items-center justify-center p-6">
+                {currentChatID && !showChatsOverlay ? (
                     <div className="w-full h-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden">
-                        <Chat currentChat={currentChat} authUser={authUser} setCurrentChat={setCurrentChat} />
+                        <Chat matches={acceptedMatches} currentChatID={currentChatID} authUser={authUser} />
                     </div>
                 ) : (
                     <MatchCard token={token} acceptedMatches={acceptedMatches} setAcceptedMatches={setAcceptedMatches} />
