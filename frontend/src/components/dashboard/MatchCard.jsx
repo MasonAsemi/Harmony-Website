@@ -82,37 +82,72 @@ const ProfileInfo = ({ currentMatch, handleDecline, handleAccept }) => {
                     Favorite Song
                 </h3>
                 <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                    {currentMatch.fav_songs[0].album_image_url ? (
-                        <img 
-                            src={currentMatch.fav_songs[0].album_image_url} 
-                            alt={currentMatch.fav_songs[0].name}
-                            className="w-16 h-16 rounded object-cover"
-                            onError={(e) => {
-                                e.target.style.display = 'none';
-                            }}
-                        />
-                    ) : (
-                        <div className="w-16 h-16 bg-gray-300 rounded flex items-center justify-center">
-                            <svg 
-                                xmlns="http://www.w3.org/2000/svg" 
-                                className="h-8 w-8 text-gray-500" 
-                                fill="none" 
-                                viewBox="0 0 24 24" 
-                                stroke="currentColor"
-                            >
-                                <path 
-                                    strokeLinecap="round" 
-                                    strokeLinejoin="round" 
-                                    strokeWidth={2} 
-                                    d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" 
+                    <div className="w-full">
+                        {(() => {
+                            const track = currentMatch.fav_songs[0];
+                            const id = track.spotify_id || track.id;
+                            const raw =
+                                track.spotify_url ||
+                                (track.external_urls && track.external_urls.spotify) ||
+                                track.url ||
+                                track.href;
+
+                            let embedUrl = null;
+                            if (id) {
+                                embedUrl = `https://open.spotify.com/embed/track/${id}`;
+                            } else if (typeof raw === 'string') {
+                                const uriMatch = raw.match(/spotify:track:([a-zA-Z0-9]+)/);
+                                const urlMatch = raw.match(/track\/([a-zA-Z0-9]+)/);
+                                const trackId = (uriMatch && uriMatch[1]) || (urlMatch && urlMatch[1]);
+                                if (trackId) embedUrl = `https://open.spotify.com/embed/track/${trackId}`;
+                            }
+
+                            return embedUrl ? (
+                                <iframe
+                                    src={embedUrl}
+                                    width="100%"
+                                    height="152"
+                                    frameBorder="0"
+                                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                                    loading="lazy"
                                 />
-                            </svg>
-                        </div>
-                    )}
-                    <div className="flex-1">
-                        <p className="font-semibold text-gray-900">
-                            {currentMatch.fav_songs[0].name}
-                        </p>
+                            ) : (
+                                <div className="flex items-center gap-3">
+                                    {track.album_image_url ? (
+                                        <img
+                                            src={track.album_image_url}
+                                            alt={track.name}
+                                            className="w-16 h-16 rounded object-cover"
+                                            onError={(e) => {
+                                                e.currentTarget.style.display = 'none';
+                                            }}
+                                        />
+                                    ) : (
+                                        <div className="w-16 h-16 bg-gray-300 rounded flex items-center justify-center">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                className="h-8 w-8 text-gray-500"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                                stroke="currentColor"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth={2}
+                                                    d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
+                                                />
+                                            </svg>
+                                        </div>
+                                    )}
+                                    <div className="flex-1">
+                                        <p className="font-semibold text-gray-900">
+                                            {track.name}
+                                        </p>
+                                    </div>
+                                </div>
+                            );
+                        })()}
                     </div>
                 </div>
             </div>
