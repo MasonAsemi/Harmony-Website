@@ -2,45 +2,17 @@ import { useEffect, useState } from "react";
 import { API_BASE_URL } from "../config";
 
 export default function Matches({ token, acceptedMatches }) {
-    const [matches, setMatches] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     useEffect(() => {
         if (!token) {
-            setMatches([]);
             setLoading(false);
             return;
         }
-
-        setLoading(true);
-        setError(null);
-
-        fetch(`${API_BASE_URL}/api/matches/`, {
-            headers: {
-                "Authorization": `Token ${token}`,
-                "Content-Type": "application/json",
-            }
-        })
-        .then(res => {
-            if (!res.ok) {
-                throw new Error(`API Error: ${res.status}`);
-            }
-            return res.json();
-        })
-        .then(data => {
-            console.log("Matches data fetched:", data);
-            // Filter out users that have been accepted (they're now in acceptedMatches)
-            const filteredMatches = (data.matches || []).filter(
-                match => !acceptedMatches.some(accepted => accepted.id === match.id)
-            );
-            setMatches(filteredMatches);
-        })
-        .catch(err => {
-            console.error("Fetch error:", err);
-            setError(err.message);
-        })
-        .finally(() => setLoading(false));
+        // Since acceptedMatches is passed as prop and managed by parent,
+        // we just need to handle loading state
+        setLoading(false);
     }, [token, acceptedMatches]);
 
     return (
@@ -56,15 +28,14 @@ export default function Matches({ token, acceptedMatches }) {
                     <p className="text-white text-center">No matches yet. Start swiping!</p>
                 )}
 
-                {acceptedMatches.map(match => (
+                {!loading && !error && acceptedMatches.map(match => (
                     <div
                         key={match.id}
                         className="w-full p-4 rounded-lg bg-white/80 text-gray-800 hover:bg-white hover:shadow-md transition-all cursor-pointer"
                     >
                         <div className="flex items-center gap-3">
-                            
                             <div className="flex-1">
-                                <div className="font-semibold">{match.user2_username}</div>
+                                <div className="font-semibold">{match.username || match.user2_username}</div>
                             </div>
                         </div>
                     </div>
