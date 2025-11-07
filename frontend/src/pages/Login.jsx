@@ -46,7 +46,7 @@ function Login() {
             
             loginSpotify();
         }
-    }, [searchParams, loginToken, navigate]);
+    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
