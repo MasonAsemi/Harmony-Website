@@ -5,21 +5,36 @@ import Matches from "../components/Matches";
 import { useAuth } from "../components/auth/AuthContext";
 import { useState, useEffect } from "react";
 import MatchCard from "../components/dashboard/MatchCard";
-
-const exampleChats = [
-    { id: 1, recipient: "Example1" },
-    { id: 2, recipient: "Example2" }
-];
+import { Author } from "./Chat";
 
 function Dashboard({ showChatsOverlay = false, setShowChatsOverlay = () => {} }) {
     const [acceptedMatches, setAcceptedMatches] = useState([]);
     const [currentChat, setCurrentChat] = useState(null);
     const [showChatWindow, setShowChatWindow] = useState(false);
     const { token, user } = useAuth();
+    const authUser = new Author(user?.id, user?.username);
+
+    const exampleChats = [
+        { id: 1, recipient: "Example1", messages: [
+            {author: new Author(10, "Example 1 chat"), text: "Test"},
+            {author: authUser, text: "Test user 1"}
+        ]},
+        { id: 2, recipient: "Example2", messages: [
+            {author: new Author(10, "Example 2 chat"), text: "Another Test"},
+            {author: authUser, text: "Test user 2"}
+        ] }
+    ];
 
     const handleChatClick = (chat) => {
-        setCurrentChat(chat);
-        setShowChatWindow(true);
+        // Toggle chat - if clicking the same chat, close it
+        if (currentChat?.id === chat.id) {
+            setCurrentChat(null);
+            setShowChatWindow(false); // Close mobile window if toggling off
+        } else {
+            setCurrentChat(chat);
+            setShowChatWindow(true); // Open mobile window for new chat
+            console.log(chat)
+        }
     };
 
     const handleCloseChatWindow = () => {
@@ -61,7 +76,7 @@ function Dashboard({ showChatsOverlay = false, setShowChatsOverlay = () => {} })
             <div className="flex-1 flex items-center justify-center p-6 md:p-6 pb-24 md:pb-6">
                 {currentChat && !showChatsOverlay ? (
                     <div className="w-full h-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden">
-                        <Chat conversation={currentChat} />
+                        <Chat currentChat={currentChat} authUser={authUser} setCurrentChat={setCurrentChat} />
                     </div>
                 ) : (
                     <MatchCard token={token} acceptedMatches={acceptedMatches} setAcceptedMatches={setAcceptedMatches} />
