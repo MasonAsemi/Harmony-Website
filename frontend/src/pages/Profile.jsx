@@ -141,7 +141,7 @@ function Profile({ pfp_src }) {
           </div>
           
           {/* Right side - Profile Fields */}
-          <div className='lg:col-span-2 flex flex-col gap-6'>
+          <div className='lg:col-span-2 flex flex-col gap-6 border-l border-gray-200 pl-0 lg:pl-8'>
             <ProfileField 
               title="Username" 
               data={profileData?.username || 'Not set'} 
