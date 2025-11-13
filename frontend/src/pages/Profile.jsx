@@ -5,6 +5,7 @@ import { profileAPI } from '../services/api';
 import SongSearch from '../components/profile/SongSearch';
 import { API_BASE_URL } from '../config';
 import MatchCardPreview from '../components/profile/MatchCardPreview';
+import Sidebar from '../components/Sidebar';
 
 function Profile({ pfp_src }) {
   const { user, token, login } = useAuth();
@@ -87,6 +88,11 @@ function Profile({ pfp_src }) {
 
   return (
     <div className='w-full max-w-7xl mx-auto px-4 py-8 pb-20 md:pb-8'>
+
+      <div className="hidden md:block">
+        <Sidebar />
+      </div>
+
       <div className='text-3xl font-bold mb-8 text-gray-800'>Profile</div>
       
       {error && (
