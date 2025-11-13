@@ -8,15 +8,7 @@ import MatchCardPreview from '../components/profile/MatchCardPreview';
 
 function Profile({ pfp_src }) {
   const { user, token, login } = useAuth();
-  const [profileData, setProfileData] = useState({
-    //username: 'Loading...',
-    //** TODO: REMOVE AND UNCOMMENT */
-    // age: null,
-    // interests: '',
-    // biography: '',
-    // location: ''
-
-  });
+  const [profileData, setProfileData] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [imageFile, setImageFile] = useState(null); 
@@ -34,7 +26,6 @@ function Profile({ pfp_src }) {
     const image =e.target.files[0]
     const imageUrl = URL.createObjectURL(e.target.files[0])
     setImageFile(imageUrl); 
-    // update user's prof with image 
 
     if (image) {
         const formData = new FormData();
@@ -47,10 +38,9 @@ function Profile({ pfp_src }) {
                 'Authorization': `Token ${token}`,
             },
         })
-        .then(response => response.json()) // Or response.text() depending on server response
+        .then(response => response.json())
         .then(data => {
             console.log('Upload successful:', data);
-            // Reload profile to get updated image URL
             loadProfile();
         })
         .catch(error => {
@@ -68,7 +58,6 @@ function Profile({ pfp_src }) {
     } catch (err) {
       setError('Failed to load profile data');
       console.error('Profile load error:', err);
-      // Keep default values when error occurs
     } finally {
       setLoading(false);
     }
@@ -85,10 +74,8 @@ function Profile({ pfp_src }) {
         [fieldName]: value
       });
       
-      // Update local state
       setProfileData(updatedData);
       
-      // Update user context if username changed
       if (fieldName === 'username') {
         login(updatedData, token);
       }
@@ -114,7 +101,7 @@ function Profile({ pfp_src }) {
         </div>
       )}
 
-      <div className='w-full'>
+      <div className='w-full bg-white rounded-2xl shadow-lg p-8'>
         <div className='grid grid-cols-1 lg:grid-cols-3 gap-8 items-start'>
           {/* Left side - Match Card Preview */}
           <div className='lg:sticky lg:top-8 flex flex-col gap-4'>
