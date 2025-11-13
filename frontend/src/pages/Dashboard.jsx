@@ -79,11 +79,6 @@ function Dashboard({ showChatsOverlay = false, setShowChatsOverlay = () => {} })
                 )}
             </div>
 
-            {/* Desktop Right sidebar - Accepted Matches (hidden on mobile) */}
-            <div className="hidden md:flex">
-                <Matches token={token} acceptedMatches={acceptedMatches} />
-            </div>
-
             {/* Desktop Sidebar (hidden on mobile) */}
             <div className="hidden md:block">
                 <Sidebar />
