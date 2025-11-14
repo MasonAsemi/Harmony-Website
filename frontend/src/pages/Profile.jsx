@@ -6,16 +6,19 @@ import SongSearch from '../components/profile/SongSearch';
 import { API_BASE_URL } from '../config';
 import MatchCardPreview from '../components/profile/MatchCardPreview';
 import Sidebar from '../components/Sidebar';
-
+import FavArtistList from '../components/profile/FavArtistList';
+import FavGenreList from '../components/profile/FavGenreList';
 function Profile({ pfp_src }) {
   const { user, token, login } = useAuth();
   const [profileData, setProfileData] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [imageFile, setImageFile] = useState(null); 
-
+  const [fav_artists, setFavArtists] = useState([]); 
+  const [fav_genres, setFavGenres] = useState([]); 
   useEffect(() => {
     if (token) {
+      
       loadProfile();
     } else {
       setLoading(false);
@@ -54,7 +57,9 @@ function Profile({ pfp_src }) {
     try {
       setLoading(true);
       const data = await profileAPI.getProfile(token);
-      setProfileData(data);
+      setProfileData(data?.user); // profile endpoint sends song, genre, and artist info 
+      setFavArtists(data?.favorite_artists); 
+      setFavGenres(data?.favorite_genres); 
       setError(null);
     } catch (err) {
       setError('Failed to load profile data');
@@ -173,6 +178,10 @@ function Profile({ pfp_src }) {
               title="Location" 
               data={profileData?.location || ''} 
               onSave={(value) => handleFieldSave('location', value)}
+            />
+            <FavGenreList genreList={fav_genres}
+            />
+            <FavArtistList artistList={fav_artists}
             />
             <SongSearch />
           </div>
