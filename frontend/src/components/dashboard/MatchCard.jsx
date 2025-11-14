@@ -379,8 +379,8 @@ const MatchCard = ({ token, acceptedMatches, setAcceptedMatches }) => {
             .then(([potentialData, acceptedData]) => {
                 console.log("Fetched potential matches:", potentialData);
                 console.log("Fetched accepted matches:", acceptedData);
-                setPotentialMatches(potentialData.matches || []);
-                setAcceptedMatches(acceptedData.matches || []);
+                setPotentialMatches(potentialData || []);
+                setAcceptedMatches(acceptedData || []);
                 setLoading(false);
             })
             .catch(err => {
@@ -388,7 +388,7 @@ const MatchCard = ({ token, acceptedMatches, setAcceptedMatches }) => {
                 setError(err.message);
                 setLoading(false);
             });
-    }, [token, setAcceptedMatches]);
+    }, []);
 
     return (
         <div className="w-full max-w-md relative my-5" style={{ height: 'calc(100vh - 40px)' }}>

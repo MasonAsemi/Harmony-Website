@@ -39,7 +39,6 @@ function Dashboard({ showChatsOverlay = false, setShowChatsOverlay = () => {} })
 
     return (
         <div className="flex flex-row h-screen bg-linear-to-br from-rose-300 via-pink-400 to-rose-500">
-            
             {/* Desktop Left sidebar - Chats (hidden on mobile) */}
             <div className="hidden md:flex w-80 ml-16 bg-pink-200 border-r border-white/20 flex-col">
                 <div className="p-4 border-b border-white/20">
@@ -99,7 +98,7 @@ function Dashboard({ showChatsOverlay = false, setShowChatsOverlay = () => {} })
                             </button>
                         </div>
                         <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                            {exampleChats.map((chat) => (
+                            {acceptedMatches.map((chat) => (
                                 <button
                                     key={chat.id}
                                     onClick={() => handleChatClick(chat)}
