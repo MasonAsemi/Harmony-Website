@@ -1,6 +1,6 @@
 # serializers.py
 from rest_framework import serializers
-from .models import User, Song, Artist, Genre
+from .models import User, Song, Artist, Genre, MatchWeightSettings
 
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=False)
@@ -48,3 +48,9 @@ class SongSerializer(serializers.ModelSerializer):
             'acousticness', 'artists', 'genres', 'embed'
         ]
         read_only_fields = fields  # All fields are read-only since songs come from Spotify
+
+
+class MatchWeightSettingsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MatchWeightSettings
+        fields = ['genre_weight', 'artist_weight', 'song_weight']

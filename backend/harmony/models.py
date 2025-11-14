@@ -176,6 +176,19 @@ class Message(models.Model):
     def __str__(self):
         return f"Message from {self.sender} to {self.receiver}: {self.content}"
 
+class MatchWeightSettings(models.Model):
+    user = models.OneToOneField(
+        User, 
+        on_delete=models.CASCADE,
+        related_name='match_weights'
+    )
+
+    genre_weight = models.FloatField(default=1.0, validators=[MinValueValidator(0), MaxValueValidator(5)])
+    artist_weight = models.FloatField(default=1.0, validators=[MinValueValidator(0), MaxValueValidator(5)])
+    song_weight = models.FloatField(default=1.0, validators=[MinValueValidator(0), MaxValueValidator(5)])
+
+    def __str__(self):
+        return f"Match Weights for {self.user.username}"
 
 
 
