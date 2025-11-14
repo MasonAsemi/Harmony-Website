@@ -17,7 +17,10 @@ const Chat = ({ matches, currentChatID, authUser }) =>
     // Update the messages state when a response from the server is loaded
     useEffect(() => 
     {
-        // Get chats from chat ID
+        // Add a check to ensure we have a chat ID before doing anything
+        if (!currentChatID) return; 
+
+        // Get chats from chat ID - THIS IS NOW TRIGGERED ON currentChatID CHANGE
         getChats(currentChatID)
             .then((res) => {
                 if (res.status == 200)
@@ -26,7 +29,7 @@ const Chat = ({ matches, currentChatID, authUser }) =>
                 }
             })
 
-        // Use web sockets
+        // Use web sockets - Reconnects for the new chat room
         const socket = connectWebsocket(currentChatID);
 
         socket.addEventListener("open", event => {
@@ -41,8 +44,9 @@ const Chat = ({ matches, currentChatID, authUser }) =>
 
         setResponse('');
 
+        // The return function closes the old socket connection when the chat ID changes
         return () => { console.log("Websocket closed"); socket.close() };
-    }, []);
+    }, [currentChatID]); // <-- **CRITICAL CHANGE**: Dependency array now includes currentChatID
 
     // Returns true if the button should be disabled, false if not
     const isButtonDisabled = () => 
