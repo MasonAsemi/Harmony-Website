@@ -103,7 +103,7 @@ function Register() {
     };
 
     return (
-        <section className="relative h-screen pt-20 overflow-hidden flex-col gap-y-2 bg-gradient-to-br from-rose-300 via-pink-400 to-rose-500 flex items-center justify-center">
+        <section className="pt-5 overflow-hidden flex-col gap-y-2 bg-gradient-to-br from-rose-300 via-pink-400 to-rose-500 flex items-center justify-center">
             <div className="auth-panel mx-4">
                 <h2 className="auth-title">Register</h2>
 

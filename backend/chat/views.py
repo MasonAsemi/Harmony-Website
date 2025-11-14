@@ -45,9 +45,9 @@ class MessageCreateView(APIView):
 
     def post(self, request, match_id, format=None):
         # 1. Get the Conversation and Match
-        conversation = get_object_or_404(Conversation, match_id=match_id)
-        match = conversation.match
-        
+        match = get_object_or_404(Match, id=match_id)
+        conversation, created = Conversation.objects.get_or_create(match=match)
+
         # 2. Permission Check
         if request.user not in [match.user1, match.user2]:
             return Response({"detail": "Permission denied. User is not part of this match."}, status=status.HTTP_403_FORBIDDEN)

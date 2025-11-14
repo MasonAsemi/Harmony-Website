@@ -15,6 +15,7 @@ from django.db import transaction, models
 from dotenv import load_dotenv
 from .matching_utils import compute_genre_similarity
 import urllib.parse
+from chat.models import Conversation
 class UserViewSet(viewsets.ModelViewSet):
     
     queryset = User.objects.all()
@@ -825,6 +826,7 @@ def match_accept(request):
 
         return Response(matches_data)
         
+    # POST logic starts here
     current_user = request.user
     target_user_id = request.data.get('id')
 
@@ -836,12 +838,21 @@ def match_accept(request):
     except User.DoesNotExist:
         return Response({'error': 'User not found'}, status=404)
 
-    # Avoid duplicate match creation
-    if not Match.objects.filter(
-        models.Q(user1=current_user, user2=target_user) |
-        models.Q(user1=target_user, user2=current_user)
-    ).exists():
-        Match.objects.create(user1=current_user, user2=target_user)
+    # Use a transaction to ensure both Match and Conversation are created atomically
+    with transaction.atomic():
+        # Check if the match already exists (using a query)
+        match_query = Match.objects.filter(
+            models.Q(user1=current_user, user2=target_user) |
+            models.Q(user1=target_user, user2=current_user)
+        )
+
+        if not match_query.exists():
+            # 1. Create the Match object and save it to a variable
+            new_match = Match.objects.create(user1=current_user, user2=target_user)
+
+            # 2. Create the corresponding Conversation object,
+            #    linking it via the 'match' field as defined in chat/models.py
+            Conversation.objects.create(match=new_match) 
 
     return Response({'message': f'Match created with {target_user.username}'}, status=201)
 
