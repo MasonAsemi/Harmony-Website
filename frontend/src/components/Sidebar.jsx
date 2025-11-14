@@ -35,7 +35,7 @@ const Sidebar = () => {
                 </svg>
             ), 
             label: "Settings", 
-            path: "#" 
+            path: "/matchsettings"
         }
     ];
 
