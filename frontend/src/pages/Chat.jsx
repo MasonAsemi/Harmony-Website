@@ -4,11 +4,12 @@ import { useAuth } from "../components/auth/AuthContext";
 import { API_BASE_URL } from "../config";
 import { connectWebsocket, getChats, sendMessage } from "../api/chat";
 
-const Chat = ({ matches, currentChatID, authUser }) =>
+const Chat = ({ matches, currentChatID, currentUser }) =>
 {
     const [userContent, setUserContent] = useState('');
     const [currentChat, setCurrentChat] = useState([]);
     const [response, setResponse] = useState('');
+    const [websocket, setWebsocket] = useState(null);
 
     const [isHoldingShift, setIsHoldingShift] = useState(false);
     const placeholderText = 'Send a message...';
@@ -16,7 +17,10 @@ const Chat = ({ matches, currentChatID, authUser }) =>
     // Update the messages state when a response from the server is loaded
     useEffect(() => 
     {
-        // Get chats from chat ID
+        // Add a check to ensure we have a chat ID before doing anything
+        if (!currentChatID) return; 
+
+        // Get chats from chat ID - THIS IS NOW TRIGGERED ON currentChatID CHANGE
         getChats(currentChatID)
             .then((res) => {
                 if (res.status == 200)
@@ -25,25 +29,29 @@ const Chat = ({ matches, currentChatID, authUser }) =>
                 }
             })
 
-        // Use web sockets
-        const socket = connectWebsocket();
+        // Use web sockets - Reconnects for the new chat room
+        const socket = connectWebsocket(currentChatID);
 
         socket.addEventListener("open", event => {
-            console.log("Websocket opened")
+            console.log("Websocket opened ", event)
         })
 
-        socket.addEventListener("onmessage", event => {
-            console.log(event)
+        socket.addEventListener("message", event => {
+            const data = JSON.parse(event.data);
+            const newMessage = data.message;
+            
+            setCurrentChat((oldChat) => {
+                return [...oldChat, newMessage];
+            })
         })
 
-        socket.onmessage = (event) => {
-            const newMessage = JSON.parse(event.data);
-        };
+        setWebsocket(socket);
 
         setResponse('');
 
+        // The return function closes the old socket connection when the chat ID changes
         return () => { console.log("Websocket closed"); socket.close() };
-    }, []);
+    }, [currentChatID]); // <-- **CRITICAL CHANGE**: Dependency array now includes currentChatID
 
     // Returns true if the button should be disabled, false if not
     const isButtonDisabled = () => 
@@ -58,12 +66,13 @@ const Chat = ({ matches, currentChatID, authUser }) =>
     // If the last assistant response was unsuccessful, then it will override the unsuccessful response and user message that prompted it
     const handleReturn = async () => 
     {
-        setCurrentChat((oldChat) => {
-            return [...oldChat, {author: authUser, text: userContent}]
-        })
+        const newMessage = {author: currentUser, content: userContent};
 
-        // TODO: Find out why this 401s
-        // sendMessage(currentChatID, authUser.username, userContent)
+        // setCurrentChat((oldChat) => {
+        //     return [...oldChat, newMessage];
+        // })
+
+        sendMessage(currentChatID, newMessage.author.username, newMessage.content)
 
         setUserContent("");
     };
@@ -111,7 +120,7 @@ const Chat = ({ matches, currentChatID, authUser }) =>
             {/* Messages area */}
             <div className="flex-1 overflow-y-auto p-8 bg-gradient-to-br from-rose-300 via-pink-400 to-rose-500">
                 {currentChat.map((message, index) => (
-                    <Message key={index} author={message.author} userAuthor={authUser} text={message.text} />
+                    <Message key={index} author={new Author(message.sender, message.sender_username)} currentUser={currentUser} text={message.content} />
                 ))}
                 {currentChat.length === 0 && (
                     <div className="flex items-center justify-center h-full">

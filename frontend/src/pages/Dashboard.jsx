@@ -14,14 +14,7 @@ function Dashboard({ showChatsOverlay = false, setShowChatsOverlay = () => {} })
     const [currentChatID, setCurrentChatID] = useState(null);
     const [showChatWindow, setShowChatWindow] = useState(false);
     const { token, user } = useAuth();
-    const authUser = new Author(user?.id, user?.username);
-
-    useEffect(() => {
-        getAcceptedMatches(token)
-            .then((json) => {
-                setAcceptedMatches(json)
-            })
-    }, [])
+    const currentUserAuthor = new Author(user?.id, user?.username);
 
     const handleChatClick = (match) => {
         // Toggle chat - if clicking the same chat, close it
@@ -41,6 +34,8 @@ function Dashboard({ showChatsOverlay = false, setShowChatsOverlay = () => {} })
     const handleCloseChatsOverlay = () => {
         setShowChatsOverlay(false);
     };
+
+    console.log(acceptedMatches)
 
     return (
         <div className="flex flex-row h-screen bg-linear-to-br from-rose-300 via-pink-400 to-rose-500">
@@ -72,7 +67,7 @@ function Dashboard({ showChatsOverlay = false, setShowChatsOverlay = () => {} })
             <div className="flex-1 flex items-center justify-center p-6">
                 {currentChatID != null && !showChatsOverlay ? (
                     <div className="w-full h-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden">
-                        <Chat matches={acceptedMatches} currentChatID={currentChatID} authUser={authUser} />
+                        <Chat matches={acceptedMatches} currentChatID={currentChatID} currentUser={currentUserAuthor} />
                     </div>
                 ) : (
                     <MatchCard token={token} acceptedMatches={acceptedMatches} setAcceptedMatches={setAcceptedMatches} />
