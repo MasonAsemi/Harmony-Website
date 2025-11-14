@@ -810,7 +810,7 @@ def matches(request):
 def match_accept(request):
     if request.method =='GET' :
         matched_users =  Match.objects.filter(models.Q(user1=request.user) |
-        models.Q(user1=request.user))
+        models.Q(user2=request.user))
     
         matches_data = [
             {
