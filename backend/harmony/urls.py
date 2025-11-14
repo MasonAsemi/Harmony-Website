@@ -1,7 +1,7 @@
 # harmony/urls.py
 from rest_framework.routers import DefaultRouter
 from django.urls import path, include
-from .views import UserViewSet, song_search, SongViewSet, spotify_callback, spotify_login, matches, match_reject, match_accept, get_genre_based_matches 
+from .views import UserViewSet, song_search, SongViewSet, spotify_callback, spotify_login, matches, match_reject, match_accept, get_full_matches, match_weight_settings 
 from rest_framework.authtoken.views import obtain_auth_token
 
 router = DefaultRouter()
@@ -16,5 +16,6 @@ urlpatterns = [
     path('matches/', matches),
     path('matches/reject/', match_reject),
     path('matches/accept/', match_accept),
-    path('matches/genre/', get_genre_based_matches, name='genre_matches'),
+    path('matches/full/', get_full_matches, name='full_matches'),
+    path('settings/match-weights/', match_weight_settings),
 ]
