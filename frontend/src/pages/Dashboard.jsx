@@ -61,9 +61,6 @@ function Dashboard() {
                     <MatchCard token={token} acceptedMatches={acceptedMatches} setAcceptedMatches={setAcceptedMatches} />
                 )}
             </div>
-
-            {/* Right sidebar - Accepted Matches */}
-            <Matches token={token} acceptedMatches={acceptedMatches} />
         </div>
     );
 }

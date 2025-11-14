@@ -36,8 +36,13 @@ const Chat = ({ matches, currentChatID, currentUser }) =>
             console.log("Websocket opened ", event)
         })
 
-        socket.addEventListener("onmessage", event => {
-            console.log(event)
+        socket.addEventListener("message", event => {
+            const data = JSON.parse(event.data);
+            const newMessage = data.message;
+            
+            setCurrentChat((oldChat) => {
+                return [...oldChat, newMessage];
+            })
         })
 
         setWebsocket(socket);
@@ -61,14 +66,13 @@ const Chat = ({ matches, currentChatID, currentUser }) =>
     // If the last assistant response was unsuccessful, then it will override the unsuccessful response and user message that prompted it
     const handleReturn = async () => 
     {
-        const newMessage = {author: currentUser, text: userContent};
+        const newMessage = {author: currentUser, content: userContent};
 
-        setCurrentChat((oldChat) => {
-            return [...oldChat, newMessage];
-        })
+        // setCurrentChat((oldChat) => {
+        //     return [...oldChat, newMessage];
+        // })
 
-        // TODO: Find out why this 401s
-        sendMessage(currentChatID, newMessage.author.username, newMessage.text)
+        sendMessage(currentChatID, newMessage.author.username, newMessage.content)
 
         setUserContent("");
     };
