@@ -379,7 +379,7 @@ const MatchCard = ({ token, acceptedMatches, setAcceptedMatches }) => {
             .then(([potentialData, acceptedData]) => {
                 console.log("Fetched potential matches:", potentialData);
                 console.log("Fetched accepted matches:", acceptedData);
-                setPotentialMatches(potentialData || []);
+                setPotentialMatches(potentialData.matches || []);
                 setAcceptedMatches(acceptedData || []);
                 setLoading(false);
             })
