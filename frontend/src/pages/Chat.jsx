@@ -9,6 +9,7 @@ const Chat = ({ matches, currentChatID, authUser }) =>
     const [userContent, setUserContent] = useState('');
     const [currentChat, setCurrentChat] = useState([]);
     const [response, setResponse] = useState('');
+    const [websocket, setWebsocket] = useState(null);
 
     const [isHoldingShift, setIsHoldingShift] = useState(false);
     const placeholderText = 'Send a message...';
@@ -26,19 +27,17 @@ const Chat = ({ matches, currentChatID, authUser }) =>
             })
 
         // Use web sockets
-        const socket = connectWebsocket();
+        const socket = connectWebsocket(currentChatID);
 
         socket.addEventListener("open", event => {
-            console.log("Websocket opened")
+            console.log("Websocket opened ", event)
         })
 
         socket.addEventListener("onmessage", event => {
             console.log(event)
         })
 
-        socket.onmessage = (event) => {
-            const newMessage = JSON.parse(event.data);
-        };
+        setWebsocket(socket);
 
         setResponse('');
 
@@ -58,12 +57,14 @@ const Chat = ({ matches, currentChatID, authUser }) =>
     // If the last assistant response was unsuccessful, then it will override the unsuccessful response and user message that prompted it
     const handleReturn = async () => 
     {
+        const newMessage = {author: authUser, text: userContent};
+
         setCurrentChat((oldChat) => {
-            return [...oldChat, {author: authUser, text: userContent}]
+            return [...oldChat, newMessage];
         })
 
         // TODO: Find out why this 401s
-        // sendMessage(currentChatID, authUser.username, userContent)
+        sendMessage(currentChatID, newMessage.author.username, newMessage.text)
 
         setUserContent("");
     };
