@@ -79,6 +79,7 @@ class UserViewSet(viewsets.ModelViewSet):
         """
         user = request.user
         
+        serializer = self.get_serializer(request.user)
         # Get favorite songs with weights (sorted by weight)
         song_preferences = UserSongPreference.objects.filter(user=user).select_related('song').prefetch_related('song__artists', 'song__genres').order_by('-weight')
         favorite_songs = []
@@ -133,16 +134,7 @@ class UserViewSet(viewsets.ModelViewSet):
             })
         
         return Response({
-            'user': {
-                'id': user.id,
-                'username': user.username,
-                'email': user.email,
-                'location': user.location,
-                'age': user.age,
-                'biography': user.biography,
-                'interests': user.interests,
-                'profile_image': user.profile_image.url if user.profile_image else None,
-            },
+            'user': serializer.data,
             'favorite_songs': favorite_songs,
             'favorite_artists': favorite_artists,
             'favorite_genres': favorite_genres,

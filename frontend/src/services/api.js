@@ -5,7 +5,7 @@ console.log('API_BASE_URL in api.js:', API_BASE_URL);
 
 export const profileAPI = {
     getProfile: async (token) => {
-        const fullURL = `${API_BASE_URL}/api/users/me/`;
+        const fullURL = `${API_BASE_URL}/api/users/profile/`;
         console.log('Fetching profile from:', fullURL);
         console.log('Token:', token);
         
