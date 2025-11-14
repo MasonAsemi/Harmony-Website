@@ -12,7 +12,7 @@ function Dashboard() {
     const [currentChat, setCurrentChat] = useState(null);
     const [currentChatID, setCurrentChatID] = useState(null);
     const { token, user } = useAuth();
-    const authUser = new Author(user?.id, user?.username);
+    const currentUserAuthor = new Author(user?.id, user?.username);
 
     const handleChatClick = (match) => {
         // Toggle chat - if clicking the same chat, close it
@@ -55,7 +55,7 @@ function Dashboard() {
             <div className="flex-1 flex items-center justify-center p-6">
                 {currentChatID ? (
                     <div className="w-full h-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden">
-                        <Chat matches={acceptedMatches} currentChatID={currentChatID} authUser={authUser} />
+                        <Chat matches={acceptedMatches} currentChatID={currentChatID} currentUser={currentUserAuthor} />
                     </div>
                 ) : (
                     <MatchCard token={token} acceptedMatches={acceptedMatches} setAcceptedMatches={setAcceptedMatches} />

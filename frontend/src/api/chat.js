@@ -22,7 +22,7 @@ export const sendMessage = (matchID, user, message) => {
     console.log(localStorage.getItem("token"))
     return axios.post(`${API_BASE_URL}/api/chat/messages/${matchID}/send/`, { 
         user: user,
-        message: message
+        content: message
     },
     {
         headers: {

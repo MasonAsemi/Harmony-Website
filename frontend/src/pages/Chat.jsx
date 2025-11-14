@@ -4,7 +4,7 @@ import { useAuth } from "../components/auth/AuthContext";
 import { API_BASE_URL } from "../config";
 import { connectWebsocket, getChats, sendMessage } from "../api/chat";
 
-const Chat = ({ matches, currentChatID, authUser }) =>
+const Chat = ({ matches, currentChatID, currentUser }) =>
 {
     const [userContent, setUserContent] = useState('');
     const [currentChat, setCurrentChat] = useState([]);
@@ -61,7 +61,7 @@ const Chat = ({ matches, currentChatID, authUser }) =>
     // If the last assistant response was unsuccessful, then it will override the unsuccessful response and user message that prompted it
     const handleReturn = async () => 
     {
-        const newMessage = {author: authUser, text: userContent};
+        const newMessage = {author: currentUser, text: userContent};
 
         setCurrentChat((oldChat) => {
             return [...oldChat, newMessage];
@@ -116,7 +116,7 @@ const Chat = ({ matches, currentChatID, authUser }) =>
             {/* Messages area */}
             <div className="flex-1 overflow-y-auto p-8 bg-gradient-to-br from-rose-300 via-pink-400 to-rose-500">
                 {currentChat.map((message, index) => (
-                    <Message key={index} author={message.author} userAuthor={authUser} text={message.text} />
+                    <Message key={index} author={new Author(message.sender, message.sender_username)} currentUser={currentUser} text={message.content} />
                 ))}
                 {currentChat.length === 0 && (
                     <div className="flex items-center justify-center h-full">
