@@ -63,9 +63,9 @@ function Dashboard({ showChatsOverlay = false, setShowChatsOverlay = () => {} })
             </div>
 
             {/* Main content area */}
-            <div className="flex-1 flex items-center justify-center p-6">
+            <div className="flex-1 relative bottom-14 md:bottom-0 flex items-center justify-center p-6">
                 {currentChatID != null && !showChatsOverlay ? (
-                    <div className="w-full h-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden">
+                    <div className="w-full h-[90%] max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden">
                         <Chat matches={acceptedMatches} currentChatID={currentChatID} currentUser={currentUserAuthor} />
                     </div>
                 ) : (
@@ -80,9 +80,9 @@ function Dashboard({ showChatsOverlay = false, setShowChatsOverlay = () => {} })
 
             {/* Mobile Chats Overlay */}
             {showChatsOverlay && (
-                <div className="fixed inset-0 z-40 md:hidden bg-black bg-opacity-50" onClick={handleCloseChatsOverlay}>
+                <div className="fixed inset-0 z-40 md:hidden backdrop-blur-xs bg-opacity-50" onClick={handleCloseChatsOverlay}>
                     <div 
-                        className="absolute bottom-16 left-0 right-0 bg-pink-200 rounded-t-3xl shadow-2xl max-h-[70vh] flex flex-col"
+                        className="absolute bottom-14 left-0 right-0 bg-pink-200 rounded-t-3xl shadow-2xl max-h-[70vh] flex flex-col"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="p-4 border-b border-white/20 flex justify-between items-center">
@@ -104,7 +104,7 @@ function Dashboard({ showChatsOverlay = false, setShowChatsOverlay = () => {} })
                                     onClick={() => handleChatClick(chat)}
                                     className="w-full p-4 rounded-lg text-left transition-all bg-white/80 text-gray-800 hover:bg-white hover:shadow-md"
                                 >
-                                    <div className="font-semibold">{chat.recipient}</div>
+                                    <div className="font-semibold">{chat.user2_username}</div>
                                     <div className="text-sm text-gray-600 mt-1">Click to view chat</div>
                                 </button>
                             ))}
@@ -114,7 +114,7 @@ function Dashboard({ showChatsOverlay = false, setShowChatsOverlay = () => {} })
             )}
 
             {/* Mobile Chat Window Overlay */}
-            {showChatWindow && currentChat && (
+            {showChatWindow && (
                 <div className="fixed inset-0 z-50 md:hidden bg-white">
                     <div className="h-full flex flex-col pb-16">
                         {/* Chat Header */}
