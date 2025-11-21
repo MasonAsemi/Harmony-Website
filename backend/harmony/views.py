@@ -1,8 +1,8 @@
 from django.shortcuts import redirect
 from rest_framework import viewsets, permissions, status 
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
-from .models import User, Song, Artist, Genre, UserSongPreference, UserArtistPreference, UserGenrePreference, Match, MatchRejection
-from .serializers import UserSerializer, SongSerializer
+from .models import User, Song, Artist, Genre, UserSongPreference, UserArtistPreference, UserGenrePreference, Match, MatchRejection, MatchWeightSettings
+from .serializers import UserSerializer, SongSerializer, MatchWeightSettingsSerializer
 from .permissions import IsSelfOrReadOnly
 from rest_framework.decorators import action, api_view, permission_classes 
 from rest_framework.response import Response
@@ -13,7 +13,7 @@ import requests
 import os 
 from django.db import transaction, models
 from dotenv import load_dotenv
-from .matching_utils import compute_genre_similarity
+from .matching_utils import compute_final_match_score
 import urllib.parse
 from chat.models import Conversation
 class UserViewSet(viewsets.ModelViewSet):
@@ -888,19 +888,55 @@ def return_accepted_matches(request)    :
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_genre_based_matches(request):
+def get_full_matches(request):
     user = request.user
     other_users = User.objects.exclude(id=user.id)
+    settings = MatchWeightSettings.objects.get_or_create(user=user)[0]
 
     matches = []
+
     for other in other_users:
-        similarity = compute_genre_similarity(user, other)
-        if similarity > 0.3:  # threshold
+        final_score = compute_final_match_score(
+            user,
+            other,
+            genre_weight=settings.genre_weight,
+            artist_weight=settings.artist_weight,
+            song_weight=settings.song_weight,
+        )
+
+        if final_score > 0.3:
             matches.append({
                 'id': other.id,
                 'username': other.username,
-                'similarity': similarity,
+                'final_score': final_score,
             })
 
-    matches.sort(key=lambda x: x['similarity'], reverse=True)
+    matches.sort(key=lambda x: x['final_score'], reverse=True)
     return Response({'matches': matches})
+
+
+@api_view(['GET', 'POST'])
+def match_weight_settings(request):
+    user = request.user 
+    try:
+        settings = MatchWeightSettings.objects.get(user=user)
+    except MatchWeightSettings.DoesNotExist:
+        settings = MatchWeightSettings(user=user)
+
+    if request.method == 'GET':
+        return Response({
+            "genre_weight": settings.genre_weight,
+            "artist_weight": settings.artist_weight,
+            "song_weight": settings.song_weight,
+        })
+
+    elif request.method == 'POST':
+        settings.genre_weight = request.data.get('genre_weight', settings.genre_weight)
+        settings.artist_weight = request.data.get('artist_weight', settings.artist_weight)
+        settings.song_weight = request.data.get('song_weight', settings.song_weight)
+        settings.save() 
+        return Response({
+            "genre_weight": settings.genre_weight,
+            "artist_weight": settings.artist_weight,
+            "song_weight": settings.song_weight,
+        }, status=status.HTTP_200_OK)

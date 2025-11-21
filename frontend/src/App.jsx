@@ -8,6 +8,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
+import MatchSettings from './pages/MatchSettings'; 
 import { useState } from 'react';
 
 // Wrapper component to handle conditional BottomNav rendering
@@ -48,6 +49,14 @@ function AppContent() {
               <Profile />
             </ProtectedRoute>
           } 
+        />
+        <Route 
+          path="/matchsettings"
+          element={
+            <ProtectedRoute>
+              <MatchSettings />
+            </ProtectedRoute>
+          }
         />
       </Routes>
       
