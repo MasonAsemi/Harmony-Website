@@ -17,7 +17,6 @@ export function Header() {
                 {/* Logo and Brand */}
                 <div className="flex items-center gap-3">
                     <Link to="/" className="flex items-center gap-3">
-                        <img src={harmonyLogo} alt="Harmony Logo" className="h-12 w-12 object-contain" />
                         <span className="text-gray-900">Harmony</span>
                     </Link>
                 </div>
@@ -30,15 +29,6 @@ export function Header() {
                             <Link to="/dashboard" className="text-gray-700 px-3 py-2 rounded hover:bg-gray-100">
                                 Dashboard
                             </Link>
-                            <Link to="/profile" className="text-gray-700 px-3 py-2 rounded hover:bg-gray-100">
-                                Profile
-                            </Link>
-                            <button 
-                                onClick={handleLogout}
-                                className="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded"
-                            >
-                                Logout
-                            </button>
                         </>
                     ) : (
                         <>
