@@ -17,7 +17,7 @@ export const API_BASE_URL = API_BASE_URL_ENV || (isLocal
 
 export const WS_BASE_URL = isLocal
   ? LOCAL_WS_BASE_URL
-  : "wss://harmony-backend-4800-3fc8f73b6cb5.herokuapp.com";
+  : "ws://harmony-backend-4800-3fc8f73b6cb5.herokuapp.com";
 
 console.log("API_BASE_URL:", API_BASE_URL);
 console.log("WS_BASE_URL:", WS_BASE_URL);
