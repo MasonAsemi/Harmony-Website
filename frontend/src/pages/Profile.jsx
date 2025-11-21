@@ -8,6 +8,7 @@ import MatchCardPreview from '../components/profile/MatchCardPreview';
 import Sidebar from '../components/Sidebar';
 import FavArtistList from '../components/profile/FavArtistList';
 import FavGenreList from '../components/profile/FavGenreList';
+
 function Profile({ pfp_src }) {
   const { user, token, login } = useAuth();
   const [profileData, setProfileData] = useState({});
@@ -16,9 +17,9 @@ function Profile({ pfp_src }) {
   const [imageFile, setImageFile] = useState(null); 
   const [fav_artists, setFavArtists] = useState([]); 
   const [fav_genres, setFavGenres] = useState([]); 
+  
   useEffect(() => {
     if (token) {
-      
       loadProfile();
     } else {
       setLoading(false);
@@ -26,8 +27,74 @@ function Profile({ pfp_src }) {
     }
   }, [token]);
 
+  // Helper function to aggregate artists from songs
+  const aggregateArtistsFromSongs = (songs) => {
+    const artistMap = new Map();
+    
+    if (!songs || !Array.isArray(songs)) {
+      console.log('No valid songs array provided');
+      return [];
+    }
+    
+    console.log('Processing songs for artists:', songs);
+    
+    songs.forEach((song, index) => {
+      console.log(`Song ${index}:`, song);
+      
+      // Handle different possible structures
+      const artistsArray = song.artists || song.artist || [];
+      
+      if (Array.isArray(artistsArray)) {
+        artistsArray.forEach(artist => {
+          if (artist && (artist.id || artist.name)) {
+            const artistId = artist.id || artist.name; // Use name as fallback ID
+            console.log(`Found artist:`, artist);
+            artistMap.set(artistId, artist);
+          }
+        });
+      }
+    });
+    
+    const result = Array.from(artistMap.values());
+    console.log('Aggregated artists:', result);
+    return result;
+  };
+
+  // Helper function to aggregate genres from songs
+  const aggregateGenresFromSongs = (songs) => {
+    const genreMap = new Map();
+    
+    if (!songs || !Array.isArray(songs)) {
+      console.log('No valid songs array provided');
+      return [];
+    }
+    
+    console.log('Processing songs for genres:', songs);
+    
+    songs.forEach((song, index) => {
+      console.log(`Song ${index} genres:`, song.genres);
+      
+      // Handle different possible structures
+      const genresArray = song.genres || song.genre || [];
+      
+      if (Array.isArray(genresArray)) {
+        genresArray.forEach(genre => {
+          if (genre && (genre.id || genre.name)) {
+            const genreId = genre.id || genre.name; // Use name as fallback ID
+            console.log(`Found genre:`, genre);
+            genreMap.set(genreId, genre);
+          }
+        });
+      }
+    });
+    
+    const result = Array.from(genreMap.values());
+    console.log('Aggregated genres:', result);
+    return result;
+  };
+
   async function handleImageChange(e) {
-    const image =e.target.files[0]
+    const image = e.target.files[0]
     const imageUrl = URL.createObjectURL(e.target.files[0])
     setImageFile(imageUrl); 
 
@@ -57,9 +124,42 @@ function Profile({ pfp_src }) {
     try {
       setLoading(true);
       const data = await profileAPI.getProfile(token);
+      console.log('Profile API Response:', data);
+      console.log('Favorite songs from API:', data?.favorite_songs);
+      console.log('Favorite artists from API:', data?.favorite_artists);
+      console.log('Favorite genres from API:', data?.favorite_genres);
+      
       setProfileData(data?.user); // profile endpoint sends song, genre, and artist info 
-      setFavArtists(data?.favorite_artists); 
-      setFavGenres(data?.favorite_genres); 
+      
+      // The API returns favorite_songs, favorite_artists, and favorite_genres at the root level
+      // For users who added songs manually (not via Spotify), we need to extract artists/genres from songs
+      
+      if (data?.favorite_artists && data.favorite_artists.length > 0) {
+        console.log('Using API-provided favorite_artists:', data.favorite_artists);
+        setFavArtists(data.favorite_artists);
+      } else if (data?.favorite_songs && data.favorite_songs.length > 0) {
+        console.log('Extracting artists from songs...');
+        const extractedArtists = aggregateArtistsFromSongs(data.favorite_songs);
+        console.log('Extracted artists:', extractedArtists);
+        setFavArtists(extractedArtists);
+      } else {
+        console.log('No artists found');
+        setFavArtists([]);
+      }
+      
+      if (data?.favorite_genres && data.favorite_genres.length > 0) {
+        console.log('Using API-provided favorite_genres:', data.favorite_genres);
+        setFavGenres(data.favorite_genres);
+      } else if (data?.favorite_songs && data.favorite_songs.length > 0) {
+        console.log('Extracting genres from songs...');
+        const extractedGenres = aggregateGenresFromSongs(data.favorite_songs);
+        console.log('Extracted genres:', extractedGenres);
+        setFavGenres(extractedGenres);
+      } else {
+        console.log('No genres found');
+        setFavGenres([]);
+      }
+      
       setError(null);
     } catch (err) {
       setError('Failed to load profile data');
@@ -179,11 +279,9 @@ function Profile({ pfp_src }) {
               data={profileData?.location || ''} 
               onSave={(value) => handleFieldSave('location', value)}
             />
-            <FavGenreList genreList={fav_genres}
-            />
-            <FavArtistList artistList={fav_artists}
-            />
-            <SongSearch />
+            <FavGenreList genreList={fav_genres} />
+            <FavArtistList artistList={fav_artists} />
+            <SongSearch onSongsUpdate={loadProfile} />
           </div>
         </div>
       </div>

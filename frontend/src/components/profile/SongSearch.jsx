@@ -5,7 +5,7 @@ import harmonyLogo from "../../assets/logo.png";
 import { addUserSong, getUserSongs, searchSong } from "../../api/music";
 import SongList from "./SongList";
 
-const SongSearch = () => {
+const SongSearch = ({ onSongsUpdate }) => {
     const [input, setInput] = useState('');
     const [songs, setSongs] = useState([]);
     const [selectedSongs, setSelectedSongs] = useState([]);
@@ -70,15 +70,34 @@ const SongSearch = () => {
         sendQuery(searchQuery);
     }
 
-    const handleSongSelect = (index) => {
+    const handleSongSelect = async (index) => {
         let updatedSongs = [...songs];
         const selectedSong = updatedSongs.splice(index, 1)[0]
         setSongs(updatedSongs);
-        addUserSong(selectedSong)
+        
+        try {
+            await addUserSong(selectedSong);
+            
+            let updatedSelectedSongs = [...selectedSongs];
+            updatedSelectedSongs.push(selectedSong);
+            setSelectedSongs(updatedSelectedSongs);
+            
+            // Notify parent component to refresh data (artists and genres)
+            if (onSongsUpdate) {
+                onSongsUpdate();
+            }
+        } catch (error) {
+            console.error("Error adding song:", error);
+        }
+    }
 
-        let updatedSelectedSongs = [...selectedSongs];
-        updatedSelectedSongs.push(selectedSong);
-        setSelectedSongs(updatedSelectedSongs)
+    const handleSongsChange = (updatedSongs) => {
+        setSelectedSongs(updatedSongs);
+        
+        // Notify parent component to refresh data (artists and genres)
+        if (onSongsUpdate) {
+            onSongsUpdate();
+        }
     }
 
     return (
@@ -114,7 +133,11 @@ const SongSearch = () => {
                 )
             })}
         </div>}
-        <SongList songs={selectedSongs} setSongs={setSelectedSongs} numSongs={3} />
+        <SongList 
+            songs={selectedSongs} 
+            setSongs={handleSongsChange} 
+            numSongs={3} 
+        />
     </div>
     );
 }

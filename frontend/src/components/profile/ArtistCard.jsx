@@ -4,6 +4,7 @@ const ArtistCard = ({artist})=>{
         <li className="artist-card">
             <img
                 src={artist.image_url || defaultImageUrl}
+                className="w-16 h-16 rounded-full object-cover"
             /> 
             <div className='card-text'>
                 {artist?.name}
@@ -11,6 +12,5 @@ const ArtistCard = ({artist})=>{
         </li>
     )
 }
-
 
 export default ArtistCard; 
