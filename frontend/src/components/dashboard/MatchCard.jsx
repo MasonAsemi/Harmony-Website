@@ -391,7 +391,7 @@ const MatchCard = ({ token, acceptedMatches, setAcceptedMatches }) => {
     }, []);
 
     return (
-        <div className="w-full max-w-md relative my-5" style={{ height: 'calc(100vh - 40px)' }}>
+        <div className="w-full relative h-[90%] bottom-0 max-w-md my-5">
             {loading ? (
                 <div className="bg-white rounded-2xl shadow-2xl p-8 text-center h-full flex items-center justify-center">
                     <p className="text-gray-600">Loading matches...</p>
