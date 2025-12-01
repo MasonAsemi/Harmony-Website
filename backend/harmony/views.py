@@ -312,6 +312,16 @@ class SongViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
+        #first convert weight to int from string 
+
+        try:
+            weight = int(weight)  # <-- Convert to integer
+        except (ValueError, TypeError):
+            return Response(
+                {"error": "weight must be an integer"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
         if not (1 <= weight <= 10):
             return Response(
                 {"error": "weight must be between 1 and 10"},
