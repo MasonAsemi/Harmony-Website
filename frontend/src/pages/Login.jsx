@@ -50,7 +50,7 @@ function Login() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         if (!username || !password) {
             setMessage('Please fill in all fields');
             return;
@@ -58,7 +58,6 @@ function Login() {
 
         setIsLoading(true);
         setMessage('');
-
         try {
             await login(username, password);
             setMessage('Login successful! Redirecting...');
