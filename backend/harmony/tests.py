@@ -172,7 +172,14 @@ class UserSongPreferenceTests(TestCase):
         )
         self.assertEqual(pref.weight, 8)
     
-   
+    def test_weight_validation(self):
+        with self.assertRaises(Exception):
+            UserSongPreference.objects.create(
+                user=self.user,
+                song=self.song,
+                weight=11  # Invalid: > 10
+            )
+    
     def test_unique_together_constraint(self):
         UserSongPreference.objects.create(user=self.user, song=self.song, weight=5)
         with self.assertRaises(Exception):
@@ -349,11 +356,11 @@ class UserViewSetTests(APITestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = User.objects.create_user(
-            username='testuser',
+            username='testuser_viewset',
             email='test@example.com',
             password='testpass123'
         )
-        self.token = Token.objects.create(user=self.user)
+        self.token, _ = Token.objects.get_or_create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
     
     def test_create_user(self):
@@ -369,7 +376,7 @@ class UserViewSetTests(APITestCase):
     def test_me_endpoint_get(self):
         response = self.client.get('/api/users/me/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['username'], 'testuser')
+        self.assertEqual(response.data['username'], 'testuser_viewset')
     
     def test_me_endpoint_patch(self):
         data = {'biography': 'Updated bio', 'age': 30}
@@ -404,8 +411,8 @@ class SongViewSetTests(APITestCase):
     
     def setUp(self):
         self.client = APIClient()
-        self.user = User.objects.create_user(username='testuser')
-        self.token = Token.objects.create(user=self.user)
+        self.user = User.objects.create_user(username='testuser_songs')
+        self.token, _ = Token.objects.get_or_create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
         
         self.artist = Artist.objects.create(name='Artist', spotify_id='a1')
@@ -448,7 +455,7 @@ class SongViewSetTests(APITestCase):
         data = {'weight': 9}
         response = self.client.patch(f'/api/songs/{self.song.id}/update_weight/', data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['weight'], 9)
+        self.assertEqual(response.data['weight'] , 9)
 
 
 class SpotifyUtilityFunctionTests(TestCase):
@@ -498,12 +505,12 @@ class SongSearchTests(APITestCase):
     
     def setUp(self):
         self.client = APIClient()
-        self.user = User.objects.create_user(username='testuser')
-        self.token = Token.objects.create(user=self.user)
+        self.user = User.objects.create_user(username='testuser_search')
+        self.token, _ = Token.objects.get_or_create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
     
     def test_song_search_no_query(self):
-        response = self.client.get('/api/song-search/')
+        response = self.client.get('/api/search/')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
     
     @patch('harmony.views.get_spotify_token')
@@ -528,7 +535,7 @@ class SongSearchTests(APITestCase):
         }
         mock_get.return_value = mock_response
         
-        response = self.client.get('/api/song-search/?query=Song')
+        response = self.client.get('/api/search/?query=Song')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['count'], 1)
 
@@ -538,9 +545,9 @@ class MatchesTests(APITestCase):
     
     def setUp(self):
         self.client = APIClient()
-        self.user1 = User.objects.create_user(username='user1', location='NYC', age=25)
-        self.user2 = User.objects.create_user(username='user2', location='LA', age=26)
-        self.token = Token.objects.create(user=self.user1)
+        self.user1 = User.objects.create_user(username='matchuser1', location='NYC', age=25)
+        self.user2 = User.objects.create_user(username='matchuser2', location='LA', age=26)
+        self.token, _ = Token.objects.get_or_create(user=self.user1)
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
     
     def test_matches_endpoint(self):
@@ -572,29 +579,29 @@ class MatchAcceptTests(APITestCase):
     
     def setUp(self):
         self.client = APIClient()
-        self.user1 = User.objects.create_user(username='user1')
-        self.user2 = User.objects.create_user(username='user2')
-        self.token = Token.objects.create(user=self.user1)
+        self.user1 = User.objects.create_user(username='acceptuser1')
+        self.user2 = User.objects.create_user(username='acceptuser2')
+        self.token, _ = Token.objects.get_or_create(user=self.user1)
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
     
     def test_match_accept_get(self):
         Match.objects.create(user1=self.user1, user2=self.user2)
-        response = self.client.get('/api/match/accept/')
+        response = self.client.get('/api/matches/accept/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
     
     def test_match_accept_post(self):
         data = {'id': self.user2.id}
-        response = self.client.post('/api/match/accept/', data)
+        response = self.client.post('/api/matches/accept/', data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
     
     def test_match_accept_no_user_id(self):
-        response = self.client.post('/api/match/accept/', {})
+        response = self.client.post('/api/matches/accept/', {})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
     
     def test_match_accept_user_not_found(self):
         data = {'id': 9999}
-        response = self.client.post('/api/match/accept/', data)
+        response = self.client.post('/api/matches/accept/', data)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
@@ -603,24 +610,24 @@ class MatchRejectTests(APITestCase):
     
     def setUp(self):
         self.client = APIClient()
-        self.user1 = User.objects.create_user(username='user1')
-        self.user2 = User.objects.create_user(username='user2')
-        self.token = Token.objects.create(user=self.user1)
+        self.user1 = User.objects.create_user(username='rejectuser1')
+        self.user2 = User.objects.create_user(username='rejectuser2')
+        self.token, _ = Token.objects.get_or_create(user=self.user1)
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
     
     def test_match_reject_success(self):
         data = {'id': self.user2.id}
-        response = self.client.post('/api/match/reject/', data)
+        response = self.client.post('/api/matches/reject/', data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
     
     def test_match_reject_no_id(self):
-        response = self.client.post('/api/match/reject/', {})
+        response = self.client.post('/api/matches/reject/', {})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
     
     def test_match_reject_duplicate(self):
         MatchRejection.objects.create(user1=self.user1, user2=self.user2)
         data = {'id': self.user2.id}
-        response = self.client.post('/api/match/reject/', data)
+        response = self.client.post('/api/matches/reject/', data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(MatchRejection.objects.filter(
             user1=self.user1, user2=self.user2).count(), 1)
@@ -631,8 +638,8 @@ class MatchWeightSettingsTests(APITestCase):
     
     def setUp(self):
         self.client = APIClient()
-        self.user = User.objects.create_user(username='testuser')
-        self.token = Token.objects.create(user=self.user)
+        self.user = User.objects.create_user(username='settingsuser')
+        self.token, _ = Token.objects.get_or_create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
     
     def test_get_settings_default(self):
@@ -648,4 +655,386 @@ class MatchWeightSettingsTests(APITestCase):
         }
         response = self.client.post('/api/settings/match-weights/', data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['genre_weight'], 2.0)
+        self.assertEqual(float( response.data['genre_weight']) , 2.0) 
+
+
+
+#to more views.py testing
+
+# Add these test classes to your tests.py file
+
+class UserViewSetAdditionalTests(APITestCase):
+    """Additional tests for UserViewSet edge cases"""
+    
+    def setUp(self):
+        self.client = APIClient()
+        self.user = User.objects.create_user(
+            username='additionaluser',
+            email='additional@example.com',
+            password='testpass123'
+        )
+        self.token, _ = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
+    
+    def test_me_endpoint_put(self):
+        """Test PUT method on me endpoint"""
+        data = {'biography': 'Updated bio', 'age': 25}
+        response = self.client.put('/users/me/', data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+    
+    def test_list_users_as_non_staff(self):
+        """Test that non-staff users can only see themselves in list"""
+        response = self.client.get('/users/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # Non-staff should only see themselves
+        self.assertEqual(len(response.data['results']), 1)
+
+
+class SongViewSetAdditionalTests(APITestCase):
+    """Additional tests for SongViewSet error cases"""
+    
+    def setUp(self):
+        self.client = APIClient()
+        self.user = User.objects.create_user(username='songuser')
+        self.token, _ = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
+        
+        self.artist = Artist.objects.create(name='Artist', spotify_id='a1')
+        self.song = Song.objects.create(name='Song', spotify_id='s1')
+        self.song.artists.add(self.artist)
+    
+    def test_create_song_without_spotify_id(self):
+        """Test creating song without spotify_id"""
+        data = {'weight': 5}
+        response = self.client.post('/songs/', data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('spotify_id', str(response.data))
+    
+    def test_update_weight_without_weight_field(self):
+        """Test updating weight without weight field"""
+        UserSongPreference.objects.create(user=self.user, song=self.song, weight=5)
+        
+        response = self.client.patch(f'/songs/{self.song.id}/update_weight/', {})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    
+    def test_update_weight_with_invalid_string(self):
+        """Test updating weight with non-numeric string"""
+        UserSongPreference.objects.create(user=self.user, song=self.song, weight=5)
+        
+        data = {'weight': 'abc'}
+        response = self.client.patch(f'/songs/{self.song.id}/update_weight/', data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    
+    def test_update_weight_below_minimum(self):
+        """Test updating weight below minimum (1)"""
+        UserSongPreference.objects.create(user=self.user, song=self.song, weight=5)
+        
+        data = {'weight': 0}
+        response = self.client.patch(f'/songs/{self.song.id}/update_weight/', data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    
+    def test_update_weight_above_maximum(self):
+        """Test updating weight above maximum (10)"""
+        UserSongPreference.objects.create(user=self.user, song=self.song, weight=5)
+        
+        data = {'weight': 11}
+        response = self.client.patch(f'/songs/{self.song.id}/update_weight/', data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class SpotifyCallbackTests(APITestCase):
+    """Test spotify_callback endpoint"""
+    
+    def setUp(self):
+        self.client = APIClient()
+    
+    def test_spotify_callback_with_error(self):
+        """Test callback when Spotify returns an error"""
+        response = self.client.get('/spotify-auth/callback/?error=access_denied')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    
+    @patch('harmony.views.requests.post')
+    @patch('harmony.views.requests.get')
+    def test_spotify_callback_no_access_token(self, mock_get, mock_post):
+        """Test callback when no access token is returned"""
+        mock_post.return_value.json.return_value = {}
+        
+        response = self.client.get('/spotify-auth/callback/?code=test_code')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    
+    @patch('harmony.views.requests.post')
+    @patch('harmony.views.requests.get')
+    def test_spotify_callback_failed_user_profile(self, mock_get, mock_post):
+        """Test callback when user profile fetch fails"""
+        mock_post.return_value.json.return_value = {'access_token': 'token123'}
+        mock_get.return_value.status_code = 401
+        
+        response = self.client.get('/spotify-auth/callback/?code=test_code')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    
+    @patch('harmony.views.requests.post')
+    @patch('harmony.views.requests.get')
+    def test_spotify_callback_invalid_json(self, mock_get, mock_post):
+        """Test callback when profile response is invalid JSON"""
+        mock_post.return_value.json.return_value = {'access_token': 'token123'}
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.json.side_effect = ValueError("Invalid JSON")
+        
+        response = self.client.get('/spotify-auth/callback/?code=test_code')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    
+    @patch('harmony.views.get_spotify_users_fav_songs')
+    @patch('harmony.views.requests.post')
+    @patch('harmony.views.requests.get')
+    def test_spotify_callback_failed_fav_songs(self, mock_get, mock_post, mock_fav_songs):
+        """Test callback when fetching favorite songs fails"""
+        mock_post.return_value.json.return_value = {'access_token': 'token123'}
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.json.return_value = {
+            'id': 'spotify_123',
+            'email': 'test@example.com',
+            'display_name': 'Test User'
+        }
+        mock_fav_songs.return_value = None
+        
+        response = self.client.get('/spotify-auth/callback/?code=test_code')
+        self.assertEqual(response.status_code, 417)
+
+
+class SpotifyDataTranslationTests(TestCase):
+    """Test Spotify data translation functions"""
+    
+    def setUp(self):
+        self.user = User.objects.create_user(username='translationuser')
+    
+    @patch('harmony.views.get_song_embed')
+    def test_translate_spotify_songs(self, mock_embed):
+        """Test translating Spotify songs to local models"""
+        mock_embed.return_value = {'html': '<iframe></iframe>'}
+        
+        fav_songs = [
+            {
+                'id': 'song_1',
+                'name': 'Song 1',
+                'album': {
+                    'name': 'Album 1',
+                    'images': [{'url': 'image1.jpg'}]
+                },
+                'popularity': 80,
+                'duration_ms': 200000,
+                'preview_url': 'preview.mp3',
+                'external_urls': {'spotify': 'http://spotify.com/song1'},
+                'artists': [
+                    {
+                        'id': 'artist_1',
+                        'name': 'Artist 1'
+                    }
+                ]
+            }
+        ]
+        
+        translate_spotify_songs(self.user, fav_songs)
+        
+        song = Song.objects.get(spotify_id='song_1')
+        self.assertEqual(song.name, 'Song 1')
+        self.assertEqual(song.album, 'Album 1')
+        self.assertIn(Artist.objects.get(spotify_id='artist_1'), song.artists.all())
+    
+    def test_translate_spotify_artist_and_genres(self):
+        """Test translating Spotify artists and genres"""
+        fav_artists = [
+            {
+                'id': 'artist_1',
+                'name': 'Artist 1',
+                'images': [{'url': 'image.jpg'}],
+                'popularity': 85,
+                'genres': ['rock', 'pop']
+            },
+            {
+                'id': 'artist_2',
+                'name': 'Artist 2',
+                'images': [],
+                'popularity': 75,
+                'genres': ['rock']
+            }
+        ]
+        
+        translate_spotify_artist_and_genres(self.user, fav_artists)
+        
+        # Check artists created
+        self.assertTrue(Artist.objects.filter(spotify_id='artist_1').exists())
+        self.assertTrue(Artist.objects.filter(spotify_id='artist_2').exists())
+        
+        # Check genres created
+        self.assertTrue(Genre.objects.filter(name='rock').exists())
+        self.assertTrue(Genre.objects.filter(name='pop').exists())
+        
+        # Check preferences created
+        self.assertTrue(UserArtistPreference.objects.filter(
+            user=self.user, artist__spotify_id='artist_1').exists())
+        self.assertTrue(UserGenrePreference.objects.filter(
+            user=self.user, genre__name='rock').exists())
+
+
+class SpotifyAPIFunctionsTests(TestCase):
+    """Test Spotify API helper functions"""
+    
+    @patch('harmony.views.requests.get')
+    def test_get_spotify_users_fav_songs_success(self, mock_get):
+        """Test fetching user's favorite songs from Spotify"""
+        user = User.objects.create_user(username='apiuser')
+        creds = SpotifyCredentials.objects.create(
+            user=user,
+            access_token='token123'
+        )
+        
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.json.return_value = {
+            'items': [
+                {'id': 'song_1', 'name': 'Song 1'},
+                {'id': 'song_2', 'name': 'Song 2'}
+            ]
+        }
+        
+        songs = get_spotify_users_fav_songs(creds)
+        self.assertEqual(len(songs), 2)
+        self.assertEqual(songs[0]['name'], 'Song 1')
+    
+    @patch('harmony.views.requests.get')
+    def test_get_spotify_users_fav_songs_failure(self, mock_get):
+        """Test fetching favorite songs when API fails"""
+        user = User.objects.create_user(username='apiuser2')
+        creds = SpotifyCredentials.objects.create(
+            user=user,
+            access_token='token123'
+        )
+        
+        mock_get.return_value.status_code = 401
+        
+        songs = get_spotify_users_fav_songs(creds)
+        self.assertIsNone(songs)
+    
+    @patch('harmony.views.requests.get')
+    def test_get_spotify_user_fav_artists_success(self, mock_get):
+        """Test fetching user's favorite artists from Spotify"""
+        user = User.objects.create_user(username='apiuser3')
+        creds = SpotifyCredentials.objects.create(
+            user=user,
+            access_token='token123'
+        )
+        
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.json.return_value = {
+            'items': [
+                {'id': 'artist_1', 'name': 'Artist 1'},
+                {'id': 'artist_2', 'name': 'Artist 2'}
+            ]
+        }
+        
+        artists = get_spotify_user_fav_artists(creds)
+        self.assertEqual(len(artists), 2)
+        self.assertEqual(artists[0]['name'], 'Artist 1')
+    
+    @patch('harmony.views.requests.get')
+    def test_get_spotify_user_fav_artists_failure(self, mock_get):
+        """Test fetching favorite artists when API fails"""
+        user = User.objects.create_user(username='apiuser4')
+        creds = SpotifyCredentials.objects.create(
+            user=user,
+            access_token='token123'
+        )
+        
+        mock_get.return_value.status_code = 401
+        
+        artists = get_spotify_user_fav_artists(creds)
+        self.assertIsNone(artists)
+
+
+class SongSearchAdditionalTests(APITestCase):
+    """Additional tests for song_search endpoint"""
+    
+    def setUp(self):
+        self.client = APIClient()
+        self.user = User.objects.create_user(username='searchuser')
+        self.token, _ = Token.objects.get_or_create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
+    
+    @patch('harmony.views.get_spotify_token')
+    @patch('harmony.views.requests.get')
+    def test_song_search_no_results(self, mock_get, mock_token):
+        """Test song search with no results"""
+        mock_token.return_value = 'token123'
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.json.return_value = {'tracks': {'items': []}}
+        
+        response = self.client.get('/search/?query=nonexistent')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 0)
+    
+    @patch('harmony.views.get_spotify_token')
+    @patch('harmony.views.requests.get')
+    def test_song_search_api_error(self, mock_get, mock_token):
+        """Test song search when Spotify API returns error"""
+        mock_token.return_value = 'token123'
+        mock_get.return_value.status_code = 502
+        mock_get.return_value.text = 'Bad Gateway'
+        
+        response = self.client.get('/search/?query=Song')
+        self.assertEqual(response.status_code, status.HTTP_502_BAD_GATEWAY)
+
+
+class MatchingFunctionsTests(APITestCase):
+    """Test matching-related endpoints"""
+    
+    def setUp(self):
+        self.client = APIClient()
+        self.user1 = User.objects.create_user(username='matchfuncuser1')
+        self.user2 = User.objects.create_user(username='matchfuncuser2')
+        self.user3 = User.objects.create_user(username='matchfuncuser3')
+        self.token, _ = Token.objects.get_or_create(user=self.user1)
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
+    
+    def test_match_accept_duplicate(self):
+        """Test accepting a match that already exists"""
+        Match.objects.create(user1=self.user1, user2=self.user2)
+        
+        data = {'id': self.user2.id}
+        response = self.client.post('/matches/accept/', data)
+        
+        # Should not create a duplicate match
+        match_count = Match.objects.filter(
+            user1=self.user1, user2=self.user2
+        ).count()
+        self.assertEqual(match_count, 1)
+    
+    def test_match_reject_user_not_found(self):
+        """Test rejecting a non-existent user"""
+        data = {'id': 9999}
+        response = self.client.post('/matches/reject/', data)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+    
+    @patch('harmony.views.compute_final_match_score')
+    def test_get_full_matches(self, mock_score):
+        """Test getting full matches with scores"""
+        mock_score.return_value = 85.5
+        
+        response = self.client.get('/matches/full/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('matches', response.data)
+    
+    @patch('harmony.views.compute_final_match_score')
+    def test_get_full_matches_filters_low_scores(self, mock_score):
+        """Test that matches below threshold are filtered"""
+        mock_score.return_value = 0.2  # Below 0.3 threshold
+        
+        response = self.client.get('/matches/full/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data['matches']), 0)
+    
+    def test_return_accepted_matches(self):
+        """Test returning accepted matches"""
+        Match.objects.create(user1=self.user1, user2=self.user2)
+        Match.objects.create(user1=self.user1, user2=self.user3)
+        
+        response = self.client.get('/return-accepted-matches/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
