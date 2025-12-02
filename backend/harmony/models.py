@@ -127,7 +127,7 @@ class SpotifyCredentials(models.Model):
     access_token = models.TextField( blank=True, null=True)
     token_type = models.TextField(  blank=True, null=True)
     scope = models.TextField( blank=True, null=True)
-    expires_in = models.IntegerField(); #seconds 
+    expires_in = models.IntegerField(blank= True, null=True); #seconds 
     refresh_token = models.TextField(blank=True, null=True)
 
 
