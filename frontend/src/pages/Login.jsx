@@ -84,7 +84,7 @@ function Login() {
     };
 
     return (
-        <section className="pt-5 min-h-screen overflow-auto bg-gradient-to-br from-rose-300 via-pink-400 to-rose-500 flex items-center justify-center">
+        <section className="pt-5 min-h-screen overflow-auto bg-gradient-to-br from-secondary via-accent to-primary flex items-center justify-center">
             <div className="flex flex-col gap-4 items-center w-full max-w-[520px] mx-4">
                 <div className="auth-panel w-full">
                     <h2 className="auth-title">Login</h2>
