@@ -1,15 +1,15 @@
 const colorFromSource = (author, currentUser) => 
 {
     if (author.id === currentUser.id)
-        return 'bg-rose-400';
-    return 'bg-white';
+        return 'bg-secondary';
+    return 'bg-[#777]';
 };
 
 const sideFromSource = (author, currentUser) => 
 {
     if (author.id === currentUser.id)
-        return 'items-start';
-    return 'items-end';
+        return 'items-end';
+    return 'items-start';
     
 }
 
@@ -25,10 +25,11 @@ const Message = ({ author, currentUser, text }) =>
     return <div>
         <div className={`flex flex-col gap-2 w-full ${sideFromSource(author, currentUser)}`}>
             <div className={``}>{author.username}</div>
-            <div className={`flex ${colorFromSource(author, currentUser)} rounded-2xl w-max min-h-0 mb-2`}>
-                <div className={`text-left text-black text-lg w-max p-4 wrap-break-word rounded-xl`}>
+            <div className={`flex relative ${colorFromSource(author, currentUser)} rounded-4xl w-max min-h-0 mb-2`}>
+                <div className={`text-left z-1 text-black text-lg max-w-50 p-3 wrap-break-word rounded-xl`}>
                     <div>{text}</div>
                 </div>
+                <div className={`absolute bottom-0 ${author.id === currentUser.id ? 'right-0' : 'left-0'} ${colorFromSource(author, currentUser)} w-1/2 h-1/2 z-0`}></div>
             </div>
         </div>
     </div>;

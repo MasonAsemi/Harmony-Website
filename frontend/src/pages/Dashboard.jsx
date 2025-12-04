@@ -39,25 +39,30 @@ function Dashboard({ showChatsOverlay = false, setShowChatsOverlay = () => {} })
     console.log(acceptedMatches)
 
     return (
-        <div className="flex flex-row h-screen bg-linear-to-br from-rose-300 via-pink-400 to-rose-500">
+        <div className="flex flex-row h-screen bg-linear-to-br from-secondary to-primary">
             {/* Desktop Left sidebar - Chats (hidden on mobile) */}
-            <div className="hidden flex-1 md:flex ml-16 bg-pink-200 border-r border-white/20 flex-col">
-                <div className="p-4 border-b border-white/20">
+            <div className="hidden flex-1 md:flex ml-16 bg-secondary border-r border-accent flex-col">
+                {/*<div className="p-4 border-b border-accent">
                     <h2 className="text-2xl font-bold text-white text-center">Chats</h2>
-                </div>
-                <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                </div>*/}
+                <div className="flex-1 overflow-y-auto space-y-1">
                     {acceptedMatches.map((match) => (
                         <button
                             key={match.id}
                             onClick={() => handleChatClick(match)}
-                            className={`w-full p-4 rounded-lg text-left transition-all ${
-                                currentChat?.id === match.id
-                                    ? 'bg-white text-gray-900 shadow-lg'
-                                    : 'bg-white/80 text-gray-800 hover:bg-white hover:shadow-md'
+                            className={`w-full p-4 text-left transition-all ${
+                                currentChatID === match.id
+                                    ? 'bg-accent text-gray-900 shadow-lg'
+                                    : 'bg-white/40 text-gray-800 hover:bg-white hover:shadow-md'
                             }`}
                         >
-                            <div className="font-semibold">{match.user2_username}</div>
-                            <div className="text-sm text-gray-600 mt-1">Click to view chat</div>
+                            <div className="flex flex-row items-center gap-2 font-semibold">
+                                <img className="w-10" src="#"></img>
+                                <p>{match.user2_username}</p>
+                                <div className="font-light flex flex-row justify-end w-full">
+                                    {true /* Has a new message condition */ ? <div className="w-3 h-3 bg-secondary rounded-4xl"></div> : null}
+                                </div>
+                            </div>
                         </button>
                     ))}
                 </div>
