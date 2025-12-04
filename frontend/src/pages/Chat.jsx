@@ -118,7 +118,7 @@ const Chat = ({ matches, currentChatID, currentUser }) =>
     return (
         <div className="flex flex-col h-full">
             {/* Messages area */}
-            <div className="flex-1 overflow-y-auto p-8 bg-gradient-to-br from-rose-300 via-pink-400 to-rose-500">
+            <div className="flex-1 overflow-y-auto p-8 bg-gradient-to-br bg-primary">
                 {currentChat.map((message, index) => (
                     <Message key={index} author={new Author(message.sender, message.sender_username)} currentUser={currentUser} text={message.content} />
                 ))}

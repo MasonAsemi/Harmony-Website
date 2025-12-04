@@ -68,7 +68,7 @@ const Home = () => {
       </header>
 
       {/* Hero Section with Animated Background - Hinge Style */}
-      <section className="relative h-screen pt-20 overflow-hidden bg-gradient-to-br from-rose-300 via-pink-400 to-rose-500">
+      <section className="relative h-screen pt-20 overflow-hidden bg-gradient-to-br from-primary to-secondary">
         <FallingAnimation />
         <div className="relative h-full flex items-center justify-between px-12 max-w-7xl mx-auto">
           {/* Bottom Left Text - Hinge Style */}

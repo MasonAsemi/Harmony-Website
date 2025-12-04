@@ -41,19 +41,23 @@ body {
 }
 
 @theme {
-  --animate-wiggle: wiggle 1s ease-in-out infinite;
-  --animate-fade-in: slide-in 0.4s ease-in-out normal;
+    --color-primary: #5f4d8d;
+    --color-secondary: #fa8285;
+    --color-accent: #fadfaa;
 
-  @keyframes wiggle {
-    0%, 100% {
-      transform: rotate(-3deg);
-    }
-    50% {
-      transform: rotate(3deg);
-    }
-  }
+    --animate-wiggle: wiggle 1s ease-in-out infinite;
+    --animate-fade-in: slide-in 0.4s ease-in-out normal;
 
-  @keyframes slide-in {
+    @keyframes wiggle {
+        0%, 100% {
+            transform: rotate(-3deg);
+        }
+        50% {
+            transform: rotate(3deg);
+        }
+    }
+
+    @keyframes slide-in {
         from {
             opacity: 0;
         }
