@@ -60,29 +60,25 @@ function Dashboard({ showChatsOverlay = false, setShowChatsOverlay = () => {} })
                     <h2 className="text-2xl font-bold  text-center" style={{color: 'var(--color-text-light)'}}>Direct Messages</h2>
                 </div>
                 <div className="flex-1 overflow-y-auto space-y-1">
-                    {acceptedMatches.map((match) => {
-                        const displayName = getOtherUserName(match);
-                        
-                        return (
-                            <button
-                                key={match.id}
-                                onClick={() => handleChatClick(match)}
-                                className={`w-full p-4 text-left transition-all ${
-                                    currentChatID === match.id
-                                        ? 'bg-accent text-gray-900 shadow-lg'
-                                        : 'bg-white/40 text-gray-800 hover:bg-white hover:shadow-md'
-                                }`}
-                            >
-                                <div className="flex flex-row items-center gap-2 font-semibold">
-                                    <img className="w-10" src="#"></img>
-                                    <p>{displayName}</p>
-                                    <div className="font-light flex flex-row justify-end w-full">
-                                        {true /* Has a new message condition */ ? <div className="w-3 h-3 bg-secondary rounded-4xl"></div> : null}
-                                    </div>
+                    {acceptedMatches.map((match) => (
+                        <button
+                            key={match.id}
+                            onClick={() => handleChatClick(match)}
+                            className={`w-full p-4 text-left transition-all ${
+                                currentChatID === match.id
+                                    ? 'bg-accent text-gray-900 shadow-lg'
+                                    : 'bg-white/40 text-gray-800 hover:bg-white hover:shadow-md'
+                            }`}
+                        >
+                            <div className="flex flex-row items-center gap-2 font-semibold">
+                                <img className="w-10" src="#"></img>
+                                <p>{match.user2_username}</p>
+                                <div className="font-light flex flex-row justify-end w-full">
+                                    {true /* Has a new message condition */ ? <div className="w-3 h-3 bg-secondary rounded-4xl"></div> : null}
                                 </div>
-                            </button>
-                        );
-                    })}
+                            </div>
+                        </button>
+                    ))}
                 </div>
             </div>
 
