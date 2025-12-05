@@ -10,7 +10,7 @@ const LOCAL_WS_BASE_URL = "ws://localhost:8000";
 const PROD_API_BASE_URL = "https://harmony-backend-4800-3fc8f73b6cb5.herokuapp.com";
 const PROD_WS_BASE_URL = "wss://harmony-backend-4800-3fc8f73b6cb5.herokuapp.com";
 
-const isDev = MODE === "development" || "test";
+const isDev = MODE === "development" || MODE === "test";
 
 export const API_BASE_URL =
     API_BASE_URL_ENV ??
