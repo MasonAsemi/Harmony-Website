@@ -1,9 +1,9 @@
 import { WS_BASE_URL, API_BASE_URL } from "../config";
 import axios from 'axios'
 
-export const connectWebsocket = (matchID) => {
+export const connectWebsocket = (userID) => {
   try {
-    return new WebSocket(`${WS_BASE_URL}/ws/chat/${matchID}/`);
+    return new WebSocket(`${WS_BASE_URL}/ws/chat/${userID}/`);
   } catch (error) {
     console.error("WebSocket connection failed:", error);
   }

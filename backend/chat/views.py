@@ -65,17 +65,34 @@ class MessageCreateView(APIView):
             serialized_message = MessageSerializer(message).data
 
             # 6. BROADCAST via Channel Layer (The Real-Time Part!) 
-            group_name = f'chat_{match_id}'
+            self_group_name = ''
+            other_group_name = ''
+            if request.user not in [match.user1]:
+                self_group_name = f'chat_{match.user1.id}'
+                other_group_name = f'chat_{match.user2.id}'
+            else:
+                self_group_name = f'chat_{match.user2.id}'
+                other_group_name = f'chat_{match.user1.id}'
+
 
             async_to_sync(channel_layer.group_send)(
-                group_name,
+                self_group_name,
                 {
                     # 'type' must match the method in ChatConsumer (chat_message)
                     'type': 'chat.message', 
                     'message': serialized_message # This is the payload sent to the consumer
                 }
             )
-            
+
+            async_to_sync(channel_layer.group_send)(
+                other_group_name,
+                {
+                    # 'type' must match the method in ChatConsumer (chat_message)
+                    'type': 'chat.message', 
+                    'message': serialized_message # This is the payload sent to the consumer
+                }
+            )
+
             # 7. Return the API response
             return Response(serialized_message, status=status.HTTP_201_CREATED)
         

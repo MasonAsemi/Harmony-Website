@@ -207,16 +207,21 @@ function Profile({ pfp_src }) {
       }
       
       // Process genres - ALWAYS aggregate from songs to get top 3 most common
-      if (data?.favorite_songs && data.favorite_songs.length > 0) {
-        console.log('Extracting top 3 genres from songs...');
-        const extractedGenres = aggregateGenresFromSongs(data.favorite_songs);
-        console.log('Setting extracted top 3 genres:', extractedGenres);
-        setFavGenres(extractedGenres);
-      } else if (data?.favorite_genres && data.favorite_genres.length > 0) {
-        console.log('No songs available, using API-provided favorite_genres (top 3)');
-        setFavGenres(data.favorite_genres.slice(0, 3));
-      } else {
-        console.log('No genres found');
+      // if (data?.favorite_songs && data.favorite_songs.length > 0) {
+      //   console.log('Extracting top 3 genres from songs...');
+      //   const extractedGenres = aggregateGenresFromSongs(data.favorite_songs);
+      //   console.log('Setting extracted top 3 genres:', extractedGenres);
+      //   setFavGenres(extractedGenres);
+      // } else if (data?.favorite_genres && data.favorite_genres.length > 0) {
+      //   console.log('No songs available, using API-provided favorite_genres (top 3)');
+      //   setFavGenres(data.favorite_genres.slice(0, 3));
+      // } else {
+      //   console.log('No genres found');
+      //   setFavGenres([]);
+      // }
+      if (data?.favorite_genres){
+        setFavGenres(data.favorite_genres);
+      }else{
         setFavGenres([]);
       }
       

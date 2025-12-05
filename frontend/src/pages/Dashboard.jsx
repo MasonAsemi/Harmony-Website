@@ -7,18 +7,18 @@ import { useState, useEffect } from "react";
 import MatchCard from "../components/dashboard/MatchCard";
 import { Author } from "./Chat";
 import { getAcceptedMatches } from "../api/matches";
-import { getChats } from "../api/chat";
+import { connectWebsocket, getChats } from "../api/chat";
 import { API_BASE_URL } from "../config";
 
-const ChatSelector = ({ index, handler, currentChatID, match, currentUser }) => {
-    const [lastMessage, setLastMessage] = useState("");
+const ChatSelector = ({ index, handler, lastMessage, currentChatID, match, currentUser }) => {
+    const [messagePreview, setMessagePreview] = useState("");
     
     useEffect(() => {
         getChats(match.id)
             .then((res) => {
                 if (res.status == 200)
                 {
-                    setLastMessage(res.data.at(-1)?.content ?? "")
+                    setMessagePreview(res.data.at(-1)?.content ?? "")
                 }
             })
     })
@@ -55,15 +55,16 @@ const ChatSelector = ({ index, handler, currentChatID, match, currentUser }) => 
 
     const displayName = getOtherUserName(match);
 
+
     return <button
         key={match.id}
         onClick={handler}
         className={`w-full p-4 text-left animate-fade-in ${
             currentChatID === match.id
-                ? 'bg-accent text-gray-900 shadow-lg'
+                ? 'bg-primary text-gray-900 shadow-lg'
                 : 'bg-white/40 text-gray-800 hover:bg-white hover:shadow-md'
         }`}
-        style={{ animationDuration: `${(index + 1) * 0.7}s` }}
+        style={{ animationDuration: `${(index + 1) * 0.2}s` }}
     >
         <div className="flex flex-row items-center gap-2 font-semibold">
             {/*<div className="w-2 h-2 scale-200 overflow-hidden">
@@ -73,11 +74,8 @@ const ChatSelector = ({ index, handler, currentChatID, match, currentUser }) => 
                 <p>{displayName}</p>
                 <div className="font-normal overflow-x-ellipsis overflow-clip whitespace-nowrap min-h-4 w-5/6 mask-[linear-gradient(to_right,black,transparent)] 
     [-webkit-mask-image:linear-gradient(to_right,black,transparent)]">
-                    {lastMessage.substring(0, 10)}
+                    {messagePreview.substring(0, 10)}
                 </div>
-            </div>
-            <div className="font-light flex flex-row justify-end w-full">
-                {true /* Has a new message condition */ ? <div className="w-3 h-3 bg-secondary rounded-4xl"></div> : null}
             </div>
         </div>
     </button>
@@ -89,6 +87,8 @@ function Dashboard({ showChatsOverlay = false, setShowChatsOverlay = () => {} })
     const [currentChatID, setCurrentChatID] = useState(null);
     const [showChatWindow, setShowChatWindow] = useState(false);
     const { token, user } = useAuth();
+    const [chatMessages, setChatMessages] = useState([])
+    const [latestMessage, setLatestMessage] = useState(null)
     const currentUserAuthor = new Author(user?.id, user?.username);
 
     const handleChatClick = (match) => {
@@ -141,12 +141,36 @@ function Dashboard({ showChatsOverlay = false, setShowChatsOverlay = () => {} })
         return match.user2_username || match.user1_username || 'Unknown User';
     };
 
-    console.log(acceptedMatches)
+    useEffect(() => 
+        {
+            // New message socket
+            const socket = connectWebsocket(user.id);
+    
+            socket.addEventListener("open", event => {
+                console.log("Websocket opened ", event)
+            })
+    
+            socket.addEventListener("message", event => {
+                const data = JSON.parse(event.data);
+                const newMessage = data.message;
+
+                if (data.message.conversation == currentChatID)
+                {
+                    setChatMessages((oldChat) => {
+                        return [...oldChat, newMessage];
+                    })
+                }
+                setLatestMessage(data)
+            })
+
+            // The return function closes the old socket connection when the chat ID changes
+            return () => { console.log("Websocket closed"); socket.close() };
+        }, [currentChatID]);
 
     return (
         <div className="flex flex-row h-screen bg-bg-light overflow-hidden">
             {/* Desktop Left sidebar - Chats (hidden on mobile) */}
-            <div className="hidden animate-fade-in duration-100 flex-1 md:flex ml-16 bg-accent flex-col">
+            <div className="hidden animate-fade-in flex-1 md:flex ml-16 bg-accent flex-col">
                 <div className="p-4 border-b border-accent">
                     <h2 className="text-2xl font-bold text-white text-center">Direct Messages</h2>
                 </div>
@@ -159,7 +183,7 @@ function Dashboard({ showChatsOverlay = false, setShowChatsOverlay = () => {} })
                             currentChatID={currentChatID} 
                             match={match} 
                             currentUser={user}
-                            lastMessage={"TestTestTestTestTestTestTestTestTestTestTestTest"} 
+                            lastMessage={latestMessage} 
                         />
                     })}
                 </div>
@@ -167,9 +191,9 @@ function Dashboard({ showChatsOverlay = false, setShowChatsOverlay = () => {} })
 
             {/* Main content area */}
             <div className="flex-1/2 animate-fade-in relative flex items-start justify-center p-6 md:items-center md:p-0">
-                {currentChatID != null && !showChatsOverlay ? (
+                {currentChatID != null ? (
                     <div className="w-full h-[80vh] bg-white rounded-2xl shadow-2xl md:rounded-none md:shadow-none overflow-hidden md:h-full ">
-                        <Chat matches={acceptedMatches} currentChatID={currentChatID} currentUser={currentUserAuthor} />
+                        <Chat matches={acceptedMatches} messages={chatMessages} setChatMessages={setChatMessages} currentChatID={currentChatID} currentUser={currentUserAuthor} />
                     </div>
                 ) : (
                     <MatchCard token={token} acceptedMatches={acceptedMatches} setAcceptedMatches={setAcceptedMatches} />
@@ -183,9 +207,9 @@ function Dashboard({ showChatsOverlay = false, setShowChatsOverlay = () => {} })
 
             {/* Mobile Chats Overlay */}
             {showChatsOverlay && (
-                <div className="fixed inset-0 z-40 md:hidden backdrop-blur-xs bg-opacity-50" onClick={handleCloseChatsOverlay}>
+                <div className="fixed animate-fade-in inset-0 z-40 md:hidden backdrop-blur-xs bg-opacity-50" onClick={handleCloseChatsOverlay}>
                     <div 
-                        className="absolute bottom-14 left-0 right-0 bg-pink-200 rounded-t-3xl shadow-2xl max-h-[70vh] flex flex-col"
+                        className="absolute bottom-14 left-0 right-0 bg-accent shadow-2xl max-h-[70vh] flex flex-col"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="p-4 border-b border-white/20 flex justify-between items-center">

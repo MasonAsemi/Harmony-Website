@@ -7,12 +7,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         # 1. Get the match_id from the URL route (now required by routing.py)
         # If the connection URL doesn't have a match_id, this will raise an error, preventing connection.
-        self.match_id = self.scope['url_route']['kwargs']['match_id']
-        self.match_group_name = f'chat_{self.match_id}'
+        self.user_id = self.scope['url_route']['kwargs']['user_id']
+        self.user_group_name = f'chat_{self.user_id}'
+        print(self.user_group_name)
 
         # 2. Join room group (adds this consumer's channel to the unique group)
         await self.channel_layer.group_add(
-            self.match_group_name,
+            self.user_group_name,
             self.channel_name
         )
         
@@ -22,7 +23,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def disconnect(self, close_code):
         # Leave room group
         await self.channel_layer.group_discard(
-            self.match_group_name,
+            self.user_group_name,
             self.channel_name
         )
 
