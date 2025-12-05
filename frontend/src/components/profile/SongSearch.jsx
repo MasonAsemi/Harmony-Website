@@ -10,15 +10,25 @@ const SongSearch = ({ onSongsUpdate }) => {
     const [songs, setSongs] = useState([]);
     const [selectedSongs, setSelectedSongs] = useState([]);
     const [cooldown, setCooldown] = useState(false);
+    const [refreshKey, setRefreshKey] = useState(0); // Add refresh key to force re-render
     const updateDelayMS = 500;
     const autosearchThreshold = 1;
     const enableAutosearch = true;
 
+    // Load user songs on mount and when refreshKey changes
     useEffect(() => {
-        getUserSongs().then((res) => {
-            setSelectedSongs(res.data)
-        })
-    }, [])
+        loadUserSongs();
+    }, [refreshKey])
+
+    const loadUserSongs = async () => {
+        try {
+            const res = await getUserSongs();
+            console.log('Loaded user songs:', res.data);
+            setSelectedSongs(res.data);
+        } catch (error) {
+            console.error('Error loading user songs:', error);
+        }
+    };
 
     const handleOnChange = (e) => {
         const currInput = e.target.value;
@@ -78,9 +88,12 @@ const SongSearch = ({ onSongsUpdate }) => {
         try {
             await addUserSong(selectedSong);
             
-            let updatedSelectedSongs = [...selectedSongs];
-            updatedSelectedSongs.push(selectedSong);
-            setSelectedSongs(updatedSelectedSongs);
+            // Clear the input field and search results
+            setInput('');
+            setSongs([]);
+            
+            // Force refresh of selected songs
+            setRefreshKey(prev => prev + 1);
             
             // Notify parent component to refresh data (artists and genres)
             if (onSongsUpdate) {
@@ -93,6 +106,9 @@ const SongSearch = ({ onSongsUpdate }) => {
 
     const handleSongsChange = (updatedSongs) => {
         setSelectedSongs(updatedSongs);
+        
+        // Force refresh
+        setRefreshKey(prev => prev + 1);
         
         // Notify parent component to refresh data (artists and genres)
         if (onSongsUpdate) {
@@ -134,6 +150,7 @@ const SongSearch = ({ onSongsUpdate }) => {
             })}
         </div>}
         <SongList 
+            key={refreshKey} // Force re-render when refreshKey changes
             songs={selectedSongs} 
             setSongs={handleSongsChange} 
             numSongs={3} 
