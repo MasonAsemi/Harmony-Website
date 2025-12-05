@@ -133,7 +133,7 @@ const Chat = ({ matches, currentChatID, currentUser }) =>
                 ))}
                 {currentChat.length === 0 && (
                     <div className="flex items-center justify-center h-full">
-                        <h1 className="text-3xl font-bold text-white">The beginning of your conversation...</h1>
+                        <h1 className="text-3xl font-bold text-gray-500">The beginning of your conversation...</h1>
                     </div>
                 )}
             </div>
