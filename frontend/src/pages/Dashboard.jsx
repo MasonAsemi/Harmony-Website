@@ -36,6 +36,20 @@ function Dashboard({ showChatsOverlay = false, setShowChatsOverlay = () => {} })
         setShowChatsOverlay(false);
     };
 
+    // Helper function to get the other user's name
+    const getOtherUserName = (match) => {
+        // Based on the console logs, the match object has user1_id and user2_id
+        // Compare these with the current user's ID
+        if (match.user1_id === user?.id) {
+            return match.user2_username;
+        } else if (match.user2_id === user?.id) {
+            return match.user1_username;
+        }
+        
+        // Fallback to user2_username if we can't determine
+        return match.user2_username || match.user1_username || 'Unknown User';
+    };
+
     console.log(acceptedMatches)
 
     return (
@@ -47,8 +61,7 @@ function Dashboard({ showChatsOverlay = false, setShowChatsOverlay = () => {} })
                 </div>
                 <div className="flex-1 overflow-y-auto space-y-1">
                     {acceptedMatches.map((match) => {
-                        // Display the other user's name, not the current user's name
-                        const displayName = match.user1 === user?.id ? match.user2_username : match.user1_username;
+                        const displayName = getOtherUserName(match);
                         
                         return (
                             <button
@@ -110,8 +123,7 @@ function Dashboard({ showChatsOverlay = false, setShowChatsOverlay = () => {} })
                         </div>
                         <div className="flex-1 overflow-y-auto p-4 space-y-3">
                             {acceptedMatches.map((chat) => {
-                                // Display the other user's name, not the current user's name
-                                const displayName = chat.user1 === user?.id ? chat.user2_username : chat.user1_username;
+                                const displayName = getOtherUserName(chat);
                                 
                                 return (
                                     <button
