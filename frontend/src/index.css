@@ -40,6 +40,23 @@ body {
     color: hsl(var(--foreground));
 }
 
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #fff;
+  border-radius: 10px
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #aaa;
+}
+
 @theme {
     --color-primary: #b06d5b; /* Light Gray */
     --color-secondary: #daab9f; /* Soft Beige */
@@ -53,6 +70,10 @@ body {
     /* White for text on dark/accent */
     --color-bg-light: #faf8f7;
     /* Warmer off-white for backgrounds */
+    --color-dark-bg: #17181F;
+    --color-light-bg: #20212A;
+    --color-lm-light-bg: #f7f7f9;
+    --color-lm-dark-bg: #b4b8bf;
 
     --animate-wiggle: wiggle 1s ease-in-out infinite;
     --animate-fade-in: slide-in 0.4s ease-in-out normal;

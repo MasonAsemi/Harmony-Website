@@ -60,37 +60,91 @@ function Profile({ pfp_src }) {
     return result;
   };
 
-  // Helper function to aggregate genres from songs
+  // Helper function to aggregate genres from songs and return top 3 most common
   const aggregateGenresFromSongs = (songs) => {
-    const genreMap = new Map();
+    const genreCountMap = new Map();
     
     if (!songs || !Array.isArray(songs)) {
-      console.log('No valid songs array provided');
+      console.log('No valid songs array provided for genres');
       return [];
     }
     
-    console.log('Processing songs for genres:', songs);
+    console.log('=== Processing songs for genres ===');
+    console.log('Total songs:', songs.length);
     
     songs.forEach((song, index) => {
-      console.log(`Song ${index} genres:`, song.genres);
+      console.log(`Song ${index} full data:`, JSON.stringify(song, null, 2));
       
-      // Handle different possible structures
-      const genresArray = song.genres || song.genre || [];
+      // The API returns genres as an array directly on the song object
+      const genresArray = song.genres || [];
       
-      if (Array.isArray(genresArray)) {
+      console.log(`Song ${index} (${song.name}) genres:`, genresArray);
+      
+      if (Array.isArray(genresArray) && genresArray.length > 0) {
+        console.log(`Found ${genresArray.length} genres in song "${song.name}"`);
+        
         genresArray.forEach(genre => {
-          if (genre && (genre.id || genre.name)) {
-            const genreId = genre.id || genre.name; // Use name as fallback ID
-            console.log(`Found genre:`, genre);
-            genreMap.set(genreId, genre);
+          console.log('Raw genre data:', genre);
+          
+          // Handle different genre formats
+          let genreObj = null;
+          
+          if (typeof genre === 'string') {
+            // Genre is a simple string
+            genreObj = { id: genre, name: genre };
+            console.log('Genre is string:', genre);
+          } else if (typeof genre === 'object' && genre !== null) {
+            // Genre is an object - use its properties
+            genreObj = {
+              id: genre.id || genre.name || JSON.stringify(genre),
+              name: genre.name || genre.id || 'Unknown'
+            };
+            console.log('Genre is object:', genreObj);
+          }
+          
+          if (genreObj && genreObj.name && genreObj.name !== 'Unknown') {
+            const genreId = genreObj.id;
+            console.log(`Processing genre: ${genreObj.name} (ID: ${genreId})`);
+            
+            // Count genre occurrences
+            if (genreCountMap.has(genreId)) {
+              const existing = genreCountMap.get(genreId);
+              existing.count += 1;
+              console.log(`Genre "${genreObj.name}" count increased to: ${existing.count}`);
+            } else {
+              genreCountMap.set(genreId, {
+                ...genreObj,
+                count: 1
+              });
+              console.log(`Genre "${genreObj.name}" added with count: 1`);
+            }
+          } else {
+            console.log('Skipping invalid genre:', genre);
           }
         });
+      } else {
+        console.log(`No genres found for song "${song.name}"`);
       }
     });
     
-    const result = Array.from(genreMap.values());
-    console.log('Aggregated genres:', result);
-    return result;
+    console.log('=== Genre count summary ===');
+    const genreEntries = Array.from(genreCountMap.entries());
+    genreEntries.forEach(([id, data]) => {
+      console.log(`Genre: ${data.name}, Count: ${data.count}`);
+    });
+    
+    // Sort by count (descending) and take top 3
+    const sortedGenres = Array.from(genreCountMap.values())
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 3)
+      .map(({ count, ...genre }) => {
+        console.log(`✓ Top genre: "${genre.name}" (appeared ${count} times)`);
+        return genre;
+      });
+    
+    console.log('=== Final top 3 genres ===');
+    console.log(sortedGenres);
+    return sortedGenres;
   };
 
   async function handleImageChange(e) {
@@ -124,16 +178,21 @@ function Profile({ pfp_src }) {
     try {
       setLoading(true);
       const data = await profileAPI.getProfile(token);
-      console.log('Profile API Response:', data);
-      console.log('Favorite songs from API:', data?.favorite_songs);
+      console.log('=== PROFILE API RESPONSE ===');
+      console.log('Full data:', data);
+      console.log('Favorite songs:', data?.favorite_songs);
+      
+      // Log the first song in detail to see structure
+      if (data?.favorite_songs && data.favorite_songs.length > 0) {
+        console.log('First song detailed structure:', JSON.stringify(data.favorite_songs[0], null, 2));
+      }
+      
       console.log('Favorite artists from API:', data?.favorite_artists);
       console.log('Favorite genres from API:', data?.favorite_genres);
       
       setProfileData(data?.user); // profile endpoint sends song, genre, and artist info 
       
-      // The API returns favorite_songs, favorite_artists, and favorite_genres at the root level
-      // For users who added songs manually (not via Spotify), we need to extract artists/genres from songs
-      
+      // Process artists
       if (data?.favorite_artists && data.favorite_artists.length > 0) {
         console.log('Using API-provided favorite_artists:', data.favorite_artists);
         setFavArtists(data.favorite_artists);
@@ -147,14 +206,15 @@ function Profile({ pfp_src }) {
         setFavArtists([]);
       }
       
-      if (data?.favorite_genres && data.favorite_genres.length > 0) {
-        console.log('Using API-provided favorite_genres:', data.favorite_genres);
-        setFavGenres(data.favorite_genres);
-      } else if (data?.favorite_songs && data.favorite_songs.length > 0) {
-        console.log('Extracting genres from songs...');
+      // Process genres - ALWAYS aggregate from songs to get top 3 most common
+      if (data?.favorite_songs && data.favorite_songs.length > 0) {
+        console.log('Extracting top 3 genres from songs...');
         const extractedGenres = aggregateGenresFromSongs(data.favorite_songs);
-        console.log('Extracted genres:', extractedGenres);
+        console.log('Setting extracted top 3 genres:', extractedGenres);
         setFavGenres(extractedGenres);
+      } else if (data?.favorite_genres && data.favorite_genres.length > 0) {
+        console.log('No songs available, using API-provided favorite_genres (top 3)');
+        setFavGenres(data.favorite_genres.slice(0, 3));
       } else {
         console.log('No genres found');
         setFavGenres([]);
@@ -223,7 +283,9 @@ function Profile({ pfp_src }) {
             <div className='w-full h-[600px] max-h-[70vh]'>
               <MatchCardPreview profileData={{
                 ...profileData,
-                profile_image: imageFile || profileData?.profile_image
+                profile_image: imageFile || profileData?.profile_image,
+                fav_artists: fav_artists,
+                fav_genres: fav_genres
               }} />
             </div>
             <div className='flex justify-center mt-4'>
