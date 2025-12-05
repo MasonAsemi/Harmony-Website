@@ -4,7 +4,7 @@ import { useAuth } from "../components/auth/AuthContext";
 import { API_BASE_URL } from "../config";
 import { connectWebsocket, getChats, sendMessage } from "../api/chat";
 
-const Chat = ({ matches, currentChatID, currentUser }) =>
+const Chat = ({ matches, messages, setChatMessages, currentChatID, currentUser }) =>
 {
     const [userContent, setUserContent] = useState('');
     const [currentChat, setCurrentChat] = useState([]);
@@ -17,50 +17,21 @@ const Chat = ({ matches, currentChatID, currentUser }) =>
     const ref = useRef(null);
 
     useEffect(() => {
-        const el = ref.current;
-        if (el) {
-            el.scrollTop = el.scrollHeight;
-        }
-    }, [currentChat]);
-
-    // Update the messages state when a response from the server is loaded
-    useEffect(() => 
-    {
-        // Add a check to ensure we have a chat ID before doing anything
-        if (!currentChatID) return; 
-
-        // Get chats from chat ID - THIS IS NOW TRIGGERED ON currentChatID CHANGE
         getChats(currentChatID)
             .then((res) => {
                 if (res.status == 200)
                 {
-                    setCurrentChat(res.data)
+                    setChatMessages(res.data)
                 }
             })
+    }, [])
 
-        // Use web sockets - Reconnects for the new chat room
-        const socket = connectWebsocket(currentChatID);
-
-        socket.addEventListener("open", event => {
-            console.log("Websocket opened ", event)
-        })
-
-        socket.addEventListener("message", event => {
-            const data = JSON.parse(event.data);
-            const newMessage = data.message;
-            
-            setCurrentChat((oldChat) => {
-                return [...oldChat, newMessage];
-            })
-        })
-
-        setWebsocket(socket);
-
-        setResponse('');
-
-        // The return function closes the old socket connection when the chat ID changes
-        return () => { console.log("Websocket closed"); socket.close() };
-    }, [currentChatID]); // <-- **CRITICAL CHANGE**: Dependency array now includes currentChatID
+    useEffect(() => {
+        const el = ref.current;
+        if (el) {
+            el.scrollTop = el.scrollHeight;
+        }
+    }, [messages]);
 
     // Returns true if the button should be disabled, false if not
     const isButtonDisabled = () => 
@@ -128,10 +99,10 @@ const Chat = ({ matches, currentChatID, currentUser }) =>
         <div className="flex flex-col h-full">
             {/* Messages area */}
             <div ref={ref} className="flex-1 overflow-y-auto p-8 bg-gradient-to-br bg-lm-light-bg z-4 shadow">
-                {currentChat.map((message, index) => (
+                {messages.map((message, index) => (
                     <Message key={index} author={new Author(message.sender, message.sender_username)} currentUser={currentUser} text={message.content} />
                 ))}
-                {currentChat.length === 0 && (
+                {messages.length === 0 && (
                     <div className="flex items-center justify-center h-full">
                         <h1 className="text-3xl font-bold text-gray-500">The beginning of your conversation...</h1>
                     </div>
