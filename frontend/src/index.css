@@ -41,18 +41,17 @@ body {
 }
 
 @theme {
-    --color-primary: #EDE8D0; /* Light Gray */
-    --color-secondary: #CF9A85; /* Soft Beige */
-    --color-tertiary: #5b443e; /* Dark Brown */
-    --color-accent: #CD6858; /* Warm Coral */
+    --color-primary: #b06d5b; /* Light Gray */
+    --color-secondary: #daab9f; /* Soft Beige */
+    --color-tertiary: #5b443e; 
+    --color-accent: #d58771; 
 
-    --color-text-primary: #3d2f2a;
+    --color-text-primary: #0a0807;
     /* Very dark brown for body text */
-    --color-text-secondary: #8b6f63;
-    /* Medium brown for secondary text */
+    
     --color-text-light: #ffffff;
     /* White for text on dark/accent */
-    --color-bg-light: #f9f7f5;
+    --color-bg-light: #faf8f7;
     /* Warmer off-white for backgrounds */
 
     --animate-wiggle: wiggle 1s ease-in-out infinite;

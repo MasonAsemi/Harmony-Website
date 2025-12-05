@@ -213,7 +213,7 @@ function Profile({ pfp_src }) {
         </div>
       )}
 
-      <div className='w-full rounded-2xl shadow-lg p-8' style={{backgroundColor : 'var(--color-primary)'}}>
+      <div className='w-full rounded-2xl shadow-lg p-8' style={{backgroundColor : 'var(--color-bg-light)'}}>
         <div className='grid grid-cols-1 lg:grid-cols-3 gap-8 items-start'>
           {/* Left side - Match Card Preview */}
           <div className='lg:sticky lg:top-8 flex flex-col gap-4'>
