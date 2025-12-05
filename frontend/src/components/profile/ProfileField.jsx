@@ -37,11 +37,11 @@ const ProfileField = ({ title, data, onSave, multiline = false }) => {
   };
 
   return (
-    <div className='content-field'>
+    <div className='content-field' style={{backgroundColor: 'var(--color-secondary)', borderRadius:8, padding:16, boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'}}>
       <div className='field-title'>
-        <h1>{title}</h1>
+        <h1 style={{color: "var(--color-text-primary)", fontWeight:'bold'}}>{title}</h1>
         {!isEditing ? (
-          <button className='edit-button' onClick={handleEdit}>
+          <button className='edit-button' onClick={handleEdit} style={{backgroundColor : 'var(--color-accent)', color:"var(--color-text-light)", borderRadius:8}}>
             Edit...
           </button>
         ) : (
@@ -50,6 +50,7 @@ const ProfileField = ({ title, data, onSave, multiline = false }) => {
               className='save-button' 
               onClick={handleSave}
               disabled={isSaving}
+              style={{backgroundColor: "var(--color-tertiary)"}}
             >
               {isSaving ? 'Saving...' : 'Save'}
             </button>
@@ -57,6 +58,7 @@ const ProfileField = ({ title, data, onSave, multiline = false }) => {
               className='cancel-button' 
               onClick={handleCancel}
               disabled={isSaving}
+              style={{backgroundColor: "var(--color-accent)"}}
             >
               Cancel
             </button>
@@ -83,7 +85,8 @@ const ProfileField = ({ title, data, onSave, multiline = false }) => {
             />
           )
         ) : (
-          <p>{data || 'Not set'}</p>
+          <p style={{color: "var(--color-text-secondary)"}}
+           >{data || 'Not set'}</p>
         )}
       </div>
     </div>

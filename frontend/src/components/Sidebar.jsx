@@ -63,8 +63,8 @@ const Sidebar = () => {
 
     return (
         <div
-            className="fixed left-0 top-0 h-screen bg-white border-r border-gray-200 transition-all duration-300 ease-in-out z-50 shadow-lg"
-            style={{ width: isExpanded ? "200px" : "64px" }}
+            className="fixed left-0 top-0 h-screen border-r border-gray-200 transition-all duration-300 ease-in-out z-50 shadow-lg"
+            style={{ width: isExpanded ? "200px" : "64px" , backgroundColor: 'var(--color-secondary)'}}
             onMouseEnter={() => setIsExpanded(true)}
             onMouseLeave={() => setIsExpanded(false)}
         >

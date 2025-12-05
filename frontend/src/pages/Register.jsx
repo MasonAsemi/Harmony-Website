@@ -71,10 +71,12 @@ function Register() {
 
         try {
             // Use /api/users/ endpoint which returns token on creation
+            
             const response = await createUser({ username, email, password });
             const data = await response.json();
-
-            if (response.ok) {
+            console.log('Registration response Status:', response.status);
+            console.log('Registration response data:', data);
+            if (response.status == 201) {
                 setMessage('Registration successful! Logging you in...');
                 setUsername('');
                 setEmail('');
@@ -83,7 +85,7 @@ function Register() {
                 loginToken(data.token);
                 setTimeout(() => navigate('/dashboard'), 1500);
             } else {
-                const data = await response.json();
+                
                 if (data.username) setMessage(`Username: ${data.username[0]}`);
                 else if (data.email) setMessage(`Email: ${data.email[0]}`);
                 else if (data.password) setMessage(`Password: ${data.password[0]}`);
@@ -109,7 +111,7 @@ function Register() {
 
                 <form onSubmit={handleSubmit} className="auth-form">
                     <div className="form-group">
-                        <label>Name</label>
+                        <label>User Name</label>
                         <input
                             type="text"
                             value={username}
