@@ -43,9 +43,20 @@ const GenreRotator = () => {
           position: relative;
           height: 1em;
           min-height: 1em;
+          width: 300px;
           vertical-align: baseline;
           perspective: 1000px;
           perspective-origin: 50% 50%;
+        }
+        
+        .genre-underline {
+          position: absolute;
+          bottom: -0.1em;
+          left: 0;
+          right: 0;
+          height: 3px;
+          background-color: rgba(255, 255, 255, 0.4);
+          border-radius: 2px;
         }
         
         .genre-rotator {
@@ -106,6 +117,8 @@ const GenreRotator = () => {
             {genres[getPrevIndex()]}
           </span>
         </span>
+        {/* Underline for genre text */}
+        <span className="genre-underline"></span>
       </span>
     </>
   );
