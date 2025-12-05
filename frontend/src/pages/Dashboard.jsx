@@ -146,7 +146,7 @@ function Dashboard({ showChatsOverlay = false, setShowChatsOverlay = () => {} })
                 <div className="fixed inset-0 z-50 md:hidden bg-white">
                     <div className="h-full flex flex-col pb-16">
                         {/* Chat Header */}
-                        <div className="bg-gradient-to-r from-rose-400 to-pink-500 p-4 flex items-center shadow-md">
+                        <div className="bg-linear-to-r from-rose-400 to-pink-500 p-4 flex items-center shadow-md">
                             <button 
                                 onClick={handleCloseChatWindow}
                                 className="text-white hover:text-gray-200 mr-3"

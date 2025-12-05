@@ -2,7 +2,7 @@ import { API_BASE_URL } from '../../config';
 
 const ProfileImage = ({ profileData }) => {
     return (
-        <div className="flex-1 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center min-h-0">
+        <div className="flex-1 bg-linear-to-br from-gray-200 to-gray-300 flex items-center justify-center min-h-0">
             {profileData?.profile_image ? (
                 <img 
                     src={profileData.profile_image}
@@ -188,7 +188,7 @@ const MatchCardPreview = ({ profileData }) => {
                 <ProfileImage profileData={profileData} />
 
                 {/* Profile info - compact, fixed at bottom */}
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                     <ProfileInfo profileData={profileData} />
                 </div>
             </div>

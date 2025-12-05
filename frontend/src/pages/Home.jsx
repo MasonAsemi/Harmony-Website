@@ -214,7 +214,7 @@ const SwipeDemo = () => {
             </motion.div>
 
             {/* Profile image */}
-            <div className="flex-1 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center min-h-0">
+            <div className="flex-1 bg-linear-to-br from-gray-200 to-gray-300 flex items-center justify-center min-h-0">
               <img 
                 src={profileData.image}
                 alt={profileData.name}
@@ -223,7 +223,7 @@ const SwipeDemo = () => {
             </div>
 
             {/* Profile info */}
-            <div className="flex-shrink-0 p-8">
+            <div className="shrink-0 p-8">
               <h2 className="text-3xl font-bold text-gray-900 mb-2">
                 {profileData.name}, {profileData.age}
               </h2>
@@ -299,7 +299,7 @@ const Home = () => {
       </header>
 
       {/* Hero Section with Animated Background - Hinge Style */}
-      <section className="relative h-screen pt-20 overflow-hidden bg-gradient-to-br from-primary to-secondary">
+      <section className="relative h-screen pt-20 overflow-hidden bg-linear-to-br from-primary to-secondary">
         <FallingAnimation />
         <div className="relative h-full flex items-center justify-center px-12 max-w-7xl mx-auto">
           {/* Bottom Left Text - Hinge Style with Rotating Genres */}
@@ -353,7 +353,7 @@ const Home = () => {
                           alt="Profile" 
                           className="w-full h-full object-cover rounded-xl"
                         />
-                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3 rounded-b-xl">
+                        <div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/70 to-transparent p-3 rounded-b-xl">
                           <h3 className="text-white text-sm font-semibold">Sarah, 24</h3>
                           <p className="text-white text-xs">📍 Fullerton, CA</p>
                         </div>
@@ -366,7 +366,7 @@ const Home = () => {
                           alt="Profile" 
                           className="w-full h-full object-cover rounded-xl"
                         />
-                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3 rounded-b-xl">
+                        <div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/70 to-transparent p-3 rounded-b-xl">
                           <h3 className="text-white text-sm font-semibold">Emily, 22</h3>
                           <p className="text-white text-xs">📍 Fullerton, CA</p>
                         </div>
@@ -379,7 +379,7 @@ const Home = () => {
                           alt="Profile" 
                           className="w-full h-full object-cover rounded-xl"
                         />
-                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3 rounded-b-xl">
+                        <div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/70 to-transparent p-3 rounded-b-xl">
                           <h3 className="text-white text-sm font-semibold">Alex, 25</h3>
                           <p className="text-white text-xs">📍 Fullerton, CA</p>
                         </div>
