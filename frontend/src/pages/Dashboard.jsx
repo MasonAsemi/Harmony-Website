@@ -8,6 +8,7 @@ import MatchCard from "../components/dashboard/MatchCard";
 import { Author } from "./Chat";
 import { getAcceptedMatches } from "../api/matches";
 import { getChats } from "../api/chat";
+import { API_BASE_URL } from "../config";
 
 const ChatSelector = ({ index, handler, currentChatID, match, currentUser }) => {
     const [lastMessage, setLastMessage] = useState("");
@@ -17,7 +18,7 @@ const ChatSelector = ({ index, handler, currentChatID, match, currentUser }) => 
             .then((res) => {
                 if (res.status == 200)
                 {
-                    setLastMessage(res.data.at(-1).content)
+                    setLastMessage(res.data.at(-1)?.content ?? "")
                 }
             })
     })
@@ -65,7 +66,9 @@ const ChatSelector = ({ index, handler, currentChatID, match, currentUser }) => 
         style={{ animationDuration: `${(index + 1) * 0.7}s` }}
     >
         <div className="flex flex-row items-center gap-2 font-semibold">
-            <img className="w-10" src="#"></img>
+            {/*<div className="w-2 h-2 scale-200 overflow-hidden">
+                <img className="w-16 h-16 rounded-4xl" src={match.profile_image ? API_BASE_URL + match.profile_image : "https://imgs.search.brave.com/UsCAAgJ2Trq0o02-dptauEr8sYGPv53dH9OAt1D9G4Q/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9zbWFs/bGltZy5wbmdrZXku/Y29tL3BuZy9zbWFs/bC8yODItMjgyMDA2/N190YXN0ZS10ZXN0/aW5nLWF0LWJhc2tp/bi1yb2JiaW5zLWVt/cHR5LXByb2ZpbGUt/cGljdHVyZS5wbmc"}></img>
+            </div>*/}
             <div>
                 <p>{displayName}</p>
                 <div className="font-normal overflow-x-ellipsis overflow-clip whitespace-nowrap min-h-4 w-5/6 mask-[linear-gradient(to_right,black,transparent)] 

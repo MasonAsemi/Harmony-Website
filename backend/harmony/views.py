@@ -830,6 +830,7 @@ def match_accept(request):
                 "user2_id": match.user2.id,
                 "user2_username": match.user2.username,
                 "created_at": match.created_at,
+                "profile_image": match.user2.profile_image.url if match.user2.profile_image else None 
             }
             for match in matched_users 
         ]
