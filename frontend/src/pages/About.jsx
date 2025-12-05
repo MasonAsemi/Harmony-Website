@@ -99,7 +99,10 @@ function About() {
                         <div className="bg-white rounded-2xl shadow-lg p-8 hover:shadow-xl transition-shadow duration-300">
                             <h3 className="text-2xl font-bold text-gray-900 mb-2">Jack Woline</h3>
                             <p className="text-blue-600 font-semibold mb-1">Lead Front-End Developer</p>
-                            <p className="text-gray-500 italic mb-4">*** Year</p>
+                            <p className="text-gray-500 italic mb-4">4th Year</p>
+                            <p className="text-gray-700 leading-relaxed">
+                                Expertise in front-end security development and analysis, as well as experience directing web security focused research.
+                            </p>
                         </div>
                     </div>
 
