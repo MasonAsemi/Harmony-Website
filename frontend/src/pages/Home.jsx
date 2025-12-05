@@ -186,7 +186,7 @@ const SwipeDemo = () => {
   }, []);
 
   return (
-    <div className="w-full h-full flex items-center justify-center px-4 py-2">
+    <div className="w-full h-full overflow-hidden flex items-center justify-center px-4 py-2">
       <div className="relative w-full max-w-lg h-[700px]">
         <motion.div
           className="absolute w-full h-full"
@@ -304,7 +304,7 @@ const Home = () => {
         <div className="relative h-full flex items-center justify-center px-12 max-w-7xl mx-auto">
           {/* Bottom Left Text - Hinge Style with Rotating Genres */}
           <div className="text-center text-white w-full">
-            <div className="inline-flex items-baseline justify-center text-7xl font-bold">
+            <div className="flex flex-col text-5xl items-center gap-20 md:inline-flex md:flex-row md:gap-0 md:items-baseline justify-center md:text-7xl font-bold">
               <span>Love is in:&nbsp;</span>
               <GenreRotator />
             </div>
@@ -315,7 +315,7 @@ const Home = () => {
       {/* About Section */}
       <section className="bg-white">
         <div className="w-full">
-          <div className="grid grid-cols-2 gap-0">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
             {/* Left Side - Content with Match Cards */}
             <div className="flex flex-col items-center justify-center px-16 py-24">
               <div className="max-w-xl space-y-12">
