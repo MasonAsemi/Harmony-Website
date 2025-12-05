@@ -58,7 +58,6 @@ body {
 }
 
 @theme {
-<<<<<<< HEAD
     --color-primary: #b06d5b; /* Light Gray */
     --color-secondary: #daab9f; /* Soft Beige */
     --color-tertiary: #5b443e; 
@@ -71,15 +70,6 @@ body {
     /* White for text on dark/accent */
     --color-bg-light: #faf8f7;
     /* Warmer off-white for backgrounds */
-=======
-    --color-primary: #5f4d8d;
-    --color-secondary: #fa8285;
-    --color-accent: #fadfaa;
-    --color-dark-bg: #17181F;
-    --color-light-bg: #20212A;
-    --color-lm-light-bg: #f7f7f9;
-    --color-lm-dark-bg: #e4e6eb;
->>>>>>> 9ecb437 (Changed colors and made chat auto scroll to bottom)
 
     --animate-wiggle: wiggle 1s ease-in-out infinite;
     --animate-fade-in: slide-in 0.4s ease-in-out normal;

@@ -95,19 +95,11 @@ function Dashboard({ showChatsOverlay = false, setShowChatsOverlay = () => {} })
     return (
         <div className="flex flex-row h-screen bg-bg-light overflow-hidden">
             {/* Desktop Left sidebar - Chats (hidden on mobile) */}
-<<<<<<< HEAD
             <div className="hidden animate-fade-in duration-100 flex-1 md:flex ml-16 bg-accent border-r border-accent flex-col">
                 <div className="p-4 border-b border-accent">
                     <h2 className="text-2xl font-bold  text-center" style={{color: 'var(--color-text-light)'}}>Direct Messages</h2>
                 </div>
                 <div className="flex flex-col overflow-y-auto space-y-1">
-=======
-            <div className="hidden animate-fade-in duration-100 flex-1 md:flex ml-16 bg-lm-dark-bg flex-col">
-                {/*<div className="p-4 border-b border-accent">
-                    <h2 className="text-2xl font-bold text-white text-center">Chats</h2>
-                </div>*/}
-                <div className="flex flex-col overflow-y-auto">
->>>>>>> 9ecb437 (Changed colors and made chat auto scroll to bottom)
                     {acceptedMatches.map((match, index) => {
                         return <ChatSelector index={index} handler={() => {handleChatClick(match)}} currentChatID={currentChatID} match={match} lastMessage={"TestTestTestTestTestTestTestTestTestTestTestTest"} />
                     })}
