@@ -3,10 +3,11 @@ import axios from "axios";
 import { Header } from "../components/Header";
 import { useAuth } from "../components/auth/AuthContext";
 import { API_BASE_URL } from "../config";
+import Sidebar from "../components/Sidebar";
 
 const Slider = ({ label, value, onChange, min = 0, max = 5 }) => (
   <div className="mb-8">
-    <label className="block text-lg mb-2 text-gray-800">
+    <label className="block text-lg mb-2 color-text-primary font-medium">
       {label}: {value.toFixed(1)}
     </label>
     <input
@@ -16,7 +17,8 @@ const Slider = ({ label, value, onChange, min = 0, max = 5 }) => (
       step="0.1"
       value={value}
       onChange={(e) => onChange(parseFloat(e.target.value))}
-      className="w-full accent-rose-500"
+      className="w-full "
+      style={{ accentColor: "var(--color-tertiary)"}}
     />
   </div>
 );
@@ -72,11 +74,16 @@ const MatchSettings = () => {
   };
 
   return (
-    <>
-      <Header />
+    <div className='w-full min-h-screen px-4 py-8 pb-20 md:pb-8' style={{backgroundColor : 'var(--color-bg-light)', padding : 100}}>
+      
+      <div className="hidden md:block">
+        <Sidebar />
+      </div>
 
-      <div className="max-w-2xl mx-auto mt-20 p-8 bg-white rounded-2xl shadow-lg">
-        <h1 className="text-3xl mb-6 text-center text-gray-900">
+      <div className="max-w-2xl mx-auto mt-20 p-8  rounded-2xl shadow-lg"
+        style={{backgroundColor: 'var(--color-bg-light)', filter:"brightness(1.2)"}}>
+        <h1 className="text-3xl mb-6 text-center text-gray-900"
+          style={{fontWeight: 'bold' , color: "var(--color-text-primary)"}}>
           Match Preference Settings
         </h1>
 
@@ -86,13 +93,14 @@ const MatchSettings = () => {
 
         <button
           onClick={saveSettings}
-          className="w-full mt-6 py-3 bg-rose-500 hover:bg-rose-600 text-white rounded-xl transition"
+          className="w-full mt-6 py-3  text-white rounded-xl transition"
+          style={{backgroundColor: "var(--color-accent)"}}
           disabled={saving}
         >
           {saving ? "Saving..." : "Save Settings"}
         </button>
       </div>
-    </>
+    </div>
   );
 };
 

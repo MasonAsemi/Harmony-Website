@@ -1,21 +1,36 @@
 import GenreCard from "./GenreCard";
-const FavGenreList = ({genreList}) =>{
-
-    return (
-    <div className='content-field'>
-      <div className='field-title'>
-        <h1>Favorite Genres</h1>
-        
+function FavGenreList({ genreList }) {
+  return (
+    <div className='flex flex-col gap-3 sm:gap-4'>
+      <div>
+        <h2 
+          className='text-lg sm:text-xl font-semibold'
+          style={{ color: 'var(--color-teriary)' }}
+        >
+          Favorite Genres
+        </h2>
       </div>
-      <ul className="horizontal-list-container">
-        {genreList.map((genre , index)=>{
-            return(
-                <GenreCard genre= {genre} />
-            )
-        })}
+      
+      {/* Horizontal scrollable list on mobile, wrapping grid on larger screens */}
+      <ul 
+        className='flex flex-wrap gap-2 sm:gap-3 overflow-x-auto sm:overflow-x-visible pb-2 sm:pb-0'
+        style={{ scrollBehavior: 'smooth' }}
+      >
+        {genreList && genreList.length > 0 ? (
+          genreList.map((genre, index) => (
+            <GenreCard key={index} genre={genre} />
+          ))
+        ) : (
+          <p 
+            className='text-sm'
+            style={{ color: 'var(--color-secondary)' }}
+          >
+            No favorite genres added yet
+          </p>
+        )}
       </ul>
     </div>
-    ); 
+  );
 }
 
 export default FavGenreList; 

@@ -170,7 +170,7 @@ const FavoriteArtists = ({ profileData }) => {
                 {profileData.fav_artists.slice(0, 3).map(artist => (
                     <span 
                         key={artist.id}
-                        className="px-2 py-1 bg-pink-100 text-pink-800 rounded-full text-xs"
+                        className="px-2 py-1 bg-pink-100 text-black-800 rounded-full text-xs"
                     >
                         {artist.name}
                     </span>
@@ -183,7 +183,7 @@ const FavoriteArtists = ({ profileData }) => {
 const MatchCardPreview = ({ profileData }) => {
     return (
         <div className="w-full h-full">
-            <div className="bg-white rounded-2xl shadow-2xl overflow-hidden h-full flex flex-col">
+            <div className="rounded-2xl shadow-2xl overflow-hidden h-full flex flex-col" style={{backgroundColor: 'white'}}>
                 {/* Profile image - takes up remaining space */}
                 <ProfileImage profileData={profileData} />
 

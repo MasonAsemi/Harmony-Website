@@ -192,13 +192,14 @@ function Profile({ pfp_src }) {
   };
 
   return (
-    <div className='w-full max-w-7xl mx-auto px-4 py-8 pb-20 md:pb-8'>
+    
+    <div className='w-full min-h-screen px-4 py-8 pb-20 md:pb-8' style={{backgroundColor : 'var(--color-bg-light)', padding : 100}}>
 
       <div className="hidden md:block">
         <Sidebar />
       </div>
 
-      <div className='text-3xl font-bold mb-8 text-gray-800'>Profile</div>
+      {/* <div className='text-3xl font-bold mb-8 text-gray-800'>Profile</div> */}
       
       {error && (
         <div className='bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6 text-center'>
@@ -212,12 +213,13 @@ function Profile({ pfp_src }) {
         </div>
       )}
 
-      <div className='w-full bg-white rounded-2xl shadow-lg p-8'>
+      <div className='w-full rounded-2xl shadow-lg p-8' style={{backgroundColor : 'var(--color-bg-light)'}}>
         <div className='grid grid-cols-1 lg:grid-cols-3 gap-8 items-start'>
           {/* Left side - Match Card Preview */}
           <div className='lg:sticky lg:top-8 flex flex-col gap-4'>
-            <h3 className='text-xl font-semibold text-gray-800 text-center'>Profile Preview</h3>
-            <p className='text-sm text-gray-600 text-center mb-2'>This is how others will see your profile</p>
+            <h3 className='text-xl font-semibold  text-center' style={{color:'var(--color-text-primary'}} 
+            >Profile Preview</h3>
+            <p className='text-sm text-center mb-2' style={{color : 'var(--color-text-secondary)'}}>This is how others will see your profile</p>
             <div className='w-full h-[600px] max-h-[70vh]'>
               <MatchCardPreview profileData={{
                 ...profileData,
@@ -225,7 +227,7 @@ function Profile({ pfp_src }) {
               }} />
             </div>
             <div className='flex justify-center mt-4'>
-              <label className='inline-flex items-center justify-center px-6 py-3 bg-rose-500 hover:bg-rose-600 text-white rounded-lg font-medium cursor-pointer transition-colors'>
+              <label className='inline-flex items-center justify-center px-6 py-3  hover:bg-rose-600 text-white rounded-lg font-medium cursor-pointer transition-colors' style={{backgroundColor:'var(--color-accent)'}}>
                 <svg 
                   xmlns="http://www.w3.org/2000/svg" 
                   className="h-5 w-5 mr-2" 

@@ -39,12 +39,12 @@ function Dashboard({ showChatsOverlay = false, setShowChatsOverlay = () => {} })
     console.log(acceptedMatches)
 
     return (
-        <div className="flex flex-row h-screen bg-linear-to-br from-secondary to-primary">
+        <div className="flex flex-row h-screen bg-bg-light overflow-hidden">
             {/* Desktop Left sidebar - Chats (hidden on mobile) */}
-            <div className="hidden flex-1 md:flex ml-16 bg-secondary border-r border-accent flex-col">
-                {/*<div className="p-4 border-b border-accent">
-                    <h2 className="text-2xl font-bold text-white text-center">Chats</h2>
-                </div>*/}
+            <div className="hidden flex-1 md:flex ml-16 bg-accent border-r border-accent flex-col">
+                <div className="p-4 border-b border-accent">
+                    <h2 className="text-2xl font-bold  text-center" style={{color: 'var(--color-text-light)'}}>Direct Messages</h2>
+                </div>
                 <div className="flex-1 overflow-y-auto space-y-1">
                     {acceptedMatches.map((match) => (
                         <button
