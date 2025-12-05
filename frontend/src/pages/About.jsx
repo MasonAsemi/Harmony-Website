@@ -39,14 +39,15 @@ function About() {
                         About
                     </Link>
 
-                    <h1 
+                    <Link 
+                        to="/"
                         className={`text-3xl font-bold transition-colors duration-300 ${
                             isHeaderSticky ? 'text-gray-900' : 'text-white'
                         }`}
                         style={{ fontFamily: "'Motley Forces', cursive" }}
                     >
                         Harmony
-                    </h1>
+                    </Link>
 
                     <Link 
                         to="/dashboard" 
@@ -89,6 +90,9 @@ function About() {
                             <h3 className="text-2xl font-bold text-gray-900 mb-2">Kelechi Duru</h3>
                             <p className="text-blue-600 font-semibold mb-1">CEO & Lead Back-End Engineer</p>
                             <p className="text-gray-500 italic mb-4">4th Year</p>
+                            <p className="text-gray-700 leading-relaxed">
+                                Experienced in full-stack development with a passion for building scientific simulations.
+                            </p>
                         </div>
 
                         {/* Jack Woline */}
