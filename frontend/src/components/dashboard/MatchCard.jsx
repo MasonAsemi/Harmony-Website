@@ -5,7 +5,7 @@ import { API_BASE_URL } from "../../config";
 
 const ProfileImage = ({ currentMatch }) => {
     return (
-    <div className="flex-1 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center min-h-0">
+    <div className="flex-1 bg-linear-to-br from-gray-200 to-gray-300 flex items-center justify-center min-h-0">
         {currentMatch?.profile_image ? (
             <img 
                 src={API_BASE_URL + currentMatch.profile_image}
@@ -274,13 +274,13 @@ const SwipeableCard = ({ match, onAccept, onReject, isTop }) => {
                 <ProfileImage currentMatch={match} />
 
                 {/* Profile info - compact, fixed at bottom */}
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                     <ProfileInfo currentMatch={match} />
                 </div>
 
                 {/* Action buttons - now inside the card */}
                 {isTop && (
-                    <div className="px-4 pb-4 flex-shrink-0">
+                    <div className="px-4 pb-4 shrink-0">
                         <ActionButtons handleDecline={onReject} handleAccept={onAccept} />
                     </div>
                 )}
