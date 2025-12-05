@@ -40,23 +40,6 @@ body {
     color: hsl(var(--foreground));
 }
 
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #fff;
-  border-radius: 10px
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #aaa;
-}
-
 @theme {
     --color-primary: #b06d5b; /* Light Gray */
     --color-secondary: #daab9f; /* Soft Beige */

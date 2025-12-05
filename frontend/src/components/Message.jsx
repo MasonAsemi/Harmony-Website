@@ -2,7 +2,7 @@ const colorFromSource = (author, currentUser) =>
 {
     if (author.id === currentUser.id)
         return 'bg-secondary';
-    return 'bg-lm-dark-bg';
+    return 'bg-[#777]';
 };
 
 const sideFromSource = (author, currentUser) => 
