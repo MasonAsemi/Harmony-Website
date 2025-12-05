@@ -46,25 +46,30 @@ function Dashboard({ showChatsOverlay = false, setShowChatsOverlay = () => {} })
                     <h2 className="text-2xl font-bold  text-center" style={{color: 'var(--color-text-light)'}}>Direct Messages</h2>
                 </div>
                 <div className="flex-1 overflow-y-auto space-y-1">
-                    {acceptedMatches.map((match) => (
-                        <button
-                            key={match.id}
-                            onClick={() => handleChatClick(match)}
-                            className={`w-full p-4 text-left transition-all ${
-                                currentChatID === match.id
-                                    ? 'bg-accent text-gray-900 shadow-lg'
-                                    : 'bg-white/40 text-gray-800 hover:bg-white hover:shadow-md'
-                            }`}
-                        >
-                            <div className="flex flex-row items-center gap-2 font-semibold">
-                                <img className="w-10" src="#"></img>
-                                <p>{match.user2_username}</p>
-                                <div className="font-light flex flex-row justify-end w-full">
-                                    {true /* Has a new message condition */ ? <div className="w-3 h-3 bg-secondary rounded-4xl"></div> : null}
+                    {acceptedMatches.map((match) => {
+                        // Display the other user's name, not the current user's name
+                        const displayName = match.user1 === user?.id ? match.user2_username : match.user1_username;
+                        
+                        return (
+                            <button
+                                key={match.id}
+                                onClick={() => handleChatClick(match)}
+                                className={`w-full p-4 text-left transition-all ${
+                                    currentChatID === match.id
+                                        ? 'bg-accent text-gray-900 shadow-lg'
+                                        : 'bg-white/40 text-gray-800 hover:bg-white hover:shadow-md'
+                                }`}
+                            >
+                                <div className="flex flex-row items-center gap-2 font-semibold">
+                                    <img className="w-10" src="#"></img>
+                                    <p>{displayName}</p>
+                                    <div className="font-light flex flex-row justify-end w-full">
+                                        {true /* Has a new message condition */ ? <div className="w-3 h-3 bg-secondary rounded-4xl"></div> : null}
+                                    </div>
                                 </div>
-                            </div>
-                        </button>
-                    ))}
+                            </button>
+                        );
+                    })}
                 </div>
             </div>
 
@@ -104,16 +109,21 @@ function Dashboard({ showChatsOverlay = false, setShowChatsOverlay = () => {} })
                             </button>
                         </div>
                         <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                            {acceptedMatches.map((chat) => (
-                                <button
-                                    key={chat.id}
-                                    onClick={() => handleChatClick(chat)}
-                                    className="w-full p-4 rounded-lg text-left transition-all bg-white/80 text-gray-800 hover:bg-white hover:shadow-md"
-                                >
-                                    <div className="font-semibold">{chat.user2_username}</div>
-                                    <div className="text-sm text-gray-600 mt-1">Click to view chat</div>
-                                </button>
-                            ))}
+                            {acceptedMatches.map((chat) => {
+                                // Display the other user's name, not the current user's name
+                                const displayName = chat.user1 === user?.id ? chat.user2_username : chat.user1_username;
+                                
+                                return (
+                                    <button
+                                        key={chat.id}
+                                        onClick={() => handleChatClick(chat)}
+                                        className="w-full p-4 rounded-lg text-left transition-all bg-white/80 text-gray-800 hover:bg-white hover:shadow-md"
+                                    >
+                                        <div className="font-semibold">{displayName}</div>
+                                        <div className="text-sm text-gray-600 mt-1">Click to view chat</div>
+                                    </button>
+                                );
+                            })}
                         </div>
                     </div>
                 </div>
