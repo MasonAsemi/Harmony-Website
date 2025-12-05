@@ -9,7 +9,7 @@ import { Author } from "./Chat";
 import { getAcceptedMatches } from "../api/matches";
 import { getChats } from "../api/chat";
 
-const ChatSelector = ({ index, handler, currentChatID, match }) => {
+const ChatSelector = ({ index, handler, currentChatID, match, currentUser }) => {
     const [lastMessage, setLastMessage] = useState("");
     
     useEffect(() => {
@@ -21,6 +21,38 @@ const ChatSelector = ({ index, handler, currentChatID, match }) => {
                 }
             })
     })
+
+    // Helper function to get the other user's name
+    const getOtherUserName = (match) => {
+        if (!currentUser) {
+            return match.user2_username || match.user1_username || 'Unknown User';
+        }
+        
+        // Convert to numbers for comparison
+        const currentUserId = Number(currentUser.id);
+        const matchUser1Id = Number(match.user1_id);
+        const matchUser2Id = Number(match.user2_id);
+        
+        if (currentUserId === matchUser1Id) {
+            return match.user2_username;
+        } else if (currentUserId === matchUser2Id) {
+            return match.user1_username;
+        }
+        
+        // Fallback to username comparison
+        if (currentUser.username) {
+            if (match.user1_username !== currentUser.username) {
+                return match.user1_username;
+            }
+            if (match.user2_username !== currentUser.username) {
+                return match.user2_username;
+            }
+        }
+        
+        return match.user2_username || match.user1_username || 'Unknown User';
+    };
+
+    const displayName = getOtherUserName(match);
 
     return <button
         key={match.id}
@@ -35,7 +67,7 @@ const ChatSelector = ({ index, handler, currentChatID, match }) => {
         <div className="flex flex-row items-center gap-2 font-semibold">
             <img className="w-10" src="#"></img>
             <div>
-                <p>{match.user1_username}</p>
+                <p>{displayName}</p>
                 <div className="font-normal overflow-x-ellipsis overflow-clip whitespace-nowrap min-h-4 w-5/6 mask-[linear-gradient(to_right,black,transparent)] 
     [-webkit-mask-image:linear-gradient(to_right,black,transparent)]">
                     {lastMessage.substring(0, 10)}
@@ -78,15 +110,31 @@ function Dashboard({ showChatsOverlay = false, setShowChatsOverlay = () => {} })
 
     // Helper function to get the other user's name
     const getOtherUserName = (match) => {
-        // Based on the console logs, the match object has user1_id and user2_id
-        // Compare these with the current user's ID
-        if (match.user1_id === user?.id) {
+        if (!user) {
+            return match.user2_username || match.user1_username || 'Unknown User';
+        }
+        
+        // Convert to numbers for comparison
+        const currentUserId = Number(user.id);
+        const matchUser1Id = Number(match.user1_id);
+        const matchUser2Id = Number(match.user2_id);
+        
+        if (currentUserId === matchUser1Id) {
             return match.user2_username;
-        } else if (match.user2_id === user?.id) {
+        } else if (currentUserId === matchUser2Id) {
             return match.user1_username;
         }
         
-        // Fallback to user2_username if we can't determine
+        // Fallback to username comparison
+        if (user.username) {
+            if (match.user1_username !== user.username) {
+                return match.user1_username;
+            }
+            if (match.user2_username !== user.username) {
+                return match.user2_username;
+            }
+        }
+        
         return match.user2_username || match.user1_username || 'Unknown User';
     };
 
@@ -101,7 +149,15 @@ function Dashboard({ showChatsOverlay = false, setShowChatsOverlay = () => {} })
                 </div>
                 <div className="flex flex-col space-y-1 overflow-y-auto">
                     {acceptedMatches.map((match, index) => {
-                        return <ChatSelector index={index} handler={() => {handleChatClick(match)}} currentChatID={currentChatID} match={match} lastMessage={"TestTestTestTestTestTestTestTestTestTestTestTest"} />
+                        return <ChatSelector 
+                            key={match.id}
+                            index={index} 
+                            handler={() => {handleChatClick(match)}} 
+                            currentChatID={currentChatID} 
+                            match={match} 
+                            currentUser={user}
+                            lastMessage={"TestTestTestTestTestTestTestTestTestTestTestTest"} 
+                        />
                     })}
                 </div>
             </div>
@@ -176,7 +232,7 @@ function Dashboard({ showChatsOverlay = false, setShowChatsOverlay = () => {} })
                                     <polyline points="12 19 5 12 12 5"></polyline>
                                 </svg>
                             </button>
-                            <h2 className="text-xl font-bold text-white">{currentChat.recipient}</h2>
+                            <h2 className="text-xl font-bold text-white">{currentChat?.recipient || 'Chat'}</h2>
                         </div>
                         
                         {/* Chat Content */}
