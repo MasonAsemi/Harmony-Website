@@ -39,14 +39,15 @@ function About() {
                         About
                     </Link>
 
-                    <h1 
+                    <Link 
+                        to="/"
                         className={`text-3xl font-bold transition-colors duration-300 ${
                             isHeaderSticky ? 'text-gray-900' : 'text-white'
                         }`}
                         style={{ fontFamily: "'Motley Forces', cursive" }}
                     >
                         Harmony
-                    </h1>
+                    </Link>
 
                     <Link 
                         to="/dashboard" 
