@@ -387,7 +387,7 @@ const Home = () => {
                       </li>
                       <li className="flex items-start">
                         <span className="text-rose-500 mr-3 text-xl">•</span>
-                        <span>Connect with fellow music enthusiasts worldwide</span>
+                        <span>Connect with fellow music enthusiasts</span>
                       </li>
                     </ul>
                   </div>
@@ -415,9 +415,6 @@ const Home = () => {
                 </div>
               </div>
               <SwipeDemo />
-              <p className="text-center text-gray-600 text-xs mt-4 max-w-md px-4">
-                Watch the animation to see how easy it is to find your perfect music match. Swipe through profiles and connect with people who share your musical taste!
-              </p>
             </div>
           </div>
         </div>
