@@ -90,13 +90,19 @@ function About() {
                             <h3 className="text-2xl font-bold text-gray-900 mb-2">Kelechi Duru</h3>
                             <p className="text-blue-600 font-semibold mb-1">CEO & Lead Back-End Engineer</p>
                             <p className="text-gray-500 italic mb-4">4th Year</p>
+                            <p className="text-gray-700 leading-relaxed">
+                                Experienced in full-stack development with a passion for building scientific simulations.
+                            </p>
                         </div>
 
                         {/* Jack Woline */}
                         <div className="bg-white rounded-2xl shadow-lg p-8 hover:shadow-xl transition-shadow duration-300">
                             <h3 className="text-2xl font-bold text-gray-900 mb-2">Jack Woline</h3>
                             <p className="text-blue-600 font-semibold mb-1">Lead Front-End Developer</p>
-                            <p className="text-gray-500 italic mb-4">*** Year</p>
+                            <p className="text-gray-500 italic mb-4">4th Year</p>
+                            <p className="text-gray-700 leading-relaxed">
+                                Expertise in front-end security development and analysis, as well as experience directing web security focused research.
+                            </p>
                         </div>
                     </div>
 
@@ -114,7 +120,10 @@ function About() {
                             <div className="bg-white rounded-2xl shadow-lg p-8 hover:shadow-xl transition-shadow duration-300">
                                 <h3 className="text-2xl font-bold text-gray-900 mb-2">Daniel Castillo</h3>
                                 <p className="text-blue-600 font-semibold mb-1">Back-End Engineer</p>
-                                <p className="text-gray-500 italic mb-4">*** Year</p>
+                                <p className="text-gray-500 italic mb-4">3rd Year</p>
+                                <p className="text-gray-700 leading-relaxed">
+                                    I have experience in self-made projects and an Engineering research project for car blind spots.
+                                </p>
                             </div>
                         </div>
                     </div>
